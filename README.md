@@ -5,9 +5,6 @@ Common CUE files for core Grey Matter mesh configurations.
 ## Prerequisites
 
 - [CUE CLI](https://cuelang.org/docs/install/)
-- [Go](https://go.dev/dl/)
-- [staticcheck](https://staticcheck.io/docs/getting-started/)
-
 ## Dependencies
 
 This project makes use of git submodules for dependency management.
