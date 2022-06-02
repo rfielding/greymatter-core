@@ -1,6 +1,6 @@
 // K8s manifests for Spire server and agent, permissions and volumes
 
-package only
+package greymatter
 
 import (
 	appsv1 "k8s.io/api/apps/v1"
@@ -313,7 +313,7 @@ operator_k8s: [
     }
     data: {
       "overrides.cue": """
-      package only
+      package greymatter
 
       config: {
         spire: \(config.spire)

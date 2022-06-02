@@ -1,7 +1,7 @@
 // All k8s manifests objects for core componenents drawn together
 // for simultaneous application
 
-package only
+package greymatter
 
 import "encoding/yaml"
 
