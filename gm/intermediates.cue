@@ -86,6 +86,7 @@ import (
   _upstream_port: int
   _spire_self: string    // can specify current identity - defaults to "edge"
   _spire_other: string // can specify an allowable upstream identity - defaults to "edge"
+  _enable_circuit_breakers: bool | *false
 
   cluster_key: string
   name: string | *cluster_key
@@ -104,6 +105,25 @@ import (
     }
   }
   zone_key: mesh.spec.zone
+  
+  if _enable_circuit_breakers {
+    circuit_breakers: #circuit_breaker // can specify circuit breaker levels for normal
+    // and high priority traffic with configured defaults
+  }
+}
+
+#circuit_breaker: {
+  #cb_default
+  high?: #cb_default
+}
+
+#cb_default: {
+  max_connections:      int64 | *512
+  max_pending_requests: int64 | *512
+  max_requests:         int64 | *512
+  max_retries:          int64 | *2
+  max_connection_pools: int64 | *512
+  track_remaining:      bool | *false
 }
 
 #route: greymatter.#Route & {
