@@ -25,7 +25,7 @@ redis: [
         metadata: {
           labels: {"greymatter.io/cluster": Name}
         }
-        spec: {
+        spec: #spire_permission_requests & {
           containers: [  
             // there are multiple in this ensemble! proxy, control, control-api, and redis
 
