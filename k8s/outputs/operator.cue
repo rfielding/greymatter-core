@@ -233,7 +233,7 @@ operator_sts: [
                 "exec",
                 "/app/operator",
               ]
-              imagePullPolicy: "Always"
+              imagePullPolicy: "IfNotPresent"
             }
             image: defaults.images.operator
             name: "operator"
