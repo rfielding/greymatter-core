@@ -188,6 +188,8 @@ operator_crd: [
   },
 ]
 
+OperatorPullPolicy: string | *"IfNotPresent" @tag(operator_pull_policy)
+
 operator_sts: [
   appsv1.#StatefulSet & {
     apiVersion: "apps/v1"
@@ -209,6 +211,9 @@ operator_sts: [
               command: [
                 "/app/operator"
               ]
+              args: [
+                "-cueRoot", "core"
+              ]
               livenessProbe: {
                 httpGet: {
                   path: "/healthz"
@@ -217,7 +222,7 @@ operator_sts: [
                 initialDelaySeconds: 120
                 periodSeconds:       20
               }
-              imagePullPolicy: "IfNotPresent"
+              imagePullPolicy: OperatorPullPolicy
             }
             if config.debug {
               command: [
@@ -232,8 +237,9 @@ operator_sts: [
                 "--api-version=2",
                 "exec",
                 "/app/operator",
+                "-cueRoot", "core",
               ]
-              imagePullPolicy: "IfNotPresent"
+              imagePullPolicy: "Always"
             }
             image: defaults.images.operator
             name: "operator"
@@ -273,7 +279,7 @@ operator_sts: [
               },
               {
                 name: "overrides-cue",
-                mountPath: "/app/overrides.cue"
+                mountPath: "/app/core/overrides.cue"
                 subPath: "overrides.cue"
               }
             ]
@@ -320,7 +326,7 @@ operator_k8s: [
     }
     data: {
       "overrides.cue": """
-      package only
+      package greymatter
 
       config: {
         spire: \(config.spire)
