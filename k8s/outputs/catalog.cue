@@ -24,7 +24,7 @@ catalog: [
         metadata: {
           labels: {"greymatter.io/cluster": Name}
         }
-        spec: {
+        spec: #spire_permission_requests & {
           containers: [  
 
             #sidecar_container_block & { _Name: Name },
@@ -62,7 +62,6 @@ catalog: [
             
           ] + #spire_socket_volumes
           imagePullSecrets: [{name: defaults.image_pull_secret_name}]
-          serviceAccountName: "gm-control"
         }
       }
     }

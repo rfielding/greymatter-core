@@ -16,6 +16,9 @@ spire_namespace: [
     metadata: {
       name: "spire"
       labels: name: "spire"
+      // annotations: {
+      //   "openshift.io/sa.scc.mcs": defaults.spire_selinux_context
+      // }
     }
   },
 ]
@@ -157,6 +160,14 @@ spire_server: [
       }]
     }
   },
+  corev1.#ServiceAccount & {
+    apiVersion: "v1"
+    kind:       "ServiceAccount"
+    metadata: {
+      name:      "server"
+      namespace: "spire"
+    }
+  },
   rbacv1.#Role & {
     apiVersion: "rbac.authorization.k8s.io/v1"
     kind:       "Role"
@@ -164,30 +175,35 @@ spire_server: [
       name:      "server"
       namespace: "spire"
     }
-    rules: [{
-      apiGroups: [
-        "",
-      ]
-      resources: [
-        "pods",
-      ]
-      verbs: [
-        "get",
-      ]
-    }, {
-      apiGroups: [
-        "",
-      ]
-      resources: [
-        "configmaps",
-      ]
-      verbs: [
-        "patch",
-        "get",
-        "list",
-        "update",
-      ]
-    }]
+    rules: [
+        {
+          apiGroups: [""]
+          resources: ["configmaps"]
+          verbs: ["create", "list", "get", "update", "patch"]
+        },
+        {
+          apiGroups: [""]
+          resources: ["events"]
+          verbs: ["create"]
+        }
+    ]
+  },
+  rbacv1.#ClusterRole & {
+    apiVersion: "rbac.authorization.k8s.io/v1"
+    kind:       "ClusterRole"
+    metadata: name: "spire-server"
+    rules: [
+      {
+        apiGroups: [""]
+        resources: ["pods", "nodes", "endpoints"]
+        verbs: ["get", "list", "watch"]
+      },
+      {
+        apiGroups: [ "authentication.k8s.io", ]
+        resources: [ "tokenreviews", ]
+        verbs: [ "get", "create", ]
+      }
+    ]
   },
   rbacv1.#RoleBinding & {
     apiVersion: "rbac.authorization.k8s.io/v1"
@@ -205,44 +221,6 @@ spire_server: [
       kind:      "ServiceAccount"
       name:      "server"
       namespace: "spire"
-    }]
-  },
-  corev1.#ServiceAccount & {
-    apiVersion: "v1"
-    kind:       "ServiceAccount"
-    metadata: {
-      name:      "server"
-      namespace: "spire"
-    }
-  },
-  rbacv1.#ClusterRole & {
-    apiVersion: "rbac.authorization.k8s.io/v1"
-    kind:       "ClusterRole"
-    metadata: name: "spire-server"
-    rules: [{
-      apiGroups: [
-        "authentication.k8s.io",
-      ]
-      resources: [
-        "tokenreviews",
-      ]
-      verbs: [
-        "get",
-        "create",
-      ]
-    }, {
-      apiGroups: [
-        "",
-      ]
-      resources: [
-        "pods",
-        "nodes",
-      ]
-      verbs: [
-        "get",
-        "list",
-        "watch",
-      ]
     }]
   },
   rbacv1.#ClusterRoleBinding & {
@@ -270,72 +248,72 @@ spire_server: [
     data: {
       // https://github.com/spiffe/spire/tree/main/support/k8s/k8s-workload-registrar
       // https://github.com/lucianozablocki/spire-tutorials/tree/k8s-registrar-tutorial/k8s/k8s-workload-registrar#configure-reconcile-mode
-      "registrar.conf": """
-        trust_domain = \"greymatter.io\"
-        server_socket_path = \"/run/spire/socket/registration.sock\"
-        cluster = \"meshes\"
-        mode = \"reconcile\"
-        pod_label = \"greymatter.io/workload\"
-        metrics_addr = \"0\"
-        controller_name = \"k8s-workload-registrar\"
-        log_level = \"debug\"
-        log_path = \"/dev/stdout\"
-        """
+      "registrar.conf": #"""
+        trust_domain = "greymatter.io"
+        server_socket_path = "/run/spire/socket/registration.sock"
+        cluster = "meshes"
+        mode = "reconcile"
+        pod_label = "greymatter.io/workload"
+        metrics_addr = "0"
+        controller_name = "k8s-workload-registrar"
+        log_level = "debug"
+        log_path = "/dev/stdout"
+        """#
 
       // https://spiffe.io/docs/latest/deploying/spire_server/
-      "server.conf": """
+      "server.conf": #"""
         server {
-          bind_address = \"0.0.0.0\"
-          bind_port = \"8443\"
+          bind_address = "0.0.0.0"
+          bind_port = "8443"
           ca_subject = {
-            country = [\"US\"],
-            organization = [\"Grey Matter\"],
-            common_name = \"Mesh\",
+            country = ["US"],
+            organization = ["Grey Matter"],
+            common_name = "Mesh",
           }
-          data_dir = \"/run/spire/data\"
-          default_svid_ttl = \"1h\"
-          log_file = \"/dev/stdout\"
-          log_level = \"DEBUG\"
-          trust_domain = \"greymatter.io\"
-          socket_path = \"/run/spire/socket/registration.sock\"
+          data_dir = "/run/spire/data"
+          default_svid_ttl = "1h"
+          log_file = "/dev/stdout"
+          log_level = "DEBUG"
+          trust_domain = "greymatter.io"
+          socket_path = "/run/spire/socket/registration.sock"
         }
         plugins {
-          DataStore \"sql\" {
+          DataStore "sql" {
             plugin_data {
-              database_type = \"sqlite3\"
-              connection_string = \"/run/spire/data/datastore.sqlite3\"
+              database_type = "sqlite3"
+              connection_string = "/run/spire/data/datastore.sqlite3"
             }
           }
-          NodeAttestor \"k8s_psat\" {
+          NodeAttestor "k8s_psat" {
             plugin_data {
               clusters = {
-                \"meshes\" = {
-                  service_account_allow_list = [\"spire:agent\"]
-                  audience = [\"server\"]
+                "meshes" = {
+                  service_account_allow_list = ["spire:agent"]
+                  audience = ["server"]
                 }
               }
             }
           }
-          KeyManager \"disk\" {
+          KeyManager "disk" {
             plugin_data {
-              keys_path = \"/run/spire/data/keys.json\"
+              keys_path = "/run/spire/data/keys.json"
             }
           }
-          Notifier \"k8sbundle\" {
+          Notifier "k8sbundle" {
             plugin_data {
-              namespace = \"spire\"
-              config_map = \"server-bundle\"
+              namespace = "spire"
+              config_map = "server-bundle"
             }
           }
-          UpstreamAuthority \"disk\" {
+          UpstreamAuthority "disk" {
             plugin_data {
-              cert_file_path = \"/run/spire/ca/intermediate.crt\"
-              key_file_path = \"/run/spire/ca/intermediate.key\"
-              bundle_file_path = \"/run/spire/ca/root.crt\"
+              cert_file_path = "/run/spire/ca/intermediate.crt"
+              key_file_path = "/run/spire/ca/intermediate.key"
+              bundle_file_path = "/run/spire/ca/root.crt"
             }
           }
         }
-        """
+        """#
     }
   },
   corev1.#ConfigMap & {
@@ -464,6 +442,12 @@ spire_agent: [
     }
   },
 
+
+
+
+
+
+
   rbacv1.#ClusterRole & {
     apiVersion: "rbac.authorization.k8s.io/v1"
     kind:       "ClusterRole"
@@ -506,33 +490,33 @@ spire_agent: [
       name:      "agent-config"
       namespace: "spire"
     }
-    data: "agent.conf": """
+    data: "agent.conf": #"""
       agent {
-        data_dir = \"/run/spire\"
-        log_level = \"INFO\"
-        server_address = \"server\"
-        server_port = \"8443\"
-        socket_path = \"/run/spire/socket/agent.sock\"
-        trust_bundle_path = \"/run/spire/bundle/bundle.crt\"
-        trust_domain = \"greymatter.io\"
+        data_dir = "/run/spire"
+        log_level = "INFO"
+        server_address = "server"
+        server_port = "8443"
+        socket_path = "/run/spire/socket/agent.sock"
+        trust_bundle_path = "/run/spire/bundle/bundle.crt"
+        trust_domain = "greymatter.io"
       }
       plugins {
-        NodeAttestor \"k8s_psat\" {
+        NodeAttestor "k8s_psat" {
           plugin_data {
-            cluster = \"meshes\"
-            token_path = \"/run/spire/token/agent\"
+            cluster = "meshes"
+            token_path = "/run/spire/token/agent"
           }
         }
-        KeyManager \"memory\" {
+        KeyManager "memory" {
           plugin_data {
           }
         }
-        WorkloadAttestor \"k8s\" {
+        WorkloadAttestor "k8s" {
           plugin_data {
             skip_kubelet_verification = true
           }
         }
       }
-      """
+      """#
   }
 ]

@@ -23,7 +23,7 @@ dashboard: [
         metadata: {
           labels: {"greymatter.io/cluster": Name}
         }
-        spec: {
+        spec: #spire_permission_requests & {
           containers: [
             #sidecar_container_block & {_Name: Name},
 

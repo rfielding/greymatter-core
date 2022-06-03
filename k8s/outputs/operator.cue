@@ -209,6 +209,15 @@ operator_sts: [
               command: [
                 "/app/operator"
               ]
+              livenessProbe: {
+                httpGet: {
+                  path: "/healthz"
+                  port: 8081
+                }
+                initialDelaySeconds: 120
+                periodSeconds:       20
+              }
+              imagePullPolicy: "IfNotPresent"
             }
             if config.debug {
               command: [
@@ -224,17 +233,9 @@ operator_sts: [
                 "exec",
                 "/app/operator",
               ]
-              livenessProbe: {
-                httpGet: {
-                  path: "/healthz"
-                  port: 8081
-                }
-                initialDelaySeconds: 120
-                periodSeconds:       20
-              }
+              imagePullPolicy: "IfNotPresent"
             }
             image: defaults.images.operator
-            imagePullPolicy: "IfNotPresent"
             name: "operator"
             ports: [{
               containerPort: 9443
@@ -259,7 +260,11 @@ operator_sts: [
                 memory: "150Mi"
               }
             }
-            securityContext: allowPrivilegeEscalation: false
+            securityContext: {
+              allowPrivilegeEscalation: false
+              // capabilities: drop: ["ALL"]
+              // seccompProfile: type: "RuntimeDefault"
+            }
             volumeMounts: [
               {
                 mountPath: "/tmp/k8s-webhook-server/serving-certs"
@@ -274,7 +279,9 @@ operator_sts: [
             ]
           }]
           imagePullSecrets: []
-          securityContext: runAsNonRoot: true
+          securityContext: {
+            runAsNonRoot: true
+          }
           serviceAccountName:            "gm-operator"
           terminationGracePeriodSeconds: 10
           volumes: [
@@ -313,11 +320,13 @@ operator_k8s: [
     }
     data: {
       "overrides.cue": """
-      package greymatter
+      package only
 
       config: {
         spire: \(config.spire)
         auto_apply_mesh: \(config.auto_apply_mesh)
+        openshift: \(config.openshift)
+        generate_webhook_certs: \(config.generate_webhook_certs)
       }
       """
     }
@@ -327,6 +336,8 @@ operator_k8s: [
     apiVersion: "v1"
     imagePullSecrets: [{
       name: "gm-docker-secret"
+    }, {
+      name: "quay-secret"
     }]
     kind: "ServiceAccount"
     metadata: {
@@ -593,6 +604,9 @@ operator_k8s: [
       ]
     }]
   },
+
+
+
   rbacv1.#RoleBinding & {
     apiVersion: "rbac.authorization.k8s.io/v1"
     kind:       "RoleBinding"
