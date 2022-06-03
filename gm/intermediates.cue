@@ -113,11 +113,11 @@ import (
 }
 
 #circuit_breaker: {
-  #cb_default
-  high?: #cb_default
+  #circuit_breaker_default
+  high?: #circuit_breaker_default
 }
 
-#cb_default: {
+#circuit_breaker_default: {
   max_connections:      int64 | *512
   max_pending_requests: int64 | *512
   max_requests:         int64 | *512
