@@ -12,6 +12,8 @@ config: {
   openshift: bool | *false @tag(openshift,type=bool)
 
   debug: bool | *false @tag(debug,type=bool) // currently just controls k8s/outputs/operator.cue for debugging
+  test: bool | *false @tag(test,type=bool) // currently just TURNS OFF GITOPS so CI integration tests can manipulate directly
+
 
   // for a hypothetical future where we want to mount specific certificates for operator webhooks, etc.
   generate_webhook_certs: bool | *true @tag(generate_webhook_certs,type=bool)

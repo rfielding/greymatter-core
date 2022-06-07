@@ -216,10 +216,12 @@ operator_sts: [
               command: [
                 "/app/operator"
               ]
-              args: [
-                "-repo", "git@github.com:greymatter-io/gitops-core.git",
-                "-sshPrivateKeyPath", "/app/.ssh/id_ed25519",
-              ]
+              if !config.test {
+                args: [
+                  "-repo", "git@github.com:greymatter-io/gitops-core.git",
+                  "-sshPrivateKeyPath", "/app/.ssh/id_ed25519",
+                ]
+              }
               livenessProbe: {
                 httpGet: {
                   path: "/healthz"
