@@ -206,13 +206,19 @@ operator_sts: [
       template: {
         metadata: labels: name: "gm-operator"
         spec: {
+          securityContext: {
+            fsGroup: 1000
+          }
           containers: [{
             if !config.debug {
+              // command: ["sleep"] // DEBUG
+              // args: ["30000"]
               command: [
                 "/app/operator"
               ]
               args: [
-                "-cueRoot", "core"
+                "-repo", "git@github.com:greymatter-io/gitops-core.git",
+                "-sshPrivateKeyPath", "/app/.ssh/id_ed25519",
               ]
               livenessProbe: {
                 httpGet: {
@@ -281,6 +287,11 @@ operator_sts: [
                 name: "overrides-cue",
                 mountPath: "/app/core/overrides.cue"
                 subPath: "overrides.cue"
+              },
+              {
+                name: "greymatter-sync-secret",
+                readOnly: true
+                mountPath: "/app/.ssh"
               }
             ]
           }]
@@ -308,7 +319,14 @@ operator_sts: [
             {
               name: "overrides-cue",
               configMap: {name: "overrides-cue"}
-            }
+            },
+            {
+              name: "greymatter-sync-secret"
+              secret: {
+                defaultMode: 256
+                secretName: "greymatter-sync-secret"
+              }
+            },
           ]
         }
       }
