@@ -3,6 +3,7 @@ package greymatter
 
 import (
   greymatter "greymatter.io/api"
+  rbac "envoyproxy.io/extensions/filters/http/rbac/v3"
 )
 
 /////////////////////////////////////////////////////////////
@@ -25,7 +26,7 @@ import (
   _spire_other: string // can specify an allowable downstream identity - defaults to "edge"
   _enable_oidc_authentication: bool | *false 
   _enable_oidc_validation: bool | *false
-
+  _enable_rbac: bool | *false
 
 
   listener_key: string
@@ -47,11 +48,14 @@ import (
   if _tcp_upstream == _|_ && _is_ingress == true {
     active_http_filters: [
       if _enable_oidc_authentication {
-        "gm.oidc-authentication"
+        "gm.oidc-authentication",
       }
       "gm.observables",
       if _enable_oidc_validation {
-        "gm.oidc-validation"
+        "gm.oidc-validation",
+      }
+      if _enable_rbac {
+        "envoy.rbac",
       }
       "gm.metrics",
       ...string
@@ -155,6 +159,9 @@ import (
             insecureSkipVerify: bool | *false
           }
         }
+      }
+      if _enable_rbac {
+        envoy_rbac: #envoy_rbac_filter
       }
     }
   }
@@ -267,4 +274,25 @@ import (
     subject_names: [for s in _subjects {"spiffe://greymatter.io/\(mesh.metadata.name).\(s)"}]
   }
   ecdh_curves: ["X25519:P-256:P-521:P-384"]
+}
+
+#envoy_rbac_filter: rbac.#RBAC | *#default_rbac
+#default_rbac: {
+  rules: {
+    action: "ALLOW",
+    policies: {
+      all: {
+        permissions: [
+          {
+            any: true
+          }
+        ],
+        principals: [
+          { 
+            any: true 
+          }
+        ]
+      }
+    }
+  }
 }
