@@ -23,6 +23,10 @@ import (
   _gm_observables_topic: string // unique topic name for observable audit collection
   _spire_self: string    // can specify current identity - defaults to "edge"
   _spire_other: string // can specify an allowable downstream identity - defaults to "edge"
+  _enable_oidc_authentication: bool | *false 
+  _enable_oidc_validation: bool | *false
+
+
 
   listener_key: string
   name: listener_key
@@ -41,24 +45,116 @@ import (
 
   // if there isn't a tcp cluster, then assume http filters, and provide the usual defaults
   if _tcp_upstream == _|_ && _is_ingress == true {
-    active_http_filters: [...string] | *[ "gm.metrics", "gm.observables" ]
+    active_http_filters: [
+      if _enable_oidc_authentication {
+        "gm.oidc-authentication"
+      }
+      "gm.observables",
+      if _enable_oidc_validation {
+        "gm.oidc-validation"
+      }
+      "gm.metrics",
+      ...string
+    ] 
     http_filters: {
-      gm_metrics: {
-        metrics_host: "0.0.0.0" // TODO are we still scraping externally? If not, set this to 127.0.0.1
-        metrics_port: 8081
-        metrics_dashboard_uri_path: "/metrics"
-        metrics_prometheus_uri_path: "prometheus" // TODO slash or no slash?
-        metrics_ring_buffer_size: 4096
-        prometheus_system_metrics_interval_seconds: 15
-        metrics_key_function: "depth"
-        metrics_key_depth: string | *"1"
-        metrics_receiver: {
-          redis_connection_string: string | *"redis://127.0.0.1:\(defaults.ports.redis_ingress)"
-          push_interval_seconds: 10
+        gm_metrics: {
+          metrics_host: "0.0.0.0" // TODO are we still scraping externally? If not, set this to 127.0.0.1
+          metrics_port: 8081
+          metrics_dashboard_uri_path: "/metrics"
+          metrics_prometheus_uri_path: "prometheus" // TODO slash or no slash?
+          metrics_ring_buffer_size: 4096
+          prometheus_system_metrics_interval_seconds: 15
+          metrics_key_function: "depth"
+          metrics_key_depth: string | *"1"
+          metrics_receiver: {
+            redis_connection_string: string | *"redis://127.0.0.1:\(defaults.ports.redis_ingress)"
+            push_interval_seconds: 10
+          }
         }
-      },
-      gm_observables: {
-        topic: _gm_observables_topic
+        gm_observables: {
+          topic: _gm_observables_topic
+        }
+      if _enable_oidc_authentication {
+        gm_oidc_authentication: {        
+          provider: string | *""
+          serviceUrl:   string | *""
+          callbackPath: string | *""
+
+          clientId: string | *""
+          clientSecret: string | *""
+
+          accessToken?: {
+            location:  *"header" | _ // options are "header" | "cookie" | "queryString" | "metadata"
+            if location == "metadata" {
+              metadataFilter: string
+            }
+            key: string | *""
+            if location == "cookie" {
+              cookieOptions: {
+                httpOnly: bool | *false
+                secure: bool | *false
+                maxAge: string | *""
+                domain: string | *""
+                path: string | *""
+              }
+            }
+          }
+
+          idToken?: {
+            location: *"header" | _
+            key: string | *""
+            if location == "cookie" {
+              cookieOptions: {
+                httpOnly: bool | *false
+                secure: bool | *false
+                maxAge: string | *""
+                domain: string | *""
+                path: string | *""
+              }
+            }
+          }
+
+          tokenRefresh?: {
+            enabled: bool |*false
+            endpoint: string | *""
+            realm: string | *""
+            timeoutMs: int | *0
+            useTLS: bool | *false
+            if useTLS {
+              certPath: string | *""
+              keyPath: string | *""
+              caPath: string | *""
+              insecureSkipVerify: bool | *false
+            }
+          }
+
+          // Optional requested permissions
+          additionalScopes: [...string] | *[]
+        }
+      }
+      if _enable_oidc_validation {
+        gm_oidc_validation: {
+          enforce: bool | *false
+          if enforce {
+            enforceResponseCode: int32 | *403
+          }
+          accessToken?: {
+            location: *"header" | _
+            if location == "metadata"{
+              metadataFilter: string 
+            }
+          }
+          userInfo?: {
+            location: *"header" | _
+          }
+          TLSConfig?: {
+            useTLS: bool | *false
+            certPath: string | *""
+            keyPath: string | *""
+            caPath: string | *""
+            insecureSkipVerify: bool | *false
+          }
+        }
       }
     }
   }
