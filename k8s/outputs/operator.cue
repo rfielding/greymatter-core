@@ -188,7 +188,8 @@ operator_crd: [
   },
 ]
 
-OperatorPullPolicy: string | *"IfNotPresent" @tag(operator_pull_policy)
+// CI requires "IfNotPresent" (and sets it with this tag) but Always is safer for development
+OperatorPullPolicy: string | *"Always" @tag(operator_pull_policy)
 
 operator_sts: [
   appsv1.#StatefulSet & {
