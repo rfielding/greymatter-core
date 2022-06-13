@@ -79,7 +79,7 @@ import (
           topic: _gm_observables_topic
         }
       if _enable_oidc_authentication {
-        gm_oidc_authentication: {        
+        "gm_oidc-authentication": {        
           provider: string | *""
           serviceUrl:   string | *""
           callbackPath: string | *""
@@ -137,7 +137,7 @@ import (
         }
       }
       if _enable_oidc_validation {
-        gm_oidc_validation: {
+        "gm_oidc-validation": {
           enforce: bool | *false
           if enforce {
             enforceResponseCode: int32 | *403
