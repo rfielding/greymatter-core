@@ -8,6 +8,7 @@ let EgressToRedisName = "\(Name)_egress_to_redis"
 edge_config: [
   #domain & { 
     domain_key: Name
+    force_https: false
   },
   #listener & {
     listener_key: Name
