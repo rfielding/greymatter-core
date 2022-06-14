@@ -2,6 +2,10 @@
 
 package greymatter
 
+import (
+  greymatter "greymatter.io/api"
+)
+
 let Name= "edge"
 let EgressToRedisName = "\(Name)_egress_to_redis"
 
@@ -9,6 +13,16 @@ edge_config: [
   #domain & { 
     domain_key: Name
     force_https: true
+    ssl_config: greymatter.#SSLConfig & {
+      protocols: [ "TLSv1.2" ]
+      trust_file: "/etc/proxy/tls/sidecar/ca.crt"
+      cert_key_pairs: [
+        greymatter.#CertKeyPathPair & {
+          certificate_path: "/etc/proxy/tls/sidecar/server.crt",
+          key_path: "/etc/proxy/tls/sidecar/server.key"
+        }
+      ]
+    }
   },
   #listener & {
     listener_key: Name
