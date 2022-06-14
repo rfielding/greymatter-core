@@ -57,7 +57,7 @@ defaults: {
   }
 
   images: {
-    operator: string | *"quay.io/greymatterio/gm-operator:0.9.0" @tag(operator_image)
+    operator: string | *"quay.io/greymatterio/operator:0.9.0" @tag(operator_image)
   }
 
 }
