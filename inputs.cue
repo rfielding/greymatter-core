@@ -25,7 +25,7 @@ mesh: meshv1.#Mesh & {
   }
   spec: {
     install_namespace: string | *"greymatter"
-    watch_namespaces: [...string] | *["default"]
+    watch_namespaces: [...string] | *["default","plus"]
     release_version: string | *"1.7" // deprecated
     zone: string | *"default-zone"
     images: {
