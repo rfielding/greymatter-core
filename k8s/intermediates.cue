@@ -12,10 +12,16 @@ import (
 
 	name:  "sidecar"
 	image: mesh.spec.images.proxy
-	ports: [...corev1.#ContainerPort] | *[{
+	ports: [...corev1.#ContainerPort] | *[
+	{
 		name:          "proxy"
 		containerPort: defaults.ports.default_ingress
-	}]
+	},
+	{
+		name: "metrics"
+		containerPort: defaults.ports.metrics
+	}
+	]
 	env: [
 		{name: "XDS_CLUSTER", value:          _Name},
 		{name: "ENVOY_ADMIN_LOG_PATH", value: "/dev/stdout"},

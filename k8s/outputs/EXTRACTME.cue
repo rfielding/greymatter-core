@@ -27,6 +27,7 @@ k8s_manifests: controlensemble +
 	redis +
 	edge +
 	dashboard +
+	[ for x in prometheus if config.enable_metrics {x}] +
 	[ for x in openshift_spire if config.openshift && config.spire {x}]
 
 // for CLI convenience,

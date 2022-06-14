@@ -16,9 +16,9 @@ import (
 	api_endpoint?:             string
 	api_spec_endpoint?:        string
 	description?:              string
-	enable_instance_metrics:   bool
-	enable_historical_metrics: bool
-	
+	enable_instance_metrics:   bool | *config.enable_metrics
+	enable_historical_metrics: bool | *config.enable_metrics
+
 	// missing fields from official cue repo
 	business_impact: string // FYI the Go currently uses this field to determine whether this is a catalog service entry
 	version?: string
@@ -35,8 +35,6 @@ catalog_entries: [
 		description:     "Handles north/south traffic flowing through the mesh."
 		api_endpoint:    "/"
 		business_impact: "critical"
-		enable_instance_metrics: true
-		enable_historical_metrics: false
 	},
 	#CatalogService & {
 		name:              "Grey Matter Control"
@@ -47,8 +45,6 @@ catalog_entries: [
 		api_endpoint:      "/services/control-api/"
 		business_impact:   "critical"
 		api_spec_endpoint: "/services/control-api/"
-		enable_instance_metrics: true
-		enable_historical_metrics: false
 	},
 	#CatalogService & {
 		name:              "Grey Matter Catalog"
@@ -59,8 +55,6 @@ catalog_entries: [
 		api_endpoint:      "/services/catalog/"
 		api_spec_endpoint: "/services/catalog/"
 		business_impact:   "high"
-		enable_instance_metrics: true
-		enable_historical_metrics: false
 	},
 	#CatalogService & {
 		name:            "Grey Matter Dashboard"
@@ -69,7 +63,16 @@ catalog_entries: [
 		version:         strings.Split(mesh.spec.images.dashboard, ":")[1]
 		description:     "A user dashboard that paints a high-level picture of the mesh."
 		business_impact: "high"
-		enable_instance_metrics: true
-		enable_historical_metrics: false
+	},
+	if config.enable_metrics {
+		#CatalogService & {
+			name:            "Grey Matter Prometheus"
+			mesh_id: mesh.metadata.name
+			service_id: "prometheus"
+			version:         strings.Split(mesh.spec.images.prometheus, ":")[1]
+			description:     "Prometheus Metrics."
+			business_impact: "low"
+
+		}
 	}
 ]

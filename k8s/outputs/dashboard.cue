@@ -38,9 +38,9 @@ dashboard: [
 								{name: "BASE_URL", value:                     "/services/\(name)/"},
 								{name: "FABRIC_SERVER", value:                "/services/catalog/"},
 								{name: "CONFIG_SERVER", value:                "/services/control-api/v1.0"},
-								{name: "PROMETHEUS_SERVER", value:            "/services/prometheus/api/v1/"},
+								{name: "PROMETHEUS_SERVER", value:            "/services/prometheus/api/v1/"}, //TODO: this is hardcoded and we will need to abstract this up to inputs.cue to make it more smooth
 								{name: "REQUEST_TIMEOUT", value:              "15000"},
-								{name: "USE_PROMETHEUS", value:               "false"},
+								{name: "USE_PROMETHEUS", value:               "\(config.enable_metrics)"},
 								{name: "DISABLE_PROMETHEUS_ROUTES_UI", value: "true"},
 								{name: "ENABLE_INLINE_DOCS", value:           "true"},
 							]
