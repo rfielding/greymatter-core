@@ -12,8 +12,7 @@ config: {
   openshift: bool | *false @tag(openshift,type=bool)
 
   debug: bool | *false @tag(debug,type=bool) // currently just controls k8s/outputs/operator.cue for debugging
-  test: bool | *false @tag(test,type=bool) // currently just TURNS OFF GITOPS so CI integration tests can manipulate directly
-
+  test: bool | *false @tag(test,type=bool) // currently just turns off GitOps so CI integration tests can manipulate directly
 
   // for a hypothetical future where we want to mount specific certificates for operator webhooks, etc.
   generate_webhook_certs: bool | *true @tag(generate_webhook_certs,type=bool)
@@ -27,15 +26,15 @@ mesh: meshv1.#Mesh & {
   spec: {
     install_namespace: string | *"greymatter"
     watch_namespaces: [...string] | *["default"]
-    release_version: string | *"1.7" // no longer does anything, for the moment
+    release_version: string | *"1.7" // deprecated
     zone: string | *"default-zone"
-    images: { // TODO start with defaults from below
-      proxy: string | *"docker.greymatter.io/release/gm-proxy:1.7.0"
-      catalog: string | *"docker.greymatter.io/release/gm-catalog:3.0.0"
-      dashboard: string | *"docker.greymatter.io/release/gm-dashboard:6.0.0"
+    images: {
+      proxy: string | *"quay.io/greymatterio/gm-proxy:1.7.0"
+      catalog: string | *"quay.io/greymatterio/gm-catalog:3.0.0"
+      dashboard: string | *"quay.io/greymatterio/gm-dashboard:6.0.0"
 
-      control: string | *"docker.greymatter.io/internal/gm-control:1.7.1"
-      control_api: string | *"docker.greymatter.io/internal/gm-control-api:1.7.1"
+      control: string | *"quay.io/greymatterio/gm-control:1.7.1"
+      control_api: string | *"quay.io/greymatterio/gm-control-api:1.7.1"
 
       redis: string | *"redis:latest"
 
@@ -58,7 +57,7 @@ defaults: {
   }
 
   images: {
-    operator: string | *"docker.greymatter.io/internal/gm-operator:latest" @tag(operator_image) // cibuild uses the tag
+    operator: string | *"quay.io/greymatterio/operator:0.9.0" @tag(operator_image)
   }
 
 }
