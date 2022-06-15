@@ -59,6 +59,7 @@ defaults: {
 		operator: string | *"quay.io/greymatterio/operator:0.9.0" @tag(operator_image)
 	}
 
+	enable_edge_tls: false
 	oidc: {
 		endpoint:      ""
 		domain:        ""

@@ -11,10 +11,24 @@ import (
 /////////////////////////////////////////////////////////////
 
 #domain: greymatter.#Domain & {
-	domain_key: string
-	name:       string | *"*"
-	port:       int | *defaults.ports.default_ingress
-	zone_key:   mesh.spec.zone
+	_force_https: bool | *false
+	domain_key:   string
+	name:         string | *"*"
+	port:         int | *defaults.ports.default_ingress
+	zone_key:     mesh.spec.zone
+	force_https:  _force_https
+	if _force_https == true {
+		ssl_config: greymatter.#SSLConfig & {
+			protocols: [ "TLSv1.2"]
+			trust_file: "/etc/proxy/tls/sidecar/ca.crt"
+			cert_key_pairs: [
+				greymatter.#CertKeyPathPair & {
+					certificate_path: "/etc/proxy/tls/sidecar/server.crt"
+					key_path:         "/etc/proxy/tls/sidecar/server.key"
+				},
+			]
+		}
+	}
 }
 
 #listener: greymatter.#Listener & {

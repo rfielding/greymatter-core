@@ -24,9 +24,26 @@ edge: [
 				}
 				spec: #spire_permission_requests & {
 					containers: [
-						#sidecar_container_block & {_Name: Name},
+						#sidecar_container_block & {
+							_Name: Name
+							_volume_mounts: [
+								if defaults.enable_edge_tls == true {
+									{
+										name:      "tls-certs"
+										mountPath: "/etc/proxy/tls/sidecar"
+									}
+								},
+							]
+						},
 					]
-					volumes: [] + #spire_socket_volumes + #tls_cert_volumes
+					volumes: #sidecar_volumes + [
+							if defaults.enable_edge_tls == true {
+							{
+								name: "tls-certs"
+								secret: {defaultMode: 420, secretName: "gm-edge-ingress-certs"}
+							}
+						},
+					]
 					imagePullSecrets: [{name: defaults.image_pull_secret_name}]
 				}
 			}

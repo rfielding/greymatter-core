@@ -8,6 +8,7 @@ import (
 // spire-socket volume that must be configured separately (see below)
 #sidecar_container_block: {
 	_Name: string
+	_volume_mounts: [...]
 
 	name:  "sidecar"
 	image: mesh.spec.images.proxy
@@ -24,29 +25,29 @@ import (
 		{name: "XDS_PORT", value:             "50000"},
 		{name: "SPIRE_PATH", value:           "/run/spire/socket/agent.sock"},
 	]
-	volumeMounts: [
-		{
-			name:      "spire-socket"
-			mountPath: "/run/spire/socket"
-		},
-		{
-			name:      "tls-certs"
-			mountPath: "/etc/proxy/tls/sidecar"
-		},
-	]
+	volumeMounts:    #sidecar_volume_mounts + _volume_mounts
 	imagePullPolicy: defaults.image_pull_policy
 }
 
-// volume for spire referenced by proxy container block above
-#spire_socket_volumes: [{
-	name: "spire-socket"
-	hostPath: {path: "/run/spire/socket", type: "DirectoryOrCreate"}
-}]
+#sidecar_volume_mounts: {
+	if config.spire {
+		[{
+			name:      "spire-socket"
+			mountPath: "/run/spire/socket"
+		}]
+	}
+	[]
+}
 
-#tls_cert_volumes: [{
-	name: "tls-certs"
-	secret: {defaultMode: 420, secretName: "gm-edge-ingress-certs"}
-}]
+#sidecar_volumes: {
+	if config.spire {
+		[{
+			name: "spire-socket"
+			hostPath: {path: "/run/spire/socket", type: "DirectoryOrCreate"}
+		}]
+	}
+	[]
+}
 
 #spire_permission_requests: {
 	if config.spire {
