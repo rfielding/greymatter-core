@@ -23,7 +23,9 @@ import (
 		{name: "XDS_ZONE", value:             mesh.spec.zone},
 		{name: "XDS_HOST", value:             defaults.xds_host},
 		{name: "XDS_PORT", value:             "50000"},
-		{name: "SPIRE_PATH", value:           "/run/spire/socket/agent.sock"},
+		if config.spire {
+			{name: "SPIRE_PATH", value:           "/run/spire/socket/agent.sock"},
+		}
 	]
 	volumeMounts:    #sidecar_volume_mounts + _volume_mounts
 	imagePullPolicy: defaults.image_pull_policy
@@ -36,7 +38,7 @@ import (
 			mountPath: "/run/spire/socket"
 		}]
 	}
-	[]
+	[...]
 }
 
 #sidecar_volumes: {
@@ -46,7 +48,7 @@ import (
 			hostPath: {path: "/run/spire/socket", type: "DirectoryOrCreate"}
 		}]
 	}
-	[]
+	[...]
 }
 
 #spire_permission_requests: {
