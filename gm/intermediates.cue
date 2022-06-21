@@ -80,10 +80,10 @@ import (
 		]
 		http_filters: {
 			gm_metrics: {
-				metrics_host:                               "0.0.0.0" // TODO are we still scraping externally? If not, set this to 127.0.0.1
+				metrics_host:                               "0.0.0.0"
 				metrics_port:                               8081
 				metrics_dashboard_uri_path:                 "/metrics"
-				metrics_prometheus_uri_path:                "prometheus" // TODO slash or no slash?
+				metrics_prometheus_uri_path:                "/prometheus"
 				metrics_ring_buffer_size:                   4096
 				prometheus_system_metrics_interval_seconds: 15
 				metrics_key_function:                       "depth"
