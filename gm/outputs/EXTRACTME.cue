@@ -11,10 +11,10 @@ mesh_configs: redis_config +
              controlensemble_config +
              dashboard_config +
              catalog_entries +
-             [for x in prometheus_config if config.enable_metrics {x} ]
+             [for x in prometheus_config if config.enable_historical_metrics {x} ]
 redis_listener: redis_listener_object // special because we need to re-apply it when Spire is enabled for every new sidecar
 
-prometheus_mesh_configs: [for x in prometheus_config if config.enable_metrics {x} ] + catalog_entries
+prometheus_mesh_configs: [for x in prometheus_config if config.enable_historical_metrics {x} ] + catalog_entries
 
 // for CLI convenience,
 // e.g. `cue eval -c ./gm/outputs --out text -e mesh_configs_yaml`

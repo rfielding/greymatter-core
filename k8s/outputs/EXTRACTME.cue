@@ -27,10 +27,10 @@ k8s_manifests: controlensemble +
 	redis +
 	edge +
 	dashboard +
-  [ for x in prometheus if config.enable_metrics {x}] +
+  [ for x in prometheus if config.enable_historical_metrics {x}] +
 	[ for x in openshift_spire if config.openshift && config.spire {x}]
 
-prometheus_yaml: [ for x in prometheus if config.enable_metrics {x}]
+prometheus_yaml: [ for x in prometheus if config.enable_historical_metrics {x}]
 
 // for CLI convenience,
 // e.g. `cue eval -c ./k8s/outputs --out text -e k8s_manifests_yaml`

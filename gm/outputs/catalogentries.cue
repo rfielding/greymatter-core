@@ -16,8 +16,8 @@ import (
 	api_endpoint?:             string
 	api_spec_endpoint?:        string
 	description?:              string
-	enable_instance_metrics:   bool | *config.enable_metrics
-	enable_historical_metrics: bool | *config.enable_metrics
+	enable_instance_metrics:   bool | *config.enable_historical_metrics
+	enable_historical_metrics: bool | *config.enable_historical_metrics
 
 	// missing fields from official cue repo
 	business_impact: string // FYI the Go currently uses this field to determine whether this is a catalog service entry
@@ -39,7 +39,7 @@ catalog_entries: [
 	#CatalogService & {
 		name:              "Grey Matter Control"
 		mesh_id: mesh.metadata.name
-	  service_id: "controlensemble"
+		service_id: "controlensemble"
 		version:         strings.Split(mesh.spec.images.control_api, ":")[1]
 		description:       "Manages the configuration of the Grey Matter data plane."
 		api_endpoint:      "/services/control-api/"
@@ -64,7 +64,7 @@ catalog_entries: [
 		description:     "A user dashboard that paints a high-level picture of the mesh."
 		business_impact: "high"
 	},
-	if config.enable_metrics {
+	if config.enable_historical_metrics {
 		#CatalogService & {
 			name:            "Grey Matter Prometheus"
 			mesh_id: mesh.metadata.name
