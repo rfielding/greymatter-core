@@ -70,8 +70,9 @@ catalog_entries: [
 			mesh_id: mesh.metadata.name
 			service_id: "prometheus"
 			version:         strings.Split(mesh.spec.images.prometheus, ":")[1]
-			description:     "Prometheus Metrics."
-			business_impact: "low"
+			description:     "Prometheus TSDB for collecting and querying historical metrics"
+			business_impact: "high"
+			api_endpoint: "/services/prometheus/api/v1/"
 
 		}
 	}
