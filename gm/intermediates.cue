@@ -37,9 +37,9 @@ import (
 	_gm_observables_topic:       string        // unique topic name for observable audit collection
 	_spire_self:                 string        // can specify current identity - defaults to "edge"
 	_spire_other:                string        // can specify an allowable downstream identity - defaults to "edge"
-	_enable_oidc_authentication: bool | *false
 	_enable_oidc_validation:     bool | *false
 	_enable_rbac:                bool | *false
+	_enable_oidc_authentication: bool | *false
 	_oidc_endpoint:              string
 	_oidc_service_url:           string
 	_oidc_provider:              string
@@ -68,7 +68,13 @@ import (
 			if _enable_oidc_authentication {
 				"gm.oidc-authentication"
 			},
+			if _enable_oidc_authentication {
+				"gm.ensure-variables"
+			},
 			"gm.observables",
+			if _enable_oidc_authentication {
+				"envoy.jwt_authn"
+			},
 			if _enable_oidc_validation {
 				"gm.oidc-validation"
 			},
@@ -115,6 +121,10 @@ import (
 						endpoint: _oidc_endpoint
 						realm:    _oidc_realm
 					}
+				}
+				"gm_ensure-variables": #ensure_variables_filter
+				"envoy_jwt_authn":     #envoy_jwt_authn & {
+					providers: defaults.oidc.jwt_authn_provider
 				}
 			}
 			if _enable_oidc_validation {
@@ -255,6 +265,7 @@ import (
 	ecdh_curves: ["X25519:P-256:P-521:P-384"]
 }
 
+// Allows for RBAC permissions to be applied to a service and its configuration
 #envoy_rbac_filter: rbac.#RBAC | *#default_rbac
 #default_rbac: {
 	rules: {
@@ -276,6 +287,67 @@ import (
 	}
 }
 
+// This filter is used by OIDC/JWT authentication and ensures that the access_token JWT
+// that is present as a cookie is copied into the header of the request
+// so that it can be accessed by the envoy_jwt_authn filter.
+#ensure_variables_filter: {
+	rules: [...#ensure_variables_rules] | *[
+		{
+			copyTo: [
+				{
+					key:      "access_token"
+					location: "header"
+				},
+			]
+			key:      "access_token"
+			location: "cookie"
+		},
+	]
+}
+
+// If other variables need to be copied/used in other filters, this filter provides
+// a template for those rules.
+#ensure_variables_rules: {
+	key:      string
+	location: string
+	copyTo: [...{
+		key:      string
+		location: string
+	}]
+}
+
+// This filter allows for the JWT supplied by an OIDC provider to be validated and 
+// used in other contexts, such as RBAC configurations.
+#envoy_jwt_authn: {
+	providers: {
+		keycloak?: {
+			issuer:    string | *""
+			audiences: [...string] | *["edge"]
+			remote_jwks?: {
+				http_uri: {
+					uri:     string | *""
+					cluster: string | *""
+					timeout: string | *"1s"
+				}
+				cache_duration: string | *"300s"
+			}
+			local_jwks?: {
+				inline_string: string | *""
+			}
+			forward:             bool | *true
+			from_headers:        [...] | *[{name: "access_token"}]
+			payload_in_metadata: string | *"claims"
+		}
+	}
+	rules: [...] | *[
+		{
+			match: {prefix: "/"}
+			requires: {provider_name: "keycloak"}
+		},
+	]
+}
+
+// Allows for authentication via an OIDC provider such as Keycloak.
 #oidc_authentication: {
 	provider:     string | *""
 	serviceUrl:   string | *""

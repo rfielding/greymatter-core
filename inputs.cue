@@ -61,9 +61,30 @@ defaults: {
 
 	enable_edge_tls: false
 	oidc: {
-		endpoint:      ""
+		endpoint_host: ""
+		endpoint_port: 0
+		endpoint:      "https://\(endpoint_host):\(endpoint_port)"
 		domain:        ""
 		client_secret: ""
 		realm:         ""
+		jwt_authn_provider: {
+			keycloak: {
+				issuer: "\(endpoint)/auth/realms/\(realm)"
+				local_jwks: {
+					inline_string: #"""
+						{}
+						"""#
+				}
+                                 // If you want to use a remote JWKS provider, comment out local_jwks above, and 
+                                 // uncomment the below remote_jwks configuration. There are coinciding configurations
+                                 // in ./gm/outputs/edge.cue that you will also need to uncomment.
+				//remote_jwks: {
+				//  http_uri: {
+				//   uri: "\(endpoint)/auth/realms/\(realm)/protocol/openid-connect/certs"
+				//   cluster: "edge_to_keycloak"
+				//  }
+				// }
+			}
+		}
 	}
 }
