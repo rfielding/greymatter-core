@@ -13,14 +13,14 @@ import (
 	name:  "sidecar"
 	image: mesh.spec.images.proxy
 	ports: [...corev1.#ContainerPort] | *[
-	{
-		name:          "proxy"
-		containerPort: defaults.ports.default_ingress
-	},
-	{
-		name: "metrics"
-		containerPort: defaults.ports.metrics
-	}
+		{
+			name:          "proxy"
+			containerPort: defaults.ports.default_ingress
+		},
+		{
+			name:          "metrics"
+			containerPort: defaults.ports.metrics
+		},
 	]
 	env: [
 		{name: "XDS_CLUSTER", value:          _Name},
@@ -30,8 +30,8 @@ import (
 		{name: "XDS_HOST", value:             defaults.xds_host},
 		{name: "XDS_PORT", value:             "50000"},
 		if config.spire {
-			{name: "SPIRE_PATH", value:           "/run/spire/socket/agent.sock"},
-		}
+			{name: "SPIRE_PATH", value: "/run/spire/socket/agent.sock"}
+		},
 	]
 	volumeMounts:    #sidecar_volume_mounts + _volume_mounts
 	imagePullPolicy: defaults.image_pull_policy
