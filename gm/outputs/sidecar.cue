@@ -75,7 +75,6 @@ package greymatter
       api_spec_endpoint: "/services/\(Name)/"
       business_impact:   "low"
       enable_instance_metrics: true
-      enable_historical_metrics: false
     },
   ]
 }

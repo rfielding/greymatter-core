@@ -27,14 +27,18 @@ k8s_manifests: controlensemble +
 	redis +
 	edge +
 	dashboard +
+  [ for x in prometheus if config.enable_historical_metrics {x}] +
 	[ for x in openshift_spire if config.openshift && config.spire {x}]
+
+prometheus_manifests: [ for x in prometheus if config.enable_historical_metrics {x}]
 
 // for CLI convenience,
 // e.g. `cue eval -c ./k8s/outputs --out text -e k8s_manifests_yaml`
 operator_manifests_yaml:         yaml.MarshalStream(operator_manifests)
 all_but_operator_manifests_yaml: yaml.MarshalStream(all_but_operator_manifests)
-spire_manifests_yaml:            yaml.MarshalStream(spire_manifests)
-k8s_manifests_yaml:              yaml.MarshalStream(k8s_manifests)
+spire_manifests_yaml: yaml.MarshalStream(spire_manifests)
+k8s_manifests_yaml: yaml.MarshalStream(k8s_manifests)
+prometheus_manifests_yaml: yaml.MarshalStream(prometheus_manifests)
 
 // TODO this was only necessary because I don't know how to pass _Name into #sidecar_container_block
 // from Go. Then I decided to kill two birds with one stone and also put the sidecar_socket_volume in there.

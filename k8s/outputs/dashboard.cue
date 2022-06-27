@@ -40,7 +40,7 @@ dashboard: [
 								{name: "CONFIG_SERVER", value:                "/services/control-api/v1.0"},
 								{name: "PROMETHEUS_SERVER", value:            "/services/prometheus/api/v1/"},
 								{name: "REQUEST_TIMEOUT", value:              "15000"},
-								{name: "USE_PROMETHEUS", value:               "false"},
+								{name: "USE_PROMETHEUS", value:               "\(config.enable_historical_metrics)"},
 								{name: "DISABLE_PROMETHEUS_ROUTES_UI", value: "true"},
 								{name: "ENABLE_INLINE_DOCS", value:           "true"},
 							]
