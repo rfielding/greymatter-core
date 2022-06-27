@@ -1,8 +1,9 @@
 package greymatter
 
 import (
-	greymatter "greymatter.io/api"
-	rbac "envoyproxy.io/extensions/filters/http/rbac/v3"
+  greymatter "greymatter.io/api"
+  rbac "envoyproxy.io/extensions/filters/http/rbac/v3"
+  ratelimit "envoyproxy.io/extensions/filters/network/ratelimit/v3"
 )
 
 /////////////////////////////////////////////////////////////
@@ -46,6 +47,8 @@ import (
 	_oidc_client_secret:         string
 	_oidc_cookie_domain:         string
 	_oidc_realm:                 string
+    // You must include a service->rate limiter service cluster
+  _enable_tcp_rate_limit: bool | *false
 
 	listener_key: string
 	name:         listener_key
@@ -53,14 +56,24 @@ import (
 	port:         int | *defaults.ports.default_ingress
 	domain_keys:  [...string] | *[listener_key]
 
-	// if there's a tcp cluster, 
 	if _tcp_upstream != _|_ {
-		active_network_filters: ["envoy.tcp_proxy"]
-		network_filters: envoy_tcp_proxy: {
-			cluster:     _tcp_upstream // NB: contrary to the docs, this points at a cluster *name*, not a cluster_key
-			stat_prefix: _tcp_upstream
-		}
-	}
+    active_network_filters: [
+      if _enable_tcp_rate_limit {
+        "envoy.rate_limit",
+      }
+      "envoy.tcp_proxy"
+    ]
+    network_filters: {
+    if _enable_tcp_rate_limit {
+      envoy_rate_limit: #envoy_tcp_rate_limit
+    }
+    // Needs to be last in filter chain
+      envoy_tcp_proxy: {
+        cluster: _tcp_upstream // NB: contrary to the docs, this points at a cluster *name*, not a cluster_key
+        stat_prefix: _tcp_upstream
+      }
+    }
+  }
 
 	// if there isn't a tcp cluster, then assume http filters, and provide the usual defaults
 	if _tcp_upstream == _|_ && _is_ingress == true {
@@ -403,4 +416,32 @@ import (
 
 	// Optional requested permissions
 	additionalScopes: [...string] | *["openid"]
+}
+
+#envoy_tcp_rate_limit: ratelimit.#RateLimit | *#default_rate_limit
+// Assumes the http/2 cluster between proxy and the rate limit service is called ratelimit.
+// see https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/other_features/global_rate_limiting#arch-overview-global-rate-limit for a discussion of ratelimiting and 
+// special descriptors to use
+#default_rate_limit: {
+  stat_prefix: "edge",
+  domain: "edge",
+  failure_mode_deny: true,
+  descriptors: [
+    {
+      entries: [
+        {
+          key: "path",
+          value: "/"
+        }
+      ]
+    }
+  ],
+  rate_limit_service: {
+    grpc_service: {
+      envoy_grpc: {
+        timeout: "0.25s"
+        cluster_name: "ratelimit"
+      }
+    }
+  }
 }
