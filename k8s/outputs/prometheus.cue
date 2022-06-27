@@ -1,4 +1,4 @@
-// Manifest for Prometheus statefulset, 
+// Manifest for Prometheus statefulset
 
 package greymatter
 
@@ -246,7 +246,7 @@ prometheus: [
 				        expr: sum(floor(increase(http_request_duration_seconds_count{status!~"2..|3..", key!="all"}[4h]) )) by (job) / sum(floor(increase(http_request_duration_seconds_count{key!="all"}[4h]) )) by (job) * 100
 				      - record: overviewQueries:errorPercent_12h:sum
 				        expr: sum(floor(increase(http_request_duration_seconds_count{status!~"2..|3..", key!="all"}[12h]) )) by (job) / sum(floor(increase(http_request_duration_seconds_count{key!="all"}[12h]) )) by (job) * 100
-				    # queries for each route
+				  # queries for each route
 				  - name: queriesByRoute
 				    rules:
 				      # error percent
@@ -278,7 +278,7 @@ prometheus: [
 				      - record: queriesByRoute:requestCount_12h:sum
 				        expr: sum(floor(increase(http_request_duration_seconds_count[12h])) >= 1) by (job, key, method)
 				    
-				    # range queries
+				  # range queries
 				  - name: rangeQueries
 				    rules:
 				      # pXXLatency range queries
