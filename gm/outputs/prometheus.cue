@@ -46,8 +46,9 @@ prometheus_config: [
 		cluster_key:  Name
 		_spire_other: Name
 	},
-	#route & {domain_key: "edge"
-				route_key: Name
+	#route & {
+		route_key: Name
+		domain_key: defaults.edge.key
 		route_match: {
 			path: "/services/prometheus/"
 		}

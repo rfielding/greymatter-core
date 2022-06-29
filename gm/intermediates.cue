@@ -1,9 +1,9 @@
 package greymatter
 
 import (
-  greymatter "greymatter.io/api"
-  rbac "envoyproxy.io/extensions/filters/http/rbac/v3"
-  ratelimit "envoyproxy.io/extensions/filters/network/ratelimit/v3"
+	greymatter "greymatter.io/api"
+	rbac "envoyproxy.io/extensions/filters/http/rbac/v3"
+	ratelimit "envoyproxy.io/extensions/filters/network/ratelimit/v3"
 )
 
 /////////////////////////////////////////////////////////////
@@ -44,11 +44,12 @@ import (
 	_oidc_endpoint:              string
 	_oidc_service_url:           string
 	_oidc_provider:              string
+	_oidc_client_id:             string
 	_oidc_client_secret:         string
 	_oidc_cookie_domain:         string
 	_oidc_realm:                 string
-    // You must include a service->rate limiter service cluster
-  _enable_tcp_rate_limit: bool | *false
+	// You must include a service->rate limiter service cluster
+	_enable_tcp_rate_limit: bool | *false
 
 	listener_key: string
 	name:         listener_key
@@ -57,23 +58,24 @@ import (
 	domain_keys:  [...string] | *[listener_key]
 
 	if _tcp_upstream != _|_ {
-    active_network_filters: [
-      if _enable_tcp_rate_limit {
-        "envoy.rate_limit",
-      }
-      "envoy.tcp_proxy"
-    ]
-    network_filters: {
-    if _enable_tcp_rate_limit {
-      envoy_rate_limit: #envoy_tcp_rate_limit
-    }
-    // Needs to be last in filter chain
-      envoy_tcp_proxy: {
-        cluster: _tcp_upstream // NB: contrary to the docs, this points at a cluster *name*, not a cluster_key
-        stat_prefix: _tcp_upstream
-      }
-    }
-  }
+		active_network_filters: [
+			if _enable_tcp_rate_limit {
+				"envoy.rate_limit"
+			},
+			"envoy.tcp_proxy",
+		]
+		network_filters: {
+			if _enable_tcp_rate_limit {
+				envoy_rate_limit: #envoy_tcp_rate_limit
+			}
+
+			// Needs to be last in filter chain
+			envoy_tcp_proxy: {
+				cluster:     _tcp_upstream // NB: contrary to the docs, this points at a cluster *name*, not a cluster_key
+				stat_prefix: _tcp_upstream
+			}
+		}
+	}
 
 	// if there isn't a tcp cluster, then assume http filters, and provide the usual defaults
 	if _tcp_upstream == _|_ && _is_ingress == true {
@@ -119,6 +121,7 @@ import (
 				"gm_oidc-authentication": #oidc_authentication & {
 					serviceUrl:   _oidc_service_url
 					provider:     _oidc_provider
+					clientId:     _oidc_client_id
 					clientSecret: _oidc_client_secret
 					accessToken: {
 						cookieOptions: {
@@ -137,7 +140,7 @@ import (
 				}
 				"gm_ensure-variables": #ensure_variables_filter
 				"envoy_jwt_authn":     #envoy_jwt_authn & {
-					providers: defaults.oidc.jwt_authn_provider
+					providers: defaults.edge.oidc.jwt_authn_provider
 				}
 			}
 			if _enable_oidc_validation {
@@ -260,8 +263,8 @@ import (
 }
 
 #spire_secret: {
-	_name:    string | *"edge" // at least one of these will be overridden
-	_subject: string | *"edge"
+	_name:    string | *defaults.edge.key // at least one of these will be overridden
+	_subject: string | *defaults.edge.key
 	_subjects?: [...string] // If provided, this list of strings will be used instead of _subject
 
 	set_current_client_cert_details?: {...}
@@ -335,7 +338,7 @@ import (
 	providers: {
 		keycloak?: {
 			issuer:    string | *""
-			audiences: [...string] | *["edge"]
+			audiences: [...string] | *[""]
 			remote_jwks?: {
 				http_uri: {
 					uri:     string | *""
@@ -365,7 +368,7 @@ import (
 	provider:     string | *""
 	serviceUrl:   string | *""
 	callbackPath: string | *"/oauth"
-	clientId:     string | *"edge"
+	clientId:     string | *""
 	clientSecret: string | *""
 
 	accessToken: {
@@ -419,29 +422,30 @@ import (
 }
 
 #envoy_tcp_rate_limit: ratelimit.#RateLimit | *#default_rate_limit
+
 // Assumes the http/2 cluster between proxy and the rate limit service is called ratelimit.
 // see https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/other_features/global_rate_limiting#arch-overview-global-rate-limit for a discussion of ratelimiting and 
 // special descriptors to use
 #default_rate_limit: {
-  stat_prefix: "edge",
-  domain: "edge",
-  failure_mode_deny: true,
-  descriptors: [
-    {
-      entries: [
-        {
-          key: "path",
-          value: "/"
-        }
-      ]
-    }
-  ],
-  rate_limit_service: {
-    grpc_service: {
-      envoy_grpc: {
-        timeout: "0.25s"
-        cluster_name: "ratelimit"
-      }
-    }
-  }
+	stat_prefix:       defaults.edge.key
+	domain:            defaults.edge.key
+	failure_mode_deny: true
+	descriptors: [
+		{
+			entries: [
+				{
+					key:   "path"
+					value: "/"
+				},
+			]
+		},
+	]
+	rate_limit_service: {
+		grpc_service: {
+			envoy_grpc: {
+				timeout:      "0.25s"
+				cluster_name: "ratelimit"
+			}
+		}
+	}
 }
