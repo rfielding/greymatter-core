@@ -62,7 +62,7 @@ defaults: {
 
 	edge: {
 		key:        "edge"
-		enable_tls: true
+		enable_tls: false
 		oidc: {
 			endpoint_host: ""
 			endpoint_port: 0
@@ -76,7 +76,7 @@ defaults: {
 					issuer: "\(endpoint)/auth/realms/\(realm)"
 					audiences: ["\(defaults.edge.key)"]
 					local_jwks: {
-					 inline_string: #"""
+						inline_string: #"""
 					  {}
 					  """#
 					}
@@ -84,10 +84,10 @@ defaults: {
 					// uncomment the below remote_jwks configuration. There are coinciding configurations
 					// in ./gm/outputs/edge.cue that you will also need to uncomment.
 					// remote_jwks: {
-					// 	http_uri: {
-					// 		uri:     "\(endpoint)/auth/realms/\(realm)/protocol/openid-connect/certs"
-					// 		cluster: "edge_to_keycloak" // this key should be unique across the mesh
-					// 	}
+					//  http_uri: {
+					//   uri:     "\(endpoint)/auth/realms/\(realm)/protocol/openid-connect/certs"
+					//   cluster: "edge_to_keycloak" // this key should be unique across the mesh
+					//  }
 					// }
 				}
 			}
