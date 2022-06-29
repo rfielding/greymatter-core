@@ -4,6 +4,8 @@ import (
 	greymatter "greymatter.io/api"
 	rbac "envoyproxy.io/extensions/filters/http/rbac/v3"
 	ratelimit "envoyproxy.io/extensions/filters/network/ratelimit/v3"
+	jwt_authn "envoyproxy.io/extensions/filters/http/jwt_authn/v3"
+	fault "envoyproxy.io/extensions/filters/http/fault/v3"
 )
 
 /////////////////////////////////////////////////////////////
@@ -38,8 +40,9 @@ import (
 	_gm_observables_topic:       string        // unique topic name for observable audit collection
 	_spire_self:                 string        // can specify current identity - defaults to "edge"
 	_spire_other:                string        // can specify an allowable downstream identity - defaults to "edge"
-	_enable_oidc_validation:     bool | *false
 	_enable_rbac:                bool | *false
+	_enable_fault_injection:     bool | *false
+	_enable_oidc_validation:     bool | *false
 	_enable_oidc_authentication: bool | *false
 	_oidc_endpoint:              string
 	_oidc_service_url:           string
@@ -80,6 +83,9 @@ import (
 	// if there isn't a tcp cluster, then assume http filters, and provide the usual defaults
 	if _tcp_upstream == _|_ && _is_ingress == true {
 		active_http_filters: [
+			if _enable_fault_injection {
+				"envoy.fault"
+			},
 			if _enable_oidc_authentication {
 				"gm.oidc-authentication"
 			},
@@ -169,6 +175,9 @@ import (
 			}
 			if _enable_rbac {
 				envoy_rbac: #envoy_rbac_filter
+			}
+			if _enable_fault_injection {
+				envoy_fault: #envoy_fault_injection
 			}
 		}
 	}
@@ -334,7 +343,7 @@ import (
 
 // This filter allows for the JWT supplied by an OIDC provider to be validated and 
 // used in other contexts, such as RBAC configurations.
-#envoy_jwt_authn: {
+#envoy_jwt_authn: jwt_authn.#JwtAuthentication & {
 	providers: {
 		keycloak?: {
 			issuer:    string | *""
@@ -446,6 +455,27 @@ import (
 				timeout:      "0.25s"
 				cluster_name: "ratelimit"
 			}
+		}
+	}
+}
+
+// Allows for the configuration of fault injection into a proxy
+// See https://www.envoyproxy.io/docs/envoy/v1.16.5/configuration/http/http_filters/fault_filter.html for header/runtime configuration
+// specifics, along with further configuration for specific upstream clusters
+#envoy_fault_injection: fault.#HTTPFault | *{
+	delay: {
+		fixed_delay: "5s"
+		percentage: {
+			numerator:   50
+			denominator: "HUNDRED"
+		}
+	}
+	abort: {
+		// Allows request to specify the status code with which to fail using the x-envoy-fault-abort-request header
+		header_abort: {} // Headers can also specify the percentage of requests to fail, capped by the below value with the x-envoy-fault-abort-request-percentage header
+		percentage: {
+			numerator:   50
+			denominator: "HUNDRED"
 		}
 	}
 }

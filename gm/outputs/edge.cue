@@ -18,13 +18,13 @@ edge_config: [
 		_is_ingress:                 true
 		_enable_oidc_authentication: false
 		_enable_rbac:                false
+		_enable_fault_injection:     false
 		_oidc_endpoint:              defaults.edge.oidc.endpoint
 		_oidc_service_url:           "https://\(defaults.edge.oidc.domain):\(defaults.ports.edge_ingress)"
 		_oidc_provider:              "\(defaults.edge.oidc.endpoint)/auth/realms/\(defaults.edge.oidc.realm)"
 		_oidc_client_id:             defaults.edge.oidc.client_id
-		_oidc_client_secret:         defaults.edge.oidc.client_secret
-		_oidc_cookie_domain:         defaults.edge.oidc.domain
-		_oidc_realm:                 defaults.edge.oidc.realm
+		_oidc_cookie_domain:         defaults.oidc.domain
+		_oidc_realm:                 defaults.oidc.realm
 	},
 	// This cluster must exist (though it never receives traffic)
 	// so that Catalog will be able to look-up edge instances
@@ -70,5 +70,5 @@ edge_config: [
 	// #listener & {
 	//  listener_key: EdgeToKeycloakName
 	//  port:         defaults.edge.oidc.endpoint_port
-	// }
+	// },
 ]
