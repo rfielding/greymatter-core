@@ -5,7 +5,7 @@ package greymatter
 let EgressToRedisName = "\(defaults.edge.key)_egress_to_redis"
 
 // Uncomment the below line for use with a remote JWKS provider (in this case, Keycloak)
-let EdgeToKeycloakName = defaults.edge.oidc.jwt_authn_provider.keycloak.remote_jwks.http_uri.cluster
+// let EdgeToKeycloakName = defaults.edge.oidc.jwt_authn_provider.keycloak.remote_jwks.http_uri.cluster
 
 edge_config: [
 	#domain & {
@@ -48,27 +48,27 @@ edge_config: [
 
 	#proxy & {
 		proxy_key: defaults.edge.key
-		domain_keys: [defaults.edge.key, EgressToRedisName, EdgeToKeycloakName]
-		listener_keys: [defaults.edge.key, EgressToRedisName, EdgeToKeycloakName]
+		domain_keys: [defaults.edge.key, EgressToRedisName]
+		listener_keys: [defaults.edge.key, EgressToRedisName]
 	}
 
 	// egress->Keycloak for OIDC/JWT Authentication (only necessary with remote JWKS provider)
 	// NB: You need to add the EdgeToKeycloakName key to the domain_keys and listener_keys 
 	// in the #proxy above for the cluster to be discoverable by Envoy
-	#cluster & {
-	 cluster_key:    EdgeToKeycloakName
-	 _upstream_host: defaults.edge.oidc.endpoint_host
-	 _upstream_port: defaults.edge.oidc.endpoint_port
-	 ssl_config: {
-	  protocols: ["TLSv1.2"]
-	  sni: defaults.edge.oidc.endpoint_host
-	 }
-	 require_tls: true
-	},
-	#route & {route_key:   EdgeToKeycloakName},
-	#domain & {domain_key: EdgeToKeycloakName, port: defaults.edge.oidc.endpoint_port},
-	#listener & {
-	 listener_key: EdgeToKeycloakName
-	 port:         defaults.edge.oidc.endpoint_port
-	}
+	// #cluster & {
+	//  cluster_key:    EdgeToKeycloakName
+	//  _upstream_host: defaults.edge.oidc.endpoint_host
+	//  _upstream_port: defaults.edge.oidc.endpoint_port
+	//  ssl_config: {
+	//   protocols: ["TLSv1.2"]
+	//   sni: defaults.edge.oidc.endpoint_host
+	//  }
+	//  require_tls: true
+	// },
+	// #route & {route_key:   EdgeToKeycloakName},
+	// #domain & {domain_key: EdgeToKeycloakName, port: defaults.edge.oidc.endpoint_port},
+	// #listener & {
+	//  listener_key: EdgeToKeycloakName
+	//  port:         defaults.edge.oidc.endpoint_port
+	// }
 ]
