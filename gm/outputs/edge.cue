@@ -23,8 +23,9 @@ edge_config: [
 		_oidc_service_url:           "https://\(defaults.edge.oidc.domain):\(defaults.ports.edge_ingress)"
 		_oidc_provider:              "\(defaults.edge.oidc.endpoint)/auth/realms/\(defaults.edge.oidc.realm)"
 		_oidc_client_id:             defaults.edge.oidc.client_id
-		_oidc_cookie_domain:         defaults.oidc.domain
-		_oidc_realm:                 defaults.oidc.realm
+		_oidc_client_secret:         defaults.edge.oidc.client_secret
+		_oidc_cookie_domain:         defaults.edge.oidc.domain
+		_oidc_realm:                 defaults.edge.oidc.realm
 	},
 	// This cluster must exist (though it never receives traffic)
 	// so that Catalog will be able to look-up edge instances
