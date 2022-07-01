@@ -206,10 +206,13 @@ import (
 	_spire_self:              string // can specify current identity - defaults to "edge"
 	_spire_other:             string // can specify an allowable upstream identity - defaults to "edge"
 	_enable_circuit_breakers: bool | *false
+	// We can expand options here for load balancers that superseed the lb_policy field
+	_load_balancer: "round_robin" | "least_request" | "maglev" | "ring_hash" | "random"
 
 	cluster_key: string
 	name:        string | *cluster_key
 	instances:   [...greymatter.#Instance] | *[]
+	
 	if _upstream_port != _|_ {
 		instances: [{host: _upstream_host, port: _upstream_port}]
 	}
@@ -228,6 +231,22 @@ import (
 	if _enable_circuit_breakers {
 		circuit_breakers: #circuit_breaker // can specify circuit breaker levels for normal
 		// and high priority traffic with configured defaults
+	}
+	if _load_balancer != _|_ {
+		lb_policy: _load_balancer
+		if lb_policy == "least_request" {
+			least_request_lb_conf: {
+				choice_count: uint32 | *2
+			}
+		}
+
+		if lb_policy == "ring_hash" || lb_policy == "maglev" {
+			ring_hash_lb_conf: {
+				minimum_ring_size?: uint64 & <8388608 | *1024
+				hash_func?:         uint32 | *0 //corresponds to the xxHash; 1 for MURMUR_HASH_2 
+				maximum_ring_size?: uint64 & <8388608 | *4194304 // 4M
+			}
+		}
 	}
 }
 
