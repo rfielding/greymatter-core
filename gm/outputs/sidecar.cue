@@ -4,7 +4,7 @@
 package greymatter
 
 #sidecar_config: {
-  Name: string | *"edge" // workaround for CUE's behavior with conflicting defaults
+  Name: string | *defaults.edge.key // workaround for CUE's behavior with conflicting defaults
   Port: int | *8080
   LocalName: "\(Name)_local"
   EgressToRedisName: "\(Name)_egress_to_redis"
@@ -50,7 +50,7 @@ package greymatter
       _spire_other: Name
     },
     #route & {
-      domain_key: "edge",
+      domain_key: defaults.edge.key,
       route_key: Name // destination cluster name is the same as route_key by default
       route_match: {
         path: "/services/\(Name)/"

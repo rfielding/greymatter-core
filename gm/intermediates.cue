@@ -47,6 +47,7 @@ import (
 	_oidc_endpoint:              string
 	_oidc_service_url:           string
 	_oidc_provider:              string
+	_oidc_client_id:             string
 	_oidc_client_secret:         string
 	_oidc_cookie_domain:         string
 	_oidc_realm:                 string
@@ -126,6 +127,7 @@ import (
 				"gm_oidc-authentication": #oidc_authentication & {
 					serviceUrl:   _oidc_service_url
 					provider:     _oidc_provider
+					clientId:     _oidc_client_id
 					clientSecret: _oidc_client_secret
 					accessToken: {
 						cookieOptions: {
@@ -144,7 +146,7 @@ import (
 				}
 				"gm_ensure-variables": #ensure_variables_filter
 				"envoy_jwt_authn":     #envoy_jwt_authn & {
-					providers: defaults.oidc.jwt_authn_provider
+					providers: defaults.edge.oidc.jwt_authn_provider
 				}
 			}
 			if _enable_oidc_validation {
@@ -270,8 +272,8 @@ import (
 }
 
 #spire_secret: {
-	_name:    string | *"edge" // at least one of these will be overridden
-	_subject: string | *"edge"
+	_name:    string | *defaults.edge.key // at least one of these will be overridden
+	_subject: string | *defaults.edge.key
 	_subjects?: [...string] // If provided, this list of strings will be used instead of _subject
 
 	set_current_client_cert_details?: {...}
@@ -345,7 +347,7 @@ import (
 	providers: {
 		keycloak?: {
 			issuer:    string | *""
-			audiences: [...string] | *["edge"]
+			audiences: [...string] | *[""]
 			remote_jwks?: {
 				http_uri: {
 					uri:     string | *""
@@ -375,7 +377,7 @@ import (
 	provider:     string | *""
 	serviceUrl:   string | *""
 	callbackPath: string | *"/oauth"
-	clientId:     string | *"edge"
+	clientId:     string | *""
 	clientSecret: string | *""
 
 	accessToken: {
@@ -434,8 +436,8 @@ import (
 // see https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/other_features/global_rate_limiting#arch-overview-global-rate-limit for a discussion of ratelimiting and 
 // special descriptors to use
 #default_rate_limit: {
-	stat_prefix:       "edge"
-	domain:            "edge"
+	stat_prefix:       defaults.edge.key
+	domain:            defaults.edge.key
 	failure_mode_deny: true
 	descriptors: [
 		{

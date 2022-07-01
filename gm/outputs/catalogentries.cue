@@ -30,7 +30,7 @@ catalog_entries: [
 	#CatalogService & {
 		name:            "Grey Matter Edge"
 		mesh_id:         mesh.metadata.name
-		service_id:      "edge"
+		service_id:      defaults.edge.key
 		version:         strings.Split(mesh.spec.images.proxy, ":")[1]
 		description:     "Handles north/south traffic flowing through the mesh."
 		api_endpoint:    "/"

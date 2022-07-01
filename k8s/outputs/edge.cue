@@ -5,29 +5,28 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-let Name = "edge"
 edge: [
 	appsv1.#Deployment & {
 		apiVersion: "apps/v1"
 		kind:       "Deployment"
 		metadata: {
-			name:      Name
+			name:      defaults.edge.key
 			namespace: mesh.spec.install_namespace
 		}
 		spec: {
 			selector: {
-				matchLabels: {"greymatter.io/cluster": Name}
+				matchLabels: {"greymatter.io/cluster": defaults.edge.key}
 			}
 			template: {
 				metadata: {
-					labels: {"greymatter.io/cluster": Name}
+					labels: {"greymatter.io/cluster": defaults.edge.key}
 				}
 				spec: #spire_permission_requests & {
 					containers: [
 						#sidecar_container_block & {
-							_Name: Name
+							_Name: defaults.edge.key
 							_volume_mounts: [
-								if defaults.enable_edge_tls == true {
+								if defaults.edge.enable_tls == true {
 									{
 										name:      "tls-certs"
 										mountPath: "/etc/proxy/tls/sidecar"
@@ -37,7 +36,7 @@ edge: [
 						},
 					]
 					volumes: #sidecar_volumes + [
-							if defaults.enable_edge_tls == true {
+							if defaults.edge.enable_tls == true {
 							{
 								name: "tls-certs"
 								secret: {defaultMode: 420, secretName: "gm-edge-ingress-certs"}
@@ -54,16 +53,16 @@ edge: [
 		apiVersion: "v1"
 		kind:       "Service"
 		metadata: {
-			name:      Name
+			name:      defaults.edge.key
 			namespace: mesh.spec.install_namespace
 		}
 		spec: {
-			selector: "greymatter.io/cluster": Name
+			selector: "greymatter.io/cluster": defaults.edge.key
 			type: "LoadBalancer"
 			ports: [{
 				name:       "ingress"
-				port:       10808
-				targetPort: 10808
+				port:       defaults.ports.edge_ingress
+				targetPort: defaults.ports.edge_ingress
 			}]
 		}
 	},

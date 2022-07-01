@@ -146,8 +146,8 @@ controlensemble: [
 			ports: [
 				{
 					name:       "proxy"
-					port:       10808
-					targetPort: 10808
+					port:       defaults.ports.default_ingress
+					targetPort: defaults.ports.default_ingress
 				},
 				{
 					name:       "control"
