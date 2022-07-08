@@ -46,6 +46,8 @@ import (
 	_enable_fault_injection:     bool | *false
 	_enable_oidc_validation:     bool | *false
 	_enable_oidc_authentication: bool | *false
+	_enable_inheaders:           bool | *false
+	_enable_impersonation:       bool | *false
 	_oidc_endpoint:              string
 	_oidc_service_url:           string
 	_oidc_provider:              string
@@ -94,6 +96,12 @@ import (
 		active_http_filters: [
 			if _enable_fault_injection {
 				"envoy.fault"
+			},
+			if _enable_inheaders {
+				"gm.inheaders"
+			},
+			if _enable_impersonation {
+				"gm.acl"
 			},
 			if _enable_oidc_authentication {
 				"gm.oidc-authentication"
@@ -191,6 +199,15 @@ import (
 			if _enable_fault_injection {
 				envoy_fault: #envoy_fault_injection
 			}
+			if _enable_inheaders {
+				gm_inheaders: debug: bool | *false
+			}
+			if _enable_impersonation {
+				gm_impersonation: {
+					servers:       string | *""
+					caseSensitive: bool | *false
+				}
+      }
 			if _enable_ext_authz {
 				envoy_ext_authz: #envoy_ext_authz
 			}
@@ -227,7 +244,7 @@ import (
 	cluster_key: string
 	name:        string | *cluster_key
 	instances:   [...greymatter.#Instance] | *[]
-	
+
 	if _upstream_port != _|_ {
 		instances: [{host: _upstream_host, port: _upstream_port}]
 	}
@@ -258,7 +275,7 @@ import (
 		if lb_policy == "ring_hash" || lb_policy == "maglev" {
 			ring_hash_lb_conf: {
 				minimum_ring_size?: uint64 & <8388608 | *1024
-				hash_func?:         uint32 | *0 //corresponds to the xxHash; 1 for MURMUR_HASH_2 
+				hash_func?:         uint32 | *0                  //corresponds to the xxHash; 1 for MURMUR_HASH_2 
 				maximum_ring_size?: uint64 & <8388608 | *4194304 // 4M
 			}
 		}
