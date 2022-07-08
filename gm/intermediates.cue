@@ -6,6 +6,8 @@ import (
 	ratelimit "envoyproxy.io/extensions/filters/network/ratelimit/v3"
 	jwt_authn "envoyproxy.io/extensions/filters/http/jwt_authn/v3"
 	fault "envoyproxy.io/extensions/filters/http/fault/v3"
+	ext_authz "envoyproxy.io/extensions/filters/http/ext_authz/v3"
+	ext_authz_tcp "envoyproxy.io/extensions/filters/network/ext_authz/v3"
 )
 
 /////////////////////////////////////////////////////////////
@@ -51,8 +53,8 @@ import (
 	_oidc_client_secret:         string
 	_oidc_cookie_domain:         string
 	_oidc_realm:                 string
-	// You must include a service->rate limiter service cluster
-	_enable_tcp_rate_limit: bool | *false
+	_enable_tcp_rate_limit:		 bool | *false  // You must include a service->rate limiter service cluster. HTTP/2
+	_enable_ext_authz:			 bool | *false  // you must create a service->ext authz service cluster. HTTP/2 only if auth server is grpc
 
 	listener_key: string
 	name:         listener_key
@@ -62,6 +64,9 @@ import (
 
 	if _tcp_upstream != _|_ {
 		active_network_filters: [
+			if _enable_ext_authz {
+				"envoy.ext_authz"
+			}
 			if _enable_tcp_rate_limit {
 				"envoy.rate_limit"
 			},
@@ -70,6 +75,10 @@ import (
 		network_filters: {
 			if _enable_tcp_rate_limit {
 				envoy_rate_limit: #envoy_tcp_rate_limit
+			}
+
+			if _enable_ext_authz {
+				envoy_ext_authz: #envoy_tcp_ext_authz
 			}
 
 			// Needs to be last in filter chain
@@ -98,6 +107,9 @@ import (
 			},
 			if _enable_oidc_validation {
 				"gm.oidc-validation"
+			},
+			if _enable_ext_authz {
+				"envoy.ext_authz"
 			},
 			if _enable_rbac {
 				"envoy.rbac"
@@ -178,6 +190,9 @@ import (
 			}
 			if _enable_fault_injection {
 				envoy_fault: #envoy_fault_injection
+			}
+			if _enable_ext_authz {
+				envoy_ext_authz: #envoy_ext_authz
 			}
 		}
 	}
@@ -268,6 +283,7 @@ import (
 	route_key:             string
 	domain_key:            string | *route_key
 	_upstream_cluster_key: string | *route_key
+	_enable_route_ext_authz: bool | *false
 	route_match: {
 		path:       string | *"/"
 		match_type: string | *"prefix"
@@ -280,6 +296,11 @@ import (
 	}]
 	zone_key:       mesh.spec.zone
 	prefix_rewrite: string | *"/"
+	filter_configs: {
+		if _enable_route_ext_authz {
+		envoy_ext_authz: ext_authz.#ExtAuthzPerRoute | *{disabled: true} // example: disable auth for landing page
+		}
+	}
 }
 
 #proxy: greymatter.#Proxy & {
@@ -497,4 +518,29 @@ import (
 			denominator: "HUNDRED"
 		}
 	}
+}
+
+// See https://www.envoyproxy.io/docs/envoy/v1.16.5/configuration/http/http_filters/ext_authz_filter for additional configuration including
+// interfacing with a traditional HTTP/1 authorization service.
+#envoy_ext_authz: ext_authz.#ExtAuthz | *{
+	grpc_service:  {
+		envoy_grpc: {
+			cluster_name: "ext_authz" // Needs to match the name of your cluster. Since its a grpc connection, you must create an http/2 cluster
+		}
+	}
+	failure_mode_allow: false // set to true to allow requests to pass in the case of a authz network failure
+	with_request_body: {
+        max_request_bytes: 1024
+        allow_partial_message: true
+        pack_as_bytes: true
+	}
+}
+
+#envoy_tcp_ext_authz: ext_authz_tcp.#ExtAuthz | *{
+	grpc_service:  {
+		envoy_grpc: {
+			cluster_name: "ext_authz_tcp" // Needs to match the name of your cluster
+		}
+	}
+	failure_mode_allow: false // set to true to allow requests to pass in the case of a authz network failure
 }
