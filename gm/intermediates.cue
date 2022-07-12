@@ -44,7 +44,6 @@ import (
 	_spire_other:                string        // can specify an allowable downstream identity - defaults to "edge"
 	_enable_rbac:                bool | *false
 	_enable_fault_injection:     bool | *false
-	_enable_oidc_validation:     bool | *false
 	_enable_oidc_authentication: bool | *false
 	_enable_inheaders:           bool | *false
 	_enable_impersonation:       bool | *false
@@ -55,8 +54,8 @@ import (
 	_oidc_client_secret:         string
 	_oidc_cookie_domain:         string
 	_oidc_realm:                 string
-	_enable_tcp_rate_limit:		 bool | *false  // You must include a service->rate limiter service cluster. HTTP/2
-	_enable_ext_authz:			 bool | *false  // you must create a service->ext authz service cluster. HTTP/2 only if auth server is grpc
+	_enable_tcp_rate_limit:      bool | *false // You must include a service->rate limiter service cluster. HTTP/2
+	_enable_ext_authz:           bool | *false // you must create a service->ext authz service cluster. HTTP/2 only if auth server is grpc
 
 	listener_key: string
 	name:         listener_key
@@ -68,7 +67,7 @@ import (
 		active_network_filters: [
 			if _enable_ext_authz {
 				"envoy.ext_authz"
-			}
+			},
 			if _enable_tcp_rate_limit {
 				"envoy.rate_limit"
 			},
@@ -109,12 +108,12 @@ import (
 			if _enable_oidc_authentication {
 				"gm.ensure-variables"
 			},
+			if _enable_oidc_authentication {
+				"gm.oidc-validation"
+			},
 			"gm.observables",
 			if _enable_oidc_authentication {
 				"envoy.jwt_authn"
-			},
-			if _enable_oidc_validation {
-				"gm.oidc-validation"
 			},
 			if _enable_ext_authz {
 				"envoy.ext_authz"
@@ -165,24 +164,25 @@ import (
 					}
 				}
 				"gm_ensure-variables": #ensure_variables_filter
-				"envoy_jwt_authn":     #envoy_jwt_authn & {
-					providers: defaults.edge.oidc.jwt_authn_provider
-				}
-			}
-			if _enable_oidc_validation {
 				"gm_oidc-validation": {
-					enforce: bool | *false
+					provider: _oidc_provider
+					enforce:  bool | *false
 					if enforce {
 						enforceResponseCode: int32 | *403
 					}
-					accessToken?: {
-						location: *"header" | _
+					accessToken: {
+						key:      "access_token"
+						location: *"cookie" | _
 						if location == "metadata" {
 							metadataFilter: string
 						}
 					}
-					userInfo?: {
+					userInfo: {
 						location: *"header" | _
+						// USER_DN header is currently required for observables
+						// application to show user audit data
+						key: "USER_DN"
+						claims: ["name"]
 					}
 					TLSConfig?: {
 						useTLS:             bool | *false
@@ -191,6 +191,9 @@ import (
 						caPath:             string | *""
 						insecureSkipVerify: bool | *false
 					}
+				}
+				"envoy_jwt_authn": #envoy_jwt_authn & {
+					providers: defaults.edge.oidc.jwt_authn_provider
 				}
 			}
 			if _enable_rbac {
@@ -207,7 +210,7 @@ import (
 					servers:       string | *""
 					caseSensitive: bool | *false
 				}
-      }
+			}
 			if _enable_ext_authz {
 				envoy_ext_authz: #envoy_ext_authz
 			}
@@ -297,9 +300,9 @@ import (
 }
 
 #route: greymatter.#Route & {
-	route_key:             string
-	domain_key:            string | *route_key
-	_upstream_cluster_key: string | *route_key
+	route_key:               string
+	domain_key:              string | *route_key
+	_upstream_cluster_key:   string | *route_key
 	_enable_route_ext_authz: bool | *false
 	route_match: {
 		path:       string | *"/"
@@ -315,7 +318,7 @@ import (
 	prefix_rewrite: string | *"/"
 	filter_configs: {
 		if _enable_route_ext_authz {
-		envoy_ext_authz: ext_authz.#ExtAuthzPerRoute | *{disabled: true} // example: disable auth for landing page
+			envoy_ext_authz: ext_authz.#ExtAuthzPerRoute | *{disabled: true} // example: disable auth for landing page
 		}
 	}
 }
@@ -540,21 +543,21 @@ import (
 // See https://www.envoyproxy.io/docs/envoy/v1.16.5/configuration/http/http_filters/ext_authz_filter for additional configuration including
 // interfacing with a traditional HTTP/1 authorization service.
 #envoy_ext_authz: ext_authz.#ExtAuthz | *{
-	grpc_service:  {
+	grpc_service: {
 		envoy_grpc: {
 			cluster_name: "ext_authz" // Needs to match the name of your cluster. Since its a grpc connection, you must create an http/2 cluster
 		}
 	}
 	failure_mode_allow: false // set to true to allow requests to pass in the case of a authz network failure
 	with_request_body: {
-        max_request_bytes: 1024
-        allow_partial_message: true
-        pack_as_bytes: true
+		max_request_bytes:     1024
+		allow_partial_message: true
+		pack_as_bytes:         true
 	}
 }
 
 #envoy_tcp_ext_authz: ext_authz_tcp.#ExtAuthz | *{
-	grpc_service:  {
+	grpc_service: {
 		envoy_grpc: {
 			cluster_name: "ext_authz_tcp" // Needs to match the name of your cluster
 		}
