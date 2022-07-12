@@ -44,7 +44,6 @@ import (
 	_spire_other:                string        // can specify an allowable downstream identity - defaults to "edge"
 	_enable_rbac:                bool | *false
 	_enable_fault_injection:     bool | *false
-	_enable_oidc_validation:     bool | *false
 	_enable_oidc_authentication: bool | *false
 	_enable_inheaders:           bool | *false
 	_enable_impersonation:       bool | *false
