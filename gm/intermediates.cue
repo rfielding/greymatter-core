@@ -270,13 +270,13 @@ import (
 	if _load_balancer != _|_ {
 		lb_policy: _load_balancer
 		if lb_policy == "least_request" {
-			least_request_lb_conf: {
+			least_request_lb_config: {
 				choice_count: uint32 | *2
 			}
 		}
 
 		if lb_policy == "ring_hash" || lb_policy == "maglev" {
-			ring_hash_lb_conf: {
+			ring_hash_lb_config: {
 				minimum_ring_size?: uint64 & <8388608 | *1024
 				hash_func?:         uint32 | *0                  //corresponds to the xxHash; 1 for MURMUR_HASH_2 
 				maximum_ring_size?: uint64 & <8388608 | *4194304 // 4M
