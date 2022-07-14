@@ -8,6 +8,7 @@ import (
 	fault "envoyproxy.io/extensions/filters/http/fault/v3"
 	ext_authz "envoyproxy.io/extensions/filters/http/ext_authz/v3"
 	ext_authz_tcp "envoyproxy.io/extensions/filters/network/ext_authz/v3"
+	lua "envoyproxy.io/extensions/filters/http/lua/v3"
 )
 
 /////////////////////////////////////////////////////////////
@@ -111,6 +112,9 @@ import (
 			if _enable_oidc_authentication {
 				"gm.oidc-validation"
 			},
+			if _enable_oidc_authentication {
+				"envoy.lua"
+			},
 			"gm.observables",
 			if _enable_oidc_authentication {
 				"envoy.jwt_authn"
@@ -191,6 +195,17 @@ import (
 						caPath:             string | *""
 						insecureSkipVerify: bool | *false
 					}
+				}
+				// Use Lua pattern matching to get the user's name from encoded JSON object
+				"envoy_lua": lua.#Lua & {
+					inline_code: """
+							function envoy_on_request(handle)
+								local user_dn = handle:headers():get('USER_DN')
+								parsed_user_dn = string.match(user_dn, '%%7B%%22name%%22:%%22(.*)%%22%%7D')
+								parsed_user_dn = string.gsub(parsed_user_dn, '%%20', ' ')
+								handle:headers():replace('USER_DN', parsed_user_dn)
+							end
+						"""
 				}
 				"envoy_jwt_authn": #envoy_jwt_authn & {
 					providers: defaults.edge.oidc.jwt_authn_provider
