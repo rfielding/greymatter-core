@@ -30,10 +30,10 @@ mesh: meshv1.#Mesh & {
 		zone:              string | *"default-zone"
 		images: {
 			proxy:       string | *"quay.io/greymatterio/gm-proxy:1.7.0"
-			catalog:     string | *"quay.io/greymatterio/gm-catalog:3.0.0"
+			catalog:     string | *"quay.io/greymatterio/gm-catalog:3.0.2"
 			dashboard:   string | *"quay.io/greymatterio/gm-dashboard:6.0.1"
-			control:     string | *"quay.io/greymatterio/gm-control:1.7.1"
-			control_api: string | *"quay.io/greymatterio/gm-control-api:1.7.1"
+			control:     string | *"quay.io/greymatterio/gm-control:1.7.3"
+			control_api: string | *"quay.io/greymatterio/gm-control-api:1.7.3"
 			redis:       string | *"redis:latest"
 			prometheus:  string | *"prom/prometheus:v2.36.2"
 		}
