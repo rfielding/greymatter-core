@@ -709,7 +709,7 @@ operator_k8s: [
         namespace: "gm-operator"
         path:      "/mutate-workload"
       }
-      failurePolicy: "Fail"
+      failurePolicy: "Ignore"
       name:          "mutate-workload.greymatter.io"
       namespaceSelector: matchExpressions: [{
         key:      "name"
