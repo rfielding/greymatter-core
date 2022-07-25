@@ -47,7 +47,7 @@ dashboard: [
 								{name: "REDIS_PORT", value:                   "6379"},
 								{name: "KEYCLOAK_CLIENT_ID", value:           "\(defaults.edge.oidc.client_id)"},
 								{name: "KEYCLOAK_CLIENT_SECRET", value:       "\(defaults.edge.oidc.client_secret)"},
-								{name: "KEYCLOAK_AUTH_URL", value:            "(defaults.edge.oidc.endpoint)/auth/realms/(defaults.edge.oidc.realm)/protocol/openid-connect/token"},
+								{name: "KEYCLOAK_AUTH_URL", value:            "\(defaults.edge.oidc.endpoint)/auth/realms/\(defaults.edge.oidc.realm)/protocol/openid-connect/token"},
 							]
 							volumeMounts: [
 								{
