@@ -510,7 +510,7 @@ import (
 // Assumes the http/2 cluster between proxy and the rate limit service is called ratelimit.
 // see https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/other_features/global_rate_limiting#arch-overview-global-rate-limit for a discussion of ratelimiting and 
 // special descriptors to use
-#default_rate_limit: {
+#default_rate_limit: ratelimit.#RateLimit & {
 	stat_prefix:       defaults.edge.key
 	domain:            defaults.edge.key
 	failure_mode_deny: true
@@ -526,8 +526,8 @@ import (
 	]
 	rate_limit_service: {
 		grpc_service: {
+			timeout:      "0.25s"
 			envoy_grpc: {
-				timeout:      "0.25s"
 				cluster_name: "ratelimit"
 			}
 		}
