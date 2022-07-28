@@ -19,6 +19,7 @@ edge_config: [
 		_enable_oidc_authentication: false
 		_enable_rbac:                false
 		_enable_fault_injection:     false
+		_enable_ext_authz:           false
 		_oidc_endpoint:              defaults.edge.oidc.endpoint
 		_oidc_service_url:           "https://\(defaults.edge.oidc.domain):\(defaults.ports.edge_ingress)"
 		_oidc_provider:              "\(defaults.edge.oidc.endpoint)/auth/realms/\(defaults.edge.oidc.realm)"
