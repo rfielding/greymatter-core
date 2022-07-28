@@ -526,7 +526,6 @@ import (
 	]
 	rate_limit_service: {
 		grpc_service: {
-			timeout:      "0.25s"
 			envoy_grpc: {
 				cluster_name: "ratelimit"
 			}
@@ -582,22 +581,22 @@ import (
 
 #OPAEgress: {
 	input: {
-		name: string
+		name:       string
 		domain_key: string
 		configs: [...]
 	}
 	_opa_key: "\(input.name)-egress-to-opa"
 	out: {
-		key: _opa_key
+		key:    _opa_key
 		config: [
 			#cluster & {
-				cluster_key: _opa_key,
-				name: "opa",
+				cluster_key: _opa_key
+				name:        "opa"
 				http2_protocol_options: {
 					allow_connect: true
 				}
 			},
-			#route & {route_key: _opa_key, domain_key: input.domain_key}
+			#route & {route_key: _opa_key, domain_key: input.domain_key},
 		] + input.configs
 	}
 }
