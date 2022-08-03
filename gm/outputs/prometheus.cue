@@ -15,7 +15,29 @@ prometheus_config: [
 		_gm_observables_topic: Name
 		_is_ingress:           true
 	},
-	#cluster & {cluster_key: LocalName, _upstream_port: 9090},
+	#cluster & {
+		cluster_key: LocalName,
+		if len(defaults.prometheus.external_host) > 0 {
+			_upstream_host: defaults.prometheus.external_host
+		}
+		_upstream_port: [
+			if defaults.prometheus.port != _|_ { defaults.prometheus.port },
+			9090, //9090 is the default for when prometheus is deployed with greymatter
+		][0]
+		
+		if defaults.prometheus.tls.enabled {
+			require_tls: true
+			ssl_config: {
+				cert_key_pairs: [
+					{
+						certificate_path: "/etc/proxy/tls/prometheus/server.crt"
+						key_path: "/etc/proxy/tls/prometheus/server.key"
+					}
+				]
+			}
+		}
+	},
+
 	#route & {route_key:     LocalName},
 
 	// egress->redis
