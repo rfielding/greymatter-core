@@ -7,12 +7,13 @@ import (
 
 config: {
 	// Flags
-	spire:                     bool | *false @tag(spire,type=bool)           // enable Spire-based mTLS
-	auto_apply_mesh:           bool | *true  @tag(auto_apply_mesh,type=bool) // apply the default mesh specified above after a delay
-	openshift:                 bool | *false @tag(openshift,type=bool)
-	enable_historical_metrics: bool | *true  @tag(enable_historical_metrics,type=bool)
-	debug:                     bool | *false @tag(debug,type=bool) // currently just controls k8s/outputs/operator.cue for debugging
-	test:                      bool | *false @tag(test,type=bool)  // currently just turns off GitOps so CI integration tests can manipulate directly
+	spire:                       bool | *false @tag(spire,type=bool)           // enable Spire-based mTLS
+	auto_apply_mesh:             bool | *true  @tag(auto_apply_mesh,type=bool) // apply the default mesh specified above after a delay
+	openshift:                   bool | *false @tag(openshift,type=bool)
+	enable_historical_metrics:   bool | *true  @tag(enable_historical_metrics,type=bool)
+	debug:                       bool | *false @tag(debug,type=bool) // currently just controls k8s/outputs/operator.cue for debugging
+	test:                        bool | *false @tag(test,type=bool)  // currently just turns off GitOps so CI integration tests can manipulate directly
+	auto_copy_image_pull_secret: bool | *true @tag(auto_copy_iamge_pull_secret, type=bool)
 
 	// for a hypothetical future where we want to mount specific certificates for operator webhooks, etc.
 	generate_webhook_certs: bool | *true        @tag(generate_webhook_certs,type=bool)

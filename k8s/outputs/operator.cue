@@ -354,6 +354,7 @@ operator_k8s: [
         auto_apply_mesh: \(config.auto_apply_mesh)
         openshift: \(config.openshift)
         generate_webhook_certs: \(config.generate_webhook_certs)
+        auto_copy_image_pull_secret: \(config.auto_copy_image_pull_secret)
       }
       """
     }
