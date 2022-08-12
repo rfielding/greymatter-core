@@ -211,6 +211,16 @@ operator_sts: [
             fsGroup: 1000
           }
           containers: [{
+              env: [{
+                name: "BUGSNAG_API_TOKEN"
+                valueFrom: {
+                  secretKeyRef: {
+                    name: "bugsnag-api-token"
+                    key: "token"
+                    optional: true
+                  }
+                }
+            }]
             if !config.debug {
               // command: ["sleep"] // DEBUG
               // args: ["30000"]
