@@ -256,8 +256,12 @@ operator_sts: [
                 "--accept-multiclient",
                 "--api-version=2",
                 "exec",
+                "--continue",
                 "/app/operator",
-                "-cueRoot", "core",
+                "--",
+                "-repo", "git@github.com:greymatter-io/gitops-core.git",
+                "-sshPrivateKeyPath", "/app/.ssh/id_ed25519",
+                "-tag", "v0.9.3"
               ]
               imagePullPolicy: "Always"
             }
