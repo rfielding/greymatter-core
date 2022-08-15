@@ -24,6 +24,11 @@ import (
 	version?:        string
 }
 
+prometheusName: [
+	if len(defaults.prometheus.external_host) > 0 { "Grey Matter Prometheus Proxy" },
+	"Grey Matter Prometheus",
+][0]
+
 // TODO these should get their own defaults treatment in gm/intermediates.cue
 
 catalog_entries: [
@@ -66,13 +71,13 @@ catalog_entries: [
 	},
 	if config.enable_historical_metrics {
 		#CatalogService & {
-			name:            "Grey Matter Prometheus"
+			name:            prometheusName
 			mesh_id:         mesh.metadata.name
 			service_id:      "prometheus"
 			version:         strings.Split(mesh.spec.images.prometheus, ":")[1]
 			description:     "Prometheus TSDB for collecting and querying historical metrics."
 			business_impact: "high"
-			api_endpoint:    "/services/prometheus/api/v1/"
+			api_endpoint:    "/services/prometheus/graph"
 		}
 	},
 ]

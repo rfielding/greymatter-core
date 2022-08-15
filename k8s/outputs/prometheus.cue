@@ -313,4 +313,51 @@ prometheus: [
 				"""#
 		}
 	},
+
+]
+
+prometheus_proxy: [
+	// // standalone proxy for prometheus
+	appsv1.#Deployment & {
+		apiVersion: "apps/v1"
+		kind:       "Deployment"
+		metadata: {
+			name:      Name
+			namespace: mesh.spec.install_namespace
+		}
+		spec: {
+			selector: {
+				matchLabels: {"greymatter.io/cluster": Name}
+			}
+			template: {
+				metadata: {
+					labels: {"greymatter.io/cluster": Name}
+				}
+				spec: #spire_permission_requests & {
+					containers: [
+						#sidecar_container_block & {
+							_Name: Name
+							_volume_mounts: [
+								if defaults.prometheus.tls.enabled == true {
+									{
+										name:      "prometheus-tls-certs"
+										mountPath: "/etc/proxy/tls/prometheus"
+									}
+								},
+							]
+						},
+					]
+					volumes: #sidecar_volumes + [
+							if defaults.prometheus.tls.enabled == true {
+							{
+								name: "prometheus-tls-certs"
+								secret: {defaultMode: 420, secretName: defaults.prometheus.tls.cert_secret }
+							}
+						},
+					]
+					imagePullSecrets: [{name: defaults.image_pull_secret_name}]
+				}
+			}
+		}
+	},
 ]
