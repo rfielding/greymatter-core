@@ -35,6 +35,7 @@ prometheus_manifests: [ for x in prometheus if config.enable_historical_metrics 
 	[ for x in prometheus_proxy if config.enable_historical_metrics && len(defaults.prometheus.external_host) > 0 {x} ]
 
 prometheus_scrape_rules: prometheus[len(prometheus)-1]
+prometheus_rbac: prometheus[1:len(prometheus)-1]
 
 // for CLI convenience,
 // e.g. `cue eval -c ./k8s/outputs --out text -e k8s_manifests_yaml`
@@ -44,6 +45,7 @@ spire_manifests_yaml: yaml.MarshalStream(spire_manifests)
 k8s_manifests_yaml: yaml.MarshalStream(k8s_manifests)
 prometheus_manifests_yaml: yaml.MarshalStream(prometheus_manifests)
 prometheus_scrape_rules_yaml: yaml.Marshal(prometheus_scrape_rules)
+prometheus_rbac_yaml: yaml.MarshalStream(prometheus_rbac)
 
 // TODO this was only necessary because I don't know how to pass _Name into #sidecar_container_block
 // from Go. Then I decided to kill two birds with one stone and also put the sidecar_socket_volume in there.
