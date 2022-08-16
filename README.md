@@ -1,4 +1,4 @@
-# Grey Matter Core CUE
+# greymatter.io Core CUE
 
 Enterprise-level CUE files for core Grey Matter mesh configurations.
 
