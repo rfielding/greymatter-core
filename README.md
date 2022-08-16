@@ -1,6 +1,6 @@
 # greymatter.io Core CUE
 
-Enterprise-level CUE files for core Grey Matter mesh configurations.
+Enterprise-level CUE files for core greymatter.io mesh configurations.
 
 ## Prerequisites
 
