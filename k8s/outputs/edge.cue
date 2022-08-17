@@ -33,6 +33,10 @@ edge: [
 									}
 								},
 							]
+							resources: {
+								limits: { cpu: "1", memory: "1Gi" }
+								requests: { cpu: "250m", memory: "128Mi" }
+							}
 						},
 					]
 					volumes: #sidecar_volumes + [
