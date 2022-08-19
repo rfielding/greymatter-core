@@ -134,6 +134,7 @@ import (
 			},
 			// Needs to be last in filter chain
 			"envoy.tcp_proxy",
+			...string,
 		]
 		network_filters: {
 			// Configures rate limiting for TCP listeners.
