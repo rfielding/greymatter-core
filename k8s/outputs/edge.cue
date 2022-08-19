@@ -34,8 +34,8 @@ edge: [
 								},
 							]
 							resources: {
-								limits: { cpu: "1", memory: "1Gi" }
-								requests: { cpu: "250m", memory: "128Mi" }
+								limits: { cpu: "200m", memory: "200Mi" }
+								requests: { cpu: "100m", memory: "128Mi" }
 							}
 						},
 					]
