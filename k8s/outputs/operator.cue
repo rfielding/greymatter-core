@@ -15,8 +15,8 @@ operator_namespace: [
     apiVersion: "v1"
     kind:       "Namespace"
     metadata: {
-      labels: name: config.namespace
-      name: config.namespace
+      labels: name: config.operator_namespace
+      name: config.operator_namespace
     }
   }
 ]
@@ -36,7 +36,7 @@ operator_crd: [
         webhook: {
           clientConfig: service: {
             name:      "gm-webhook"
-            namespace: config.namespace
+            namespace: config.operator_namespace
             path:      "/convert"
           }
           conversionReviewVersions: [
@@ -196,16 +196,16 @@ operator_sts: [
     apiVersion: "apps/v1"
     kind:       "StatefulSet"
     metadata: {
-      labels: name: config.namespace
-      name:      config.namespace
-      namespace: config.namespace
+      labels: name: config.operator_namespace
+      name:      config.operator_namespace
+      namespace: config.operator_namespace
     }
     spec: {
-      serviceName: config.namespace
+      serviceName: config.operator_namespace
       replicas:    1
-      selector: matchLabels: name: config.namespace
+      selector: matchLabels: name: config.operator_namespace
       template: {
-        metadata: labels: name: config.namespace
+        metadata: labels: name: config.operator_namespace
         spec: {
           securityContext: {
             fsGroup: 1000
@@ -317,7 +317,7 @@ operator_sts: [
           securityContext: {
             runAsNonRoot: true
           }
-          serviceAccountName:            config.namespace
+          serviceAccountName:            config.operator_namespace
           terminationGracePeriodSeconds: 10
           volumes: [
             {
@@ -358,7 +358,7 @@ operator_k8s: [
     kind: "ConfigMap"
     metadata: {
       name: "overrides-cue"
-      namespace: config.namespace
+      namespace: config.operator_namespace
     }
     data: {
       "overrides.cue": """
@@ -384,8 +384,8 @@ operator_k8s: [
     }]
     kind: "ServiceAccount"
     metadata: {
-      name:      config.namespace
-      namespace: config.namespace
+      name:      config.operator_namespace
+      namespace: config.operator_namespace
     }
   },
   rbacv1.#Role & {
@@ -393,7 +393,7 @@ operator_k8s: [
     kind:       "Role"
     metadata: {
       name:      "gm-leader-election-role"
-      namespace: config.namespace
+      namespace: config.operator_namespace
     }
     rules: [{
       apiGroups: [
@@ -655,7 +655,7 @@ operator_k8s: [
     kind:       "RoleBinding"
     metadata: {
       name:      "gm-leader-election-rolebinding"
-      namespace: config.namespace
+      namespace: config.operator_namespace
     }
     roleRef: {
       apiGroup: "rbac.authorization.k8s.io"
@@ -664,8 +664,8 @@ operator_k8s: [
     }
     subjects: [{
       kind:      "ServiceAccount"
-      name:      config.namespace
-      namespace: config.namespace
+      name:      config.operator_namespace
+      namespace: config.operator_namespace
     }]
   },
   rbacv1.#ClusterRoleBinding & {
@@ -679,8 +679,8 @@ operator_k8s: [
     }
     subjects: [{
       kind:      "ServiceAccount"
-      name:      config.namespace
-      namespace: config.namespace
+      name:      config.operator_namespace
+      namespace: config.operator_namespace
     }]
   },
   corev1.#Secret & { // the values here get filled in programmatically by the operator
@@ -692,7 +692,7 @@ operator_k8s: [
     kind: "Secret"
     metadata: {
       name:      "gm-webhook-cert"
-      namespace: config.namespace
+      namespace: config.operator_namespace
     }
   },
   corev1.#Service & {
@@ -700,7 +700,7 @@ operator_k8s: [
     kind:       "Service"
     metadata: {
       name:      "gm-webhook"
-      namespace: config.namespace
+      namespace: config.operator_namespace
     }
     spec: {
       ports: [{
@@ -708,7 +708,7 @@ operator_k8s: [
         protocol:   "TCP"
         targetPort: 9443
       }]
-      selector: name: config.namespace
+      selector: name: config.operator_namespace
     }
   },
   admisv1.#MutatingWebhookConfiguration & {
@@ -722,7 +722,7 @@ operator_k8s: [
       ]
       clientConfig: service: {
         name:      "gm-webhook"
-        namespace: config.namespace
+        namespace: config.operator_namespace
         path:      "/mutate-workload"
       }
       failurePolicy: "Ignore"
@@ -731,7 +731,7 @@ operator_k8s: [
         key:      "name"
         operator: "NotIn"
         values: [
-          config.namespace,
+          config.operator_namespace,
           "spire",
         ]
       }]
@@ -762,7 +762,7 @@ operator_k8s: [
       ]
       clientConfig: service: {
         name:      "gm-webhook"
-        namespace: config.namespace
+        namespace: config.operator_namespace
         path:      "/mutate-mesh"
       }
       failurePolicy: "Fail"
@@ -797,7 +797,7 @@ operator_k8s: [
       ]
       clientConfig: service: {
         name:      "gm-webhook"
-        namespace: config.namespace
+        namespace: config.operator_namespace
         path:      "/validate-mesh"
       }
       failurePolicy: "Fail"

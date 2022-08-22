@@ -37,8 +37,8 @@ openshift_privileged_scc: [
 		}
 		subjects: [{
 			kind:      "ServiceAccount"
-			name:      config.namespace
-			namespace: config.namespace
+			name:      config.operator_namespace
+			namespace: config.operator_namespace
 		}]
 	},
 ]
@@ -114,8 +114,8 @@ openshift_spire_scc: [
 		}
 		subjects: [{
 			kind:      "ServiceAccount"
-			name:      config.namespace
-			namespace: config.namespace
+			name:      config.operator_namespace
+			namespace: config.operator_namespace
 		}]
 	},
 ]
