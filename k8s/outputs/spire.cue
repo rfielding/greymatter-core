@@ -100,8 +100,8 @@ spire_server: [
               mountPath: "/run/spire/data"
             }]
             resources: {
-              limits: { cpu: "1", memory: "1Gi" }
-              requests: { cpu: "500m", memory: "512Mi" }
+              limits: { cpu: "350m", memory: "1Gi" }
+              requests: { cpu: "100m", memory: "512Mi" }
             }
           }, {
             name:            "registrar"
@@ -125,8 +125,8 @@ spire_server: [
               mountPath: "/run/spire/socket"
             }]
             resources: {
-              limits: { cpu: "1", memory: "1Gi" }
-              requests: { cpu: "500m", memory: "512Mi" }
+              limits: { cpu: "400m", memory: "1Gi" }
+              requests: { cpu: "100m", memory: "512Mi" }
             }
           }]
           volumes: [{
@@ -398,8 +398,8 @@ spire_agent: [
               mountPath: "/run/spire/token"
             }]
             resources: { 
-              limits: { cpu: "1", memory: "1Gi" }
-              requests: { cpu: "500m", memory: "512Mi" }
+              limits: { cpu: "400m", memory: "512Mi" }
+              requests: { cpu: "200m", memory: "256Mi" }
             }
           }]
           volumes: [{
