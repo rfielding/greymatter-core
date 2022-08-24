@@ -196,16 +196,16 @@ operator_sts: [
     apiVersion: "apps/v1"
     kind:       "StatefulSet"
     metadata: {
-      labels: name: config.operator_namespace
-      name:      config.operator_namespace
+      labels: name: "greymatter-operator"
+      name:      "greymatter-operator"
       namespace: config.operator_namespace
     }
     spec: {
-      serviceName: config.operator_namespace
+      serviceName: "greymatter-operator"
       replicas:    1
-      selector: matchLabels: name: config.operator_namespace
+      selector: matchLabels: name: "greymatter-operator"
       template: {
-        metadata: labels: name: config.operator_namespace
+        metadata: labels: name: "greymatter-operator"
         spec: {
           securityContext: {
             fsGroup: 1000
@@ -317,7 +317,7 @@ operator_sts: [
           securityContext: {
             runAsNonRoot: true
           }
-          serviceAccountName:            config.operator_namespace
+          serviceAccountName:            "greymatter-operator"
           terminationGracePeriodSeconds: 10
           volumes: [
             {
@@ -384,7 +384,7 @@ operator_k8s: [
     }]
     kind: "ServiceAccount"
     metadata: {
-      name:      config.operator_namespace
+      name:      "greymatter-operator"
       namespace: config.operator_namespace
     }
   },
@@ -664,7 +664,7 @@ operator_k8s: [
     }
     subjects: [{
       kind:      "ServiceAccount"
-      name:      config.operator_namespace
+      name:      "greymatter-operator"
       namespace: config.operator_namespace
     }]
   },
@@ -679,7 +679,7 @@ operator_k8s: [
     }
     subjects: [{
       kind:      "ServiceAccount"
-      name:      config.operator_namespace
+      name:      "greymatter-operator"
       namespace: config.operator_namespace
     }]
   },
@@ -708,7 +708,7 @@ operator_k8s: [
         protocol:   "TCP"
         targetPort: 9443
       }]
-      selector: name: config.operator_namespace
+      selector: name: "greymatter-operator"
     }
   },
   admisv1.#MutatingWebhookConfiguration & {
@@ -731,7 +731,7 @@ operator_k8s: [
         key:      "name"
         operator: "NotIn"
         values: [
-          config.operator_namespace,
+          "greymatter-operator",
           "spire",
         ]
       }]

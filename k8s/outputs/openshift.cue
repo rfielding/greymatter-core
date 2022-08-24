@@ -37,7 +37,7 @@ openshift_privileged_scc: [
 		}
 		subjects: [{
 			kind:      "ServiceAccount"
-			name:      config.operator_namespace
+			name:      "greymatter-operator"
 			namespace: config.operator_namespace
 		}]
 	},
@@ -114,7 +114,7 @@ openshift_spire_scc: [
 		}
 		subjects: [{
 			kind:      "ServiceAccount"
-			name:      config.operator_namespace
+			name:      "greymatter-operator"
 			namespace: config.operator_namespace
 		}]
 	},
