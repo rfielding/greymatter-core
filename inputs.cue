@@ -8,12 +8,11 @@ import (
 config: {
 	// Flags
 	spire:                       bool | *false           @tag(spire,type=bool)           // enable Spire-based mTLS
-	auto_apply_mesh:             bool | *true            @tag(auto_apply_mesh,type=bool) // apply the default mesh specified above after a delay
 	openshift:                   bool | *false           @tag(openshift,type=bool)
 	enable_historical_metrics:   bool | *true            @tag(enable_historical_metrics,type=bool)
 	debug:                       bool | *false           @tag(debug,type=bool) // currently just controls k8s/outputs/operator.cue for debugging
 	test:                        bool | *false           @tag(test,type=bool)  // currently just turns off GitOps so CI integration tests can manipulate directly
-	auto_copy_image_pull_secret: bool | *true            @tag(auto_copy_iamge_pull_secret, type=bool)
+	auto_copy_image_pull_secret: bool | *true            @tag(auto_copy_image_pull_secret, type=bool)
 	operator_namespace:          string | *"gm-operator" @tag(operator_namespace, type=string) // namespace the operator will deploy into
 
 	// for a hypothetical future where we want to mount specific certificates for operator webhooks, etc.
@@ -31,7 +30,7 @@ mesh: meshv1.#Mesh & {
 		release_version:   string | *"1.7" // deprecated
 		zone:              string | *"default-zone"
 		images: {
-			proxy:       string | *"quay.io/greymatterio/gm-proxy:1.7.0"
+			proxy:       string | *"quay.io/greymatterio/gm-proxy:1.7.1"
 			catalog:     string | *"quay.io/greymatterio/gm-catalog:3.0.5"
 			dashboard:   string | *"quay.io/greymatterio/gm-dashboard:connections"
 			control:     string | *"quay.io/greymatterio/gm-control:1.7.3"

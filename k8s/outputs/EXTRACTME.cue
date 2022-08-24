@@ -11,7 +11,6 @@ spire_manifests: spire_namespace +
 	spire_agent
 // Deploys the operator and optionally spire (so these manifests are in place before anything else)
 operator_manifests: operator_namespace +
-	operator_crd +
 	operator_sts +
 	operator_k8s +
 	[ for x in openshift_privileged_scc if config.openshift {x}] +

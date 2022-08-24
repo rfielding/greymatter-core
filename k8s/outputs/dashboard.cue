@@ -21,7 +21,10 @@ dashboard: [
 			}
 			template: {
 				metadata: {
-					labels: {"greymatter.io/cluster": Name}
+					labels: {
+						"greymatter.io/cluster": Name
+						"greymatter.io/workload": "\(mesh.metadata.name).\(Name)"
+					}
 				}
 				spec: #spire_permission_requests & {
 					containers: [

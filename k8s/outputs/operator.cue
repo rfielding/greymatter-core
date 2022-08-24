@@ -6,8 +6,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-  admisv1 "k8s.io/api/admissionregistration/v1"
-  // "encoding/base64"
+	admisv1 "k8s.io/api/admissionregistration/v1"
 )
 
 operator_namespace: [
@@ -19,173 +18,6 @@ operator_namespace: [
       name: config.operator_namespace
     }
   }
-]
-
-operator_crd: [
-  // TODO we need the #CustomResourceDefinition definition
-  {
-    apiVersion: "apiextensions.k8s.io/v1"
-    kind:       "CustomResourceDefinition"
-    metadata: {
-      annotations: "controller-gen.kubebuilder.io/version": "v0.6.1"
-      name: "meshes.greymatter.io"
-    }
-    spec: {
-      conversion: {
-        strategy: "Webhook"
-        webhook: {
-          clientConfig: service: {
-            name:      "gm-webhook"
-            namespace: config.operator_namespace
-            path:      "/convert"
-          }
-          conversionReviewVersions: [
-            "v1",
-          ]
-        }
-      }
-      group: "greymatter.io"
-      names: {
-        kind:     "Mesh"
-        listKind: "MeshList"
-        plural:   "meshes"
-        singular: "mesh"
-      }
-      scope: "Cluster"
-      versions: [{
-        additionalPrinterColumns: [{
-          jsonPath: ".spec.install_namespace"
-          name:     "Install Namespace"
-          type:     "string"
-        }, {
-          jsonPath: ".spec.release_version"
-          name:     "Release Version"
-          type:     "string"
-        }, {
-          jsonPath: ".spec.zone"
-          name:     "Zone"
-          type:     "string"
-        }]
-        name: "v1alpha1"
-        schema: openAPIV3Schema: {
-          description: "Mesh defines a Grey Matter mesh's desired state and describes its observed state."
-
-          properties: {
-            apiVersion: {
-              description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
-
-              type: "string"
-            }
-            kind: {
-              description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
-
-              type: "string"
-            }
-            metadata: type: "object"
-            spec: {
-              description: "MeshSpec defines the desired state of a Grey Matter mesh."
-              properties: {
-                image_pull_secrets: {
-                  description: "A list of pull secrets to try for fetching core services."
-                  items: type: "string"
-                  type: "array"
-                }
-                images: {
-                  description: "A list of OCI image strings and their respective pull secret names. These are treated as overrides to the specified \"release_version\"."
-
-                  properties: {
-                    catalog: type: "string"
-                    control: type: "string"
-                    control_api: type: "string"
-                    dashboard: type: "string"
-                    jwt_security: type: "string"
-                    prometheus: type: "string"
-                    proxy: type: "string"
-                    redis: type: "string"
-                  }
-                  type: "object"
-                }
-                install_namespace: {
-                  description: "Namespace where mesh core components and dependencies should be installed."
-
-                  type: "string"
-                }
-                release_version: {
-                  default:     "latest"
-                  description: "The version of Grey Matter to install for this mesh."
-                  enum: [
-                    "1.6",
-                    "1.7",
-                    "latest",
-                  ]
-                  type: "string"
-                }
-                user_tokens: {
-                  description: "Add user tokens to the JWT Security Service."
-                  items: {
-                    properties: {
-                      label: type: "string"
-                      values: {
-                        additionalProperties: {
-                          items: type: "string"
-                          type: "array"
-                        }
-                        type: "object"
-                      }
-                    }
-                    required: [
-                      "label",
-                      "values",
-                    ]
-                    type: "object"
-                  }
-                  type: "array"
-                }
-                watch_namespaces: {
-                  description: "Namespaces to include in the mesh network."
-                  items: type: "string"
-                  type: "array"
-                }
-                zone: {
-                  default:     "default-zone"
-                  description: "Label this mesh as belonging to a particular zone."
-                  type:        "string"
-                }
-              }
-              required: [
-                "install_namespace",
-                "release_version",
-                "zone",
-              ]
-              type: "object"
-            }
-            status: {
-              description: "MeshStatus describes the observed state of a Grey Matter mesh."
-              type: "object"
-              properties: {
-                sidecar_list: {
-                  type: "array"
-                  items: type: "string"
-                }
-              }
-            }
-          }
-          type: "object"
-        }
-        served:  true
-        storage: true
-        subresources: status: {}
-      }]
-    }
-    status: {
-      acceptedNames: {
-        kind:   ""
-        plural: ""
-      }
-      conditions: []
-      storedVersions: []
-    }
-  },
 ]
 
 // CI requires "IfNotPresent" (and sets it with this tag) but Always is safer for development
@@ -231,7 +63,7 @@ operator_sts: [
                 args: [
                   "-repo", "git@github.com:greymatter-io/gitops-core.git",
                   "-sshPrivateKeyPath", "/app/.ssh/id_ed25519",
-                  "-tag", "v0.9.3"
+                  "-branch", "main"
                 ]
               }
               livenessProbe: {
@@ -292,8 +124,6 @@ operator_sts: [
             }
             securityContext: {
               allowPrivilegeEscalation: false
-              // capabilities: drop: ["ALL"]
-              // seccompProfile: type: "RuntimeDefault"
             }
             volumeMounts: [
               {
@@ -353,6 +183,9 @@ operator_sts: [
 ]
 
 operator_k8s: [
+
+	// This ConfigMap is so flags passed to cue eval will have an effect on CUE
+	// applied at runtime so the integration tests can manipulate things without gitops
   corev1.#ConfigMap & {
     apiVersion: "v1"
     kind: "ConfigMap"
@@ -366,14 +199,14 @@ operator_k8s: [
 
       config: {
         spire: \(config.spire)
-        auto_apply_mesh: \(config.auto_apply_mesh)
         openshift: \(config.openshift)
         generate_webhook_certs: \(config.generate_webhook_certs)
+        enable_historical_metrics: \(config.enable_historical_metrics)
         auto_copy_image_pull_secret: \(config.auto_copy_image_pull_secret)
       }
       """
-    }
-  },
+		}
+	},
 
   corev1.#ServiceAccount & {
     apiVersion: "v1"
@@ -446,56 +279,13 @@ operator_k8s: [
     metadata: name: "gm-operator-role"
     rules: [{
       apiGroups: [
-        "apiextensions.k8s.io",
-      ]
-      resourceNames: [
-        "meshes.greymatter.io",
-      ]
-      resources: [
-        "customresourcedefinitions",
-      ]
-      verbs: [
-        "get",
-      ]
-    }, {
-      apiGroups: [
-        "greymatter.io",
-      ]
-      resources: [
-        "meshes",
-      ]
-      verbs: [
-        "create",
-        "delete",
-        "get",
-        "list",
-        "patch",
-        "update",
-        "watch",
-      ]
-    }, {
-      apiGroups: [
-        "greymatter.io",
-      ]
-      resources: [
-        "meshes/status",
-      ]
-      verbs: [
-        "get",
-        "patch",
-        "update",
-      ]
-    }, {
-      apiGroups: [
         "admissionregistration.k8s.io",
       ]
       resourceNames: [
         "gm-mutate-config",
-        "gm-validate-config",
       ]
       resources: [
         "mutatingwebhookconfigurations",
-        "validatingwebhookconfigurations",
       ]
       verbs: [
         "get",
@@ -648,7 +438,115 @@ operator_k8s: [
     }]
   },
 
-
+	rbacv1.#RoleBinding & {
+		apiVersion: "rbac.authorization.k8s.io/v1"
+		kind:       "RoleBinding"
+		metadata: {
+			name:      "gm-leader-election-rolebinding"
+      namespace: config.operator_namespace
+		}
+		roleRef: {
+			apiGroup: "rbac.authorization.k8s.io"
+			kind:     "Role"
+			name:     "gm-leader-election-role"
+		}
+		subjects: [{
+			kind:      "ServiceAccount"
+      name:      "greymatter-operator"
+      namespace: config.operator_namespace
+		}]
+	},
+	// This ClusterRoleBinding, apart from its normal duties, is also the owner of most operator-created
+	// resources because it has cluster scope and the CRD (the previous owner) is deprecated.
+	rbacv1.#ClusterRoleBinding & {
+		apiVersion: "rbac.authorization.k8s.io/v1"
+		kind:       "ClusterRoleBinding"
+		metadata: name: "gm-operator-rolebinding"
+		roleRef: {
+			apiGroup: "rbac.authorization.k8s.io"
+			kind:     "ClusterRole"
+			name:     "gm-operator-role"
+		}
+		subjects: [{
+			kind:      "ServiceAccount"
+      name:      "greymatter-operator"
+      namespace: config.operator_namespace
+		}]
+	},
+	corev1.#Secret & {// the values here get filled in programmatically by the operator
+		apiVersion: "v1"
+		data: {
+			"tls.crt": ''
+			"tls.key": ''
+		}
+		kind: "Secret"
+		metadata: {
+			name:      "gm-webhook-cert"
+      namespace: config.operator_namespace
+		}
+	},
+	corev1.#Service & {
+		apiVersion: "v1"
+		kind:       "Service"
+		metadata: {
+			name:      "gm-webhook"
+      namespace: config.operator_namespace
+		}
+		spec: {
+			ports: [{
+				port:       443
+				protocol:   "TCP"
+				targetPort: 9443
+			}]
+			selector: name: "greymatter-operator"
+		}
+	},
+	admisv1.#MutatingWebhookConfiguration & {
+		apiVersion: "admissionregistration.k8s.io/v1"
+		kind:       "MutatingWebhookConfiguration"
+		metadata: name: "gm-mutate-config"
+		webhooks: [{
+			admissionReviewVersions: [
+				"v1",
+				"v1beta1",
+			]
+			clientConfig: service: {
+				name:      "gm-webhook"
+				namespace: config.operator_namespace
+				path:      "/mutate-workload"
+			}
+			failurePolicy: "Ignore"
+			name:          "mutate-workload.greymatter.io"
+			namespaceSelector: matchExpressions: [{
+				key:      "name"
+				operator: "NotIn"
+				values: [
+					config.operator_namespace,
+					"spire",
+				]
+			}]
+			rules: [{
+				apiGroups: [
+					"",
+					"apps",
+				]
+				apiVersions: [
+					"v1",
+				]
+				operations: [
+					"CREATE",
+					"UPDATE",
+					"DELETE",
+				]
+				resources: [
+					"pods",
+					"deployments",
+					"statefulsets",
+				]
+			}]
+			sideEffects: "None"
+		}]
+	},
 
   rbacv1.#RoleBinding & {
     apiVersion: "rbac.authorization.k8s.io/v1"
@@ -668,6 +566,8 @@ operator_k8s: [
       namespace: config.operator_namespace
     }]
   },
+  // This ClusterRoleBinding, apart from its normal duties, is also the owner of most operator-created
+  // resources because it has cluster scope and the CRD (the previous owner) is deprecated.
   rbacv1.#ClusterRoleBinding & {
     apiVersion: "rbac.authorization.k8s.io/v1"
     kind:       "ClusterRoleBinding"
@@ -755,70 +655,7 @@ operator_k8s: [
         ]
       }]
       sideEffects: "None"
-    }, {
-      admissionReviewVersions: [
-        "v1",
-        "v1beta1",
-      ]
-      clientConfig: service: {
-        name:      "gm-webhook"
-        namespace: config.operator_namespace
-        path:      "/mutate-mesh"
-      }
-      failurePolicy: "Fail"
-      name:          "mutate-mesh.greymatter.io"
-      rules: [{
-        apiGroups: [
-          "greymatter.io",
-        ]
-        apiVersions: [
-          "v1alpha1",
-        ]
-        operations: [
-          "CREATE",
-          "UPDATE",
-        ]
-        resources: [
-          "meshes",
-        ]
-      }]
-      sideEffects: "None"
-    }]
+    }, ]
   },
   
-  admisv1.#ValidatingWebhookConfiguration & {
-    apiVersion: "admissionregistration.k8s.io/v1"
-    kind:       "ValidatingWebhookConfiguration"
-    metadata: name: "gm-validate-config"
-    webhooks: [{
-      admissionReviewVersions: [
-        "v1",
-        "v1beta1",
-      ]
-      clientConfig: service: {
-        name:      "gm-webhook"
-        namespace: config.operator_namespace
-        path:      "/validate-mesh"
-      }
-      failurePolicy: "Fail"
-      name:          "validate-mesh.greymatter.io"
-      rules: [{
-        apiGroups: [
-          "greymatter.io",
-        ]
-        apiVersions: [
-          "v1alpha1",
-        ]
-        operations: [
-          "CREATE",
-          "UPDATE",
-          "DELETE",
-        ]
-        resources: [
-          "meshes",
-        ]
-      }]
-      sideEffects: "None"
-    }]
-  },
 ]
