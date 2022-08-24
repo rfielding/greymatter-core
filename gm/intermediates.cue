@@ -378,7 +378,10 @@ import (
 	if _enable_circuit_breakers {
 		// circuit_breakers can specify circuit breaker levels for normal and high
 		// priority traffic with configured defaults
-		circuit_breakers: #circuit_breaker
+		circuit_breakers: greymatter.#CircuitBreakersThresholds & {
+			#circuit_breakers_default
+			high?: #circuit_breakers_default
+		}
 	}
 
 	// Allows for configuration of a load balancer, designated by the policy type.
@@ -400,13 +403,10 @@ import (
 	}
 }
 
-#circuit_breaker: {
-	#circuit_breaker_default
-	high?: #circuit_breaker_default
-}
-
-// #circuit_breaker_default default values.
-#circuit_breaker_default: {
+// #circuit_breakers_default provides default circuit breaker values.
+// Setting _enable_circuit_breakers: true on the #cluster will use these values
+// unless overriden.
+#circuit_breakers_default: {
 	max_connections:      int64 | *512
 	max_pending_requests: int64 | *512
 	max_requests:         int64 | *512
@@ -687,8 +687,8 @@ import (
 	failure_mode_allow: false // set to true to allow requests to pass in the case of a authz network failure
 }
 
-// #OPAEgress configures egress to an OPA service for external authorization.
-#OPAEgress: {
+// #opa_egress configures egress to an OPA service for external authorization.
+#opa_egress: {
 	input: {
 		name:       string
 		domain_key: string
@@ -710,4 +710,4 @@ import (
 	}
 }
 
-#catalogentry: greymatter.#CatalogService
+#catalog_entry: greymatter.#CatalogService

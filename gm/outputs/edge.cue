@@ -32,7 +32,7 @@ edge_config: [
 	// so that Catalog will be able to look-up edge instances
 	#cluster & {cluster_key: defaults.edge.key},
 
-	// egress->redis
+	// egress -> redis
 	#domain & {domain_key: EgressToRedisName, port: defaults.ports.redis_ingress},
 	#cluster & {
 		cluster_key:  EgressToRedisName
@@ -42,8 +42,9 @@ edge_config: [
 	},
 	#route & {route_key: EgressToRedisName},
 	#listener & {
-		listener_key:  EgressToRedisName
-		ip:            "127.0.0.1" // egress listeners are local-only
+		listener_key: EgressToRedisName
+		// egress listeners are local-only
+		ip:            "127.0.0.1"
 		port:          defaults.ports.redis_ingress
 		_tcp_upstream: defaults.redis_cluster_name
 	},
@@ -52,9 +53,9 @@ edge_config: [
 		proxy_key: defaults.edge.key
 		domain_keys: [defaults.edge.key, EgressToRedisName]
 		listener_keys: [defaults.edge.key, EgressToRedisName]
-	},
+	}
 
-	// egress->Keycloak for OIDC/JWT Authentication (only necessary with remote JWKS provider)
+	// egress -> Keycloak for OIDC/JWT Authentication (only necessary with remote JWKS provider)
 	// NB: You need to add the EdgeToKeycloakName key to the domain_keys and listener_keys 
 	// in the #proxy above for the cluster to be discoverable by Envoy
 	// #cluster & {
@@ -70,7 +71,7 @@ edge_config: [
 	// #route & {route_key:   EdgeToKeycloakName},
 	// #domain & {domain_key: EdgeToKeycloakName, port: defaults.edge.oidc.endpoint_port},
 	// #listener & {
-	// 	listener_key: EdgeToKeycloakName
-	// 	port:         defaults.edge.oidc.endpoint_port
+	//  listener_key: EdgeToKeycloakName
+	//  port:         defaults.edge.oidc.endpoint_port
 	// },
 ]

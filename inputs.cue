@@ -62,9 +62,13 @@ defaults: {
 		operator: string | *"quay.io/greymatterio/operator:0.9.2" @tag(operator_image)
 	}
 
-	// The external_host field instructs greymatter to install Prometheus or uses an external one.
-	//   If enable_historical_metrics is true and external_host is empty, then greymatter will install Prometheus into the greymatter namespace.
-	//   If enable_historical_metrics is true and external_host has a value, greymatter will not install Prometheus into the greymatter namespace and connect to the external Prometheus via a sidecar (e.g. external_host: prometheus.metrics.svc).
+	// The external_host field instructs greymatter to install Prometheus or
+	// uses an external one. If enable_historical_metrics is true and external_host
+	// is empty, then greymatter will install Prometheus into the greymatter
+	// namespace. If enable_historical_metrics is true and external_host has a
+	// value, greymatter will not install Prometheus into the greymatter namespace
+	// and will connect to the external Prometheus via a sidecar
+	// (e.g. external_host: prometheus.metrics.svc).
 	prometheus: {
 		external_host: ""
 		port:          9090
