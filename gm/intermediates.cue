@@ -96,6 +96,11 @@ import (
 	// If auth server is grpc, HTTP/2 only
 	_enable_ext_authz: bool | *false
 
+	// Enables the jwt-security filter. Must have a mesh with jwt-security running.
+	// Typically will be used in conjunction with PKI authentication, inheaders, impersonation. 
+	// Should not be used with OIDC. 
+	_enable_jwt_security: bool | *false
+
 	// Set of configurable values for use in OIDC configurations
 	// and populated by inputs.cue if applicable.
 	// Do not change theses values in the service, rather make 
@@ -180,6 +185,12 @@ import (
 			},
 			if _enable_impersonation {
 				"gm.impersonation"
+			},
+			// Note: when TLS is enabled, jwtsecurity should come after inheaders
+			// and impersonation else it may send an incorrect or invalid DN
+			// to jwt-security service
+			if _enable_jwt_security {
+				"gm.jwtsecurity"
 			},
 			// Note that only one filter can be added per conditional expression.
 			// These four filters allow the OIDC authentication flow to facilitate
@@ -320,6 +331,9 @@ import (
 					servers:       string | *""
 					caseSensitive: bool | *false
 				}
+			}
+			if _enable_jwt_security {
+				"gm_jwtsecurity": #jwt_security_filter
 			}
 			if _enable_ext_authz {
 				envoy_ext_authz: #envoy_ext_authz
@@ -690,13 +704,11 @@ import (
 // #opa_egress configures egress to an OPA service for external authorization.
 #opa_egress: {
 	input: {
-		name:       string
-		domain_key: string
-		configs: [...]
+		service_name: string
+		domain_key:   string
 	}
-	_opa_key: "\(input.name)-egress-to-opa"
+	_opa_key: "\(input.service_name)-egress-to-opa"
 	out: {
-		key:    _opa_key
 		config: [
 			#cluster & {
 				cluster_key: _opa_key
@@ -706,7 +718,53 @@ import (
 				}
 			},
 			#route & {route_key: _opa_key, domain_key: input.domain_key},
-		] + input.configs
+		]
+	}
+}
+
+_jwt_egress_port: 10900
+#jwt_security_filter: {
+	apiKey:             string
+	endpoint:           string | *"http://localhost:\(_jwt_egress_port)"
+	jwtHeaderName:      string | *"x-jwt-token"
+	useTls:             bool | *false
+	certPath:           string | *"./certs/server.crt"
+	keyPath:            string | *"./certs/server.key"
+	caPath:             string | *"./certs/intermediate.crt"
+	insecureSkipVerify: bool | *false
+	timeoutMs:          int | *1000 //milliseconds
+	maxRetries:         int | *0
+	retryDelayMs:       int | *0   //milliseconds
+	cacheLimit:         int | *100 //number of tokens stored
+	cachedTokenExp:     int | *10  //minutes
+}
+
+#jwt_security_egress: {
+	input: {
+		service_name: string
+	}
+	out: {
+		key: "\(input.service_name)-egress-to-jwt"
+		config: [
+			#domain & {
+				domain_key: key
+				port:       _jwt_egress_port
+			},
+			#listener & {
+				listener_key: key
+				ip:           "127.0.0.1"
+				port:         _jwt_egress_port
+			},
+
+			#cluster & {
+				cluster_key: key
+				name:        "jwt-security"
+			},
+			#route & {
+				route_key: key
+			},
+			...,
+		]
 	}
 }
 
