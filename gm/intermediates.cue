@@ -334,7 +334,7 @@ import (
 			// _spire_other: "edge"  // but this defaults to "edge" and may be omitted
 			_name:    _spire_self
 			_subject: _spire_other
-			set_current_client_cert_details: uri: true
+			set_current_client_cert_details: URI: true
 			forward_client_cert_details: "APPEND_FORWARD"
 		}
 	}
