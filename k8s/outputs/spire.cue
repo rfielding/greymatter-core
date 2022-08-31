@@ -16,9 +16,6 @@ spire_namespace: [
     metadata: {
       name: "spire"
       labels: name: "spire"
-      // annotations: {
-      //   "openshift.io/sa.scc.mcs": defaults.spire_selinux_context
-      // }
     }
   },
 ]

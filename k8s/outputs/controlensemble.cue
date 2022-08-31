@@ -46,7 +46,7 @@ controlensemble: [
 								{name: "GM_CONTROL_CMD", value:                      "kubernetes"},
 								{name: "GM_CONTROL_KUBERNETES_NAMESPACES", value:    strings.Join([mesh.spec.install_namespace]+mesh.spec.watch_namespaces, ",")},
 								{name: "GM_CONTROL_KUBERNETES_CLUSTER_LABEL", value: "greymatter.io/cluster"},
-								{name: "GM_CONTROL_KUBERNETES_PORT_NAME", value:     "proxy"},
+								{name: "GM_CONTROL_KUBERNETES_PORT_NAME", value:     defaults.proxy_port_name},
 								{name: "GM_CONTROL_XDS_ADS_ENABLED", value:          "true"},
 								{name: "GM_CONTROL_XDS_RESOLVE_DNS", value:          "true"},
 								{name: "GM_CONTROL_API_HOST", value:                 "127.0.0.1:5555"},

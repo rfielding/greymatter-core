@@ -6,7 +6,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	admisv1 "k8s.io/api/admissionregistration/v1"
 )
 
 operator_namespace: [
@@ -279,20 +278,6 @@ operator_k8s: [
     metadata: name: "gm-operator-role"
     rules: [{
       apiGroups: [
-        "admissionregistration.k8s.io",
-      ]
-      resourceNames: [
-        "gm-mutate-config",
-      ]
-      resources: [
-        "mutatingwebhookconfigurations",
-      ]
-      verbs: [
-        "get",
-        "patch",
-      ]
-    }, {
-      apiGroups: [
         "apps",
       ]
       resources: [
@@ -300,9 +285,21 @@ operator_k8s: [
         "statefulsets",
       ]
       verbs: [
+      	"watch",
         "get",
         "list",
         "create",
+        "update",
+      ]
+    }, {
+    	apiGroups: [
+        "apps",
+      ]
+      resources: [
+        "deployments/finalizers",
+        "statefulsets/finalizers",
+      ]
+      verbs: [
         "update",
       ]
     }, {
@@ -343,6 +340,7 @@ operator_k8s: [
       ]
       verbs: [
         "list",
+        "update"
       ]
     }, {
       apiGroups: [
@@ -485,68 +483,6 @@ operator_k8s: [
       namespace: config.operator_namespace
 		}
 	},
-	corev1.#Service & {
-		apiVersion: "v1"
-		kind:       "Service"
-		metadata: {
-			name:      "gm-webhook"
-      namespace: config.operator_namespace
-		}
-		spec: {
-			ports: [{
-				port:       443
-				protocol:   "TCP"
-				targetPort: 9443
-			}]
-			selector: name: "greymatter-operator"
-		}
-	},
-	admisv1.#MutatingWebhookConfiguration & {
-		apiVersion: "admissionregistration.k8s.io/v1"
-		kind:       "MutatingWebhookConfiguration"
-		metadata: name: "gm-mutate-config"
-		webhooks: [{
-			admissionReviewVersions: [
-				"v1",
-				"v1beta1",
-			]
-			clientConfig: service: {
-				name:      "gm-webhook"
-				namespace: config.operator_namespace
-				path:      "/mutate-workload"
-			}
-			failurePolicy: "Ignore"
-			name:          "mutate-workload.greymatter.io"
-			namespaceSelector: matchExpressions: [{
-				key:      "name"
-				operator: "NotIn"
-				values: [
-					config.operator_namespace,
-					"spire",
-				]
-			}]
-			rules: [{
-				apiGroups: [
-					"",
-					"apps",
-				]
-				apiVersions: [
-					"v1",
-				]
-				operations: [
-					"CREATE",
-					"UPDATE",
-					"DELETE",
-				]
-				resources: [
-					"pods",
-					"deployments",
-					"statefulsets",
-				]
-			}]
-			sideEffects: "None"
-		}]
-	},
 
   rbacv1.#RoleBinding & {
     apiVersion: "rbac.authorization.k8s.io/v1"
@@ -566,6 +502,7 @@ operator_k8s: [
       namespace: config.operator_namespace
     }]
   },
+
   // This ClusterRoleBinding, apart from its normal duties, is also the owner of most operator-created
   // resources because it has cluster scope and the CRD (the previous owner) is deprecated.
   rbacv1.#ClusterRoleBinding & {
@@ -583,79 +520,5 @@ operator_k8s: [
       namespace: config.operator_namespace
     }]
   },
-  corev1.#Secret & { // the values here get filled in programmatically by the operator
-    apiVersion: "v1"
-    data: {
-      "tls.crt": ''
-      "tls.key": ''
-    }
-    kind: "Secret"
-    metadata: {
-      name:      "gm-webhook-cert"
-      namespace: config.operator_namespace
-    }
-  },
-  corev1.#Service & {
-    apiVersion: "v1"
-    kind:       "Service"
-    metadata: {
-      name:      "gm-webhook"
-      namespace: config.operator_namespace
-    }
-    spec: {
-      ports: [{
-        port:       443
-        protocol:   "TCP"
-        targetPort: 9443
-      }]
-      selector: name: "greymatter-operator"
-    }
-  },
-  admisv1.#MutatingWebhookConfiguration & {
-    apiVersion: "admissionregistration.k8s.io/v1"
-    kind:       "MutatingWebhookConfiguration"
-    metadata: name: "gm-mutate-config"
-    webhooks: [{
-      admissionReviewVersions: [
-        "v1",
-        "v1beta1",
-      ]
-      clientConfig: service: {
-        name:      "gm-webhook"
-        namespace: config.operator_namespace
-        path:      "/mutate-workload"
-      }
-      failurePolicy: "Ignore"
-      name:          "mutate-workload.greymatter.io"
-      namespaceSelector: matchExpressions: [{
-        key:      "name"
-        operator: "NotIn"
-        values: [
-          "greymatter-operator",
-          "spire",
-        ]
-      }]
-      rules: [{
-        apiGroups: [
-          "",
-          "apps",
-        ]
-        apiVersions: [
-          "v1",
-        ]
-        operations: [
-          "CREATE",
-          "UPDATE",
-          "DELETE",
-        ]
-        resources: [
-          "pods",
-          "deployments",
-          "statefulsets",
-        ]
-      }]
-      sideEffects: "None"
-    }, ]
-  },
-  
+
 ]
