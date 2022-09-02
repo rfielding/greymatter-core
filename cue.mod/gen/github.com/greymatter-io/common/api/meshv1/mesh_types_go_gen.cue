@@ -4,11 +4,6 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 // MeshSpec defines the desired state of a Grey Matter mesh.
 #MeshSpec: {
-	// The version of Grey Matter to install for this mesh.
-	// +kubebuilder:validation:Enum="1.6";"1.7";"latest"
-	// +kubebuilder:default="latest"
-	release_version: string @go(ReleaseVersion)
-
 	// A list of OCI image strings and their respective pull secret names.
 	// These are treated as overrides to the specified "release_version".
 	// +optional
