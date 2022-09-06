@@ -34,15 +34,15 @@ import (
 		},
 	]
 	resources: {
-		limits: {  
-			cpu: *"200m" | string
+		limits: {
+			cpu:    *"200m" | string
 			memory: *"512Mi" | string
 		}
 		requests: {
-			cpu: *"50m" | string
+			cpu:    *"50m" | string
 			memory: *"128Mi" | string
 		}
-		
+
 	}
 	volumeMounts:    #sidecar_volume_mounts + _volume_mounts
 	imagePullPolicy: defaults.image_pull_policy
@@ -76,4 +76,3 @@ import (
 	}
 	...
 }
-

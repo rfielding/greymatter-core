@@ -7,7 +7,7 @@ import (
 
 config: {
 	// Flags
-	spire:                       bool | *false           @tag(spire,type=bool)           // enable Spire-based mTLS
+	spire:                       bool | *false           @tag(spire,type=bool) // enable Spire-based mTLS
 	openshift:                   bool | *false           @tag(openshift,type=bool)
 	enable_historical_metrics:   bool | *true            @tag(enable_historical_metrics,type=bool)
 	debug:                       bool | *false           @tag(debug,type=bool) // currently just controls k8s/outputs/operator.cue for debugging
@@ -29,13 +29,14 @@ mesh: meshv1.#Mesh & {
 		watch_namespaces:  [...string] | *["default", "plus", "examples"]
 		zone:              string | *"default-zone"
 		images: {
-			proxy:       string | *"quay.io/greymatterio/gm-proxy:1.7.1"
-			catalog:     string | *"quay.io/greymatterio/gm-catalog:3.0.5"
-			dashboard:   string | *"quay.io/greymatterio/gm-dashboard:connections"
-			control:     string | *"quay.io/greymatterio/gm-control:1.7.3"
-			control_api: string | *"quay.io/greymatterio/gm-control-api:1.7.3"
-			redis:       string | *"redis:latest"
-			prometheus:  string | *"prom/prometheus:v2.36.2"
+			proxy:        string | *"quay.io/greymatterio/gm-proxy:1.7.1"
+			catalog:      string | *"quay.io/greymatterio/gm-catalog:3.0.5"
+			dashboard:    string | *"quay.io/greymatterio/gm-dashboard:connections"
+			control:      string | *"quay.io/greymatterio/gm-control:1.7.3"
+			control_api:  string | *"quay.io/greymatterio/gm-control-api:1.7.3"
+			redis:        string | *"redis:latest"
+			prometheus:   string | *"prom/prometheus:v2.36.2"
+			jwt_security: string | *"quay.io/greymatterio/gm-jwt-security:1.3.1"
 		}
 	}
 }
@@ -44,7 +45,6 @@ defaults: {
 	image_pull_secret_name:   string | *"gm-docker-secret"
 	image_pull_policy:        corev1.#enumPullPolicy | *corev1.#PullAlways
 	xds_host:                 "controlensemble.\(mesh.spec.install_namespace).svc.cluster.local"
-	sidecar_list:             [...string] | *["dashboard", "catalog", "controlensemble", "edge"]
 	proxy_port_name:          "proxy" // the name of the ingress port for sidecars - used by service discovery
 	redis_cluster_name:       "redis"
 	redis_host:               "\(redis_cluster_name).\(mesh.spec.install_namespace).svc.cluster.local"
@@ -53,8 +53,10 @@ defaults: {
 	redis_username:           ""
 	redis_password:           ""
 	gitops_state_key_gm:      "gmHashes"  // the key in Redis for Grey Matter applied-state backups
-  gitops_state_key_k8s:     "k8sHashes" // the key in Redis for K8s applied-state backups
-  gitops_state_key_sidecar: "k8sHashes" // the key in Redis for K8s applied-state backups
+	gitops_state_key_k8s:     "k8sHashes" // the key in Redis for K8s applied-state backups
+	gitops_state_key_sidecar: "k8sHashes" // the key in Redis for K8s applied-state backups
+	spire_selinux_context:    string | *"s0:c30,c5"
+	sidecar_list:             [...string] | *["dashboard", "catalog", "controlensemble", "edge", "jwtsecurity"]
 
 	ports: {
 		default_ingress: 10808
