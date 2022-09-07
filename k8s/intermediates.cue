@@ -30,7 +30,7 @@ import (
 		{name: "XDS_HOST", value:             defaults.xds_host},
 		{name: "XDS_PORT", value:             "50000"},
 		if config.spire {
-			{name: "SPIRE_PATH", value: "/run/spire/socket/agent.sock"}
+			{name: "SPIRE_PATH", value: "\(defaults.spire.socket_mount_path)/agent.sock"}
 		},
 	]
 	resources: {
@@ -49,27 +49,27 @@ import (
 }
 
 #sidecar_volume_mounts: {
-	if config.spire {
+	if config.spire && defaults.spire.host_mount_socket {
 		[{
 			name:      "spire-socket"
-			mountPath: "/run/spire/socket"
+			mountPath: defaults.spire.socket_mount_path
 		}]
 	}
 	[...]
 }
 
 #sidecar_volumes: {
-	if config.spire {
+	if config.spire && defaults.spire.host_mount_socket {
 		[{
 			name: "spire-socket"
-			hostPath: {path: "/run/spire/socket", type: "DirectoryOrCreate"}
+			hostPath: {path: defaults.spire.socket_mount_path, type: "DirectoryOrCreate"}
 		}]
 	}
 	[...]
 }
 
 #spire_permission_requests: {
-	if config.spire {
+	if config.spire && defaults.spire.host_mount_socket {
 		hostPID: true
 		// hostNetwork: true
 		// dnsPolicy: "ClusterFirstWithHostNet"

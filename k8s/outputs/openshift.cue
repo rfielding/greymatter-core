@@ -127,7 +127,7 @@ openshift_spire: [
 		kind:       "RoleBinding"
 		metadata: {
 			name:      "system:openshift:scc:spire:agent"
-			namespace: "spire"
+			namespace: defaults.spire.namespace
 		}
 		roleRef: {
 			apiGroup: "rbac.authorization.k8s.io"
@@ -137,7 +137,7 @@ openshift_spire: [
 		subjects: [{
 			kind:      "ServiceAccount"
 			name:      "agent"
-			namespace: "spire"
+			namespace: defaults.spire.namespace
 		}]
 	},
 	// RoleBindings for Grey Matter services so they can access their agent.sock

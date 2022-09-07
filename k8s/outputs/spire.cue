@@ -14,7 +14,7 @@ spire_namespace: [
     apiVersion: "v1"
     kind:       "Namespace"
     metadata: {
-      name: "spire"
+      name: defaults.spire.namespace
       labels: name: "spire"
     }
   },
@@ -26,7 +26,7 @@ spire_server: [
     kind:       "Service"
     metadata: {
       name:      "server"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
     }
     spec: {
       type: "NodePort"
@@ -44,7 +44,7 @@ spire_server: [
     kind:       "StatefulSet"
     metadata: {
       name:      "server"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
       labels: app: "server"
     }
     spec: {
@@ -53,7 +53,7 @@ spire_server: [
       template: {
         metadata: {
           name:      "server"
-          namespace: "spire"
+          namespace: defaults.spire.namespace
           labels: app: "server"
         }
         spec: {
@@ -74,7 +74,7 @@ spire_server: [
               exec: command: [
                 "/opt/spire/bin/spire-server",
                 "healthcheck",
-                "-socketPath=/run/spire/socket/registration.sock",
+                "-socketPath=\(defaults.spire.socket_mount_path)/registration.sock",
               ]
               failureThreshold:    2
               initialDelaySeconds: 15
@@ -83,13 +83,13 @@ spire_server: [
             }
             volumeMounts: [{
               name:      "server-socket"
-              mountPath: "/run/spire/socket"
+              mountPath: defaults.spire.socket_mount_path
             }, {
               name:      "server-config"
               mountPath: "/run/spire/config"
               readOnly:  true
             }, {
-              name:      "server-ca"
+              name:      defaults.spire.ca_secret_name
               mountPath: "/run/spire/ca"
               readOnly:  true
             }, {
@@ -119,7 +119,7 @@ spire_server: [
               readOnly:  true
             }, {
               name:      "server-socket"
-              mountPath: "/run/spire/socket"
+              mountPath: defaults.spire.socket_mount_path
             }]
             resources: {
               limits: { cpu: "400m", memory: "1Gi" }
@@ -136,9 +136,9 @@ spire_server: [
               defaultMode: 420
             }
           }, {
-            name: "server-ca"
+            name: defaults.spire.ca_secret_name
             secret: {
-              secretName:  "server-ca"
+              secretName:  defaults.spire.ca_secret_name
               defaultMode: 420
             }
           }]
@@ -151,7 +151,7 @@ spire_server: [
         kind:       "PersistentVolumeClaim"
         metadata: {
           name:      "server-data"
-          namespace: "spire"
+          namespace: defaults.spire.namespace
         }
         spec: {
           accessModes: [
@@ -168,7 +168,7 @@ spire_server: [
     kind:       "ServiceAccount"
     metadata: {
       name:      "server"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
     }
   },
   rbacv1.#Role & {
@@ -176,7 +176,7 @@ spire_server: [
     kind:       "Role"
     metadata: {
       name:      "server"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
     }
     rules: [
         {
@@ -213,7 +213,7 @@ spire_server: [
     kind:       "RoleBinding"
     metadata: {
       name:      "server"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
     }
     roleRef: {
       apiGroup: "rbac.authorization.k8s.io"
@@ -223,7 +223,7 @@ spire_server: [
     subjects: [{
       kind:      "ServiceAccount"
       name:      "server"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
     }]
   },
   rbacv1.#ClusterRoleBinding & {
@@ -238,7 +238,7 @@ spire_server: [
     subjects: [{
       kind:      "ServiceAccount"
       name:      "server"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
     }]
   },
   corev1.#ConfigMap & {
@@ -246,14 +246,14 @@ spire_server: [
     kind:       "ConfigMap"
     metadata: {
       name:      "server-config"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
     }
     data: {
       // https://github.com/spiffe/spire/tree/main/support/k8s/k8s-workload-registrar
       // https://github.com/lucianozablocki/spire-tutorials/tree/k8s-registrar-tutorial/k8s/k8s-workload-registrar#configure-reconcile-mode
       "registrar.conf": #"""
-        trust_domain = "greymatter.io"
-        server_socket_path = "/run/spire/socket/registration.sock"
+        trust_domain = "\#(defaults.spire.trust_domain)"
+        server_socket_path = "\#(defaults.spire.socket_mount_path)/registration.sock"
         cluster = "meshes"
         mode = "reconcile"
         pod_label = "greymatter.io/workload"
@@ -277,8 +277,8 @@ spire_server: [
           default_svid_ttl = "1h"
           log_file = "/dev/stdout"
           log_level = "DEBUG"
-          trust_domain = "greymatter.io"
-          socket_path = "/run/spire/socket/registration.sock"
+          trust_domain = "\#(defaults.spire.trust_domain)"
+          socket_path = "\#(defaults.spire.socket_mount_path)/registration.sock"
         }
         plugins {
           DataStore "sql" {
@@ -304,7 +304,7 @@ spire_server: [
           }
           Notifier "k8sbundle" {
             plugin_data {
-              namespace = "spire"
+              namespace = "\#(defaults.spire.namespace)"
               config_map = "server-bundle"
             }
           }
@@ -324,7 +324,7 @@ spire_server: [
     kind:       "ConfigMap"
     metadata: {
       name:      "server-bundle"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
     }
     data: "bundle.crt": ""
   },
@@ -337,14 +337,14 @@ spire_agent: [
     kind:       "DaemonSet"
     metadata: {
       name:      "agent"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
       labels: app: "agent"
     }
     spec: {
       selector: matchLabels: app: "agent"
       template: {
         metadata: {
-          namespace: "spire"
+          namespace: defaults.spire.namespace
           labels: app: "agent"
         }
         spec: {
@@ -372,7 +372,7 @@ spire_agent: [
                 "/opt/spire/bin/spire-agent",
                 "healthcheck",
                 "-socketPath",
-                "/run/spire/socket/agent.sock",
+                "\(defaults.spire.socket_mount_path)/agent.sock",
               ]
               failureThreshold:    2
               initialDelaySeconds: 15
@@ -385,7 +385,7 @@ spire_agent: [
               readOnly:  true
             }, {
               name:      "agent-socket"
-              mountPath: "/run/spire/socket"
+              mountPath: defaults.spire.socket_mount_path
             }, {
               name:      "server-bundle"
               mountPath: "/run/spire/bundle"
@@ -408,7 +408,7 @@ spire_agent: [
           }, {
             name: "agent-socket"
             hostPath: {
-              path: "/run/spire/socket"
+              path: defaults.spire.socket_mount_path
               type: "DirectoryOrCreate"
             }
           }, {
@@ -444,7 +444,7 @@ spire_agent: [
     kind:       "ServiceAccount"
     metadata: {
       name:      "agent"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
     }
   },
 
@@ -486,7 +486,7 @@ spire_agent: [
     subjects: [{
       kind:      "ServiceAccount"
       name:      "agent"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
     }]
   },
   corev1.#ConfigMap & {
@@ -494,7 +494,7 @@ spire_agent: [
     kind:       "ConfigMap"
     metadata: {
       name:      "agent-config"
-      namespace: "spire"
+      namespace: defaults.spire.namespace
     }
     data: "agent.conf": #"""
       agent {
@@ -502,9 +502,9 @@ spire_agent: [
         log_level = "INFO"
         server_address = "server"
         server_port = "8443"
-        socket_path = "/run/spire/socket/agent.sock"
+        socket_path = "\#(defaults.spire.socket_mount_path)/agent.sock"
         trust_bundle_path = "/run/spire/bundle/bundle.crt"
-        trust_domain = "greymatter.io"
+        trust_domain = "\#(defaults.spire.trust_domain)"
       }
       plugins {
         NodeAttestor "k8s_psat" {

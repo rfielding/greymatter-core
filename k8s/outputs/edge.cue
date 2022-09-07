@@ -21,7 +21,7 @@ edge: [
 				metadata: {
 					labels: {
 						"greymatter.io/cluster": defaults.edge.key
-						"greymatter.io/workload": "\(mesh.metadata.name).\(defaults.edge.key)"
+						"greymatter.io/workload": "\(config.operator_namespace).\(mesh.metadata.name).\(defaults.edge.key)"
 					}
 				}
 				spec: #spire_permission_requests & {

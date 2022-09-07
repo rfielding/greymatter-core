@@ -472,13 +472,13 @@ import (
 	set_current_client_cert_details?: {...}
 	forward_client_cert_details?: string
 
-	secret_validation_name: "spiffe://greymatter.io"
-	secret_name:            "spiffe://greymatter.io/\(mesh.metadata.name).\(_name)"
+	secret_validation_name: "spiffe://\(defaults.spire.trust_domain)"
+	secret_name:            "spiffe://\(defaults.spire.trust_domain)/\(config.operator_namespace).\(mesh.metadata.name).\(_name)"
 	if _subjects == _|_ {
-		subject_names: ["spiffe://greymatter.io/\(mesh.metadata.name).\(_subject)"]
+		subject_names: ["spiffe://\(defaults.spire.trust_domain)/\(config.operator_namespace).\(mesh.metadata.name).\(_subject)"]
 	}
 	if _subjects != _|_ {
-		subject_names: [ for s in _subjects {"spiffe://greymatter.io/\(mesh.metadata.name).\(s)"}]
+		subject_names: [ for s in _subjects {"spiffe://\(defaults.spire.trust_domain)/\(config.operator_namespace).\(mesh.metadata.name).\(s)"}]
 	}
 	ecdh_curves: ["X25519:P-256:P-521:P-384"]
 }

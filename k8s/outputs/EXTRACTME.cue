@@ -21,8 +21,7 @@ operator_manifests: operator_namespace +
 	operator_k8s +
 	[ for x in openshift_privileged_scc if config.openshift {x}] +
 	[ for x in openshift_spire_scc if config.openshift && config.spire {x}] +
-	[ for x in spire_manifests if config.spire {x}]
-
+	[ for x in spire_manifests if config.deploy_spire {x}]
 // For development convenience, not otherwise used
 all_but_operator_manifests: operator_namespace +
 	operator_k8s +
