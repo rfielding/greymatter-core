@@ -62,7 +62,7 @@ operator_sts: [
                 args: [
                   "-repo", "git@github.com:greymatter-io/gitops-core.git",
                   "-sshPrivateKeyPath", "/app/.ssh/id_ed25519",
-                  "-branch", "multiple-operators-in-one-cluster"
+                  "-branch", "main"
                 ]
               }
               livenessProbe: {
