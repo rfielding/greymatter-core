@@ -62,7 +62,7 @@ operator_sts: [
                 args: [
                   "-repo", "git@github.com:greymatter-io/gitops-core.git",
                   "-sshPrivateKeyPath", "/app/.ssh/id_ed25519",
-                  "-branch", "main"
+                  "-branch", "multiple-operators-in-one-cluster"
                 ]
               }
               livenessProbe: {
@@ -275,7 +275,7 @@ operator_k8s: [
   rbacv1.#ClusterRole & {
     apiVersion: "rbac.authorization.k8s.io/v1"
     kind:       "ClusterRole"
-    metadata: name: "gm-operator-role"
+    metadata: name: "\(config.operator_namespace)-gm-operator-role"
     rules: [{
       apiGroups: [
         "apps",
@@ -436,41 +436,6 @@ operator_k8s: [
     }]
   },
 
-	rbacv1.#RoleBinding & {
-		apiVersion: "rbac.authorization.k8s.io/v1"
-		kind:       "RoleBinding"
-		metadata: {
-			name:      "gm-leader-election-rolebinding"
-      namespace: config.operator_namespace
-		}
-		roleRef: {
-			apiGroup: "rbac.authorization.k8s.io"
-			kind:     "Role"
-			name:     "gm-leader-election-role"
-		}
-		subjects: [{
-			kind:      "ServiceAccount"
-      name:      "greymatter-operator"
-      namespace: config.operator_namespace
-		}]
-	},
-	// This ClusterRoleBinding, apart from its normal duties, is also the owner of most operator-created
-	// resources because it has cluster scope and the CRD (the previous owner) is deprecated.
-	rbacv1.#ClusterRoleBinding & {
-		apiVersion: "rbac.authorization.k8s.io/v1"
-		kind:       "ClusterRoleBinding"
-		metadata: name: "gm-operator-rolebinding"
-		roleRef: {
-			apiGroup: "rbac.authorization.k8s.io"
-			kind:     "ClusterRole"
-			name:     "gm-operator-role"
-		}
-		subjects: [{
-			kind:      "ServiceAccount"
-      name:      "greymatter-operator"
-      namespace: config.operator_namespace
-		}]
-	},
 	corev1.#Secret & {// the values here get filled in programmatically by the operator
 		apiVersion: "v1"
 		data: {
@@ -508,11 +473,11 @@ operator_k8s: [
   rbacv1.#ClusterRoleBinding & {
     apiVersion: "rbac.authorization.k8s.io/v1"
     kind:       "ClusterRoleBinding"
-    metadata: name: "gm-operator-rolebinding"
+    metadata: name: "\(config.operator_namespace)-gm-operator-rolebinding"
     roleRef: {
       apiGroup: "rbac.authorization.k8s.io"
       kind:     "ClusterRole"
-      name:     "gm-operator-role"
+      name:     "\(config.operator_namespace)-gm-operator-role"
     }
     subjects: [{
       kind:      "ServiceAccount"

@@ -59,7 +59,7 @@ redis: [
 							imagePullPolicy: defaults.image_pull_policy
 							volumeMounts: [
 								{
-									name:      "gm-redis-append-dir-\(mesh.metadata.name)"
+									name:      "\(config.operator_namespace)-gm-redis-append-dir-\(mesh.metadata.name)"
 									mountPath: "/data"
 								},
 							]
@@ -74,7 +74,7 @@ redis: [
 				{
 					apiVersion: "v1"
 					kind:       "PersistentVolumeClaim"
-					metadata: name: "gm-redis-append-dir-\(mesh.metadata.name)"
+					metadata: name: "\(config.operator_namespace)-gm-redis-append-dir-\(mesh.metadata.name)"
 					spec: {
 						accessModes: ["ReadWriteOnce"]
 						resources: requests: storage: "1Gi"

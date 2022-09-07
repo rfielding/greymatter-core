@@ -45,6 +45,7 @@ defaults: {
 	image_pull_secret_name:   string | *"gm-docker-secret"
 	image_pull_policy:        corev1.#enumPullPolicy | *corev1.#PullAlways
 	xds_host:                 "controlensemble.\(mesh.spec.install_namespace).svc.cluster.local"
+	sidecar_list:             [...string] | *["dashboard", "catalog", "controlensemble", "edge", "jwtsecurity"]
 	proxy_port_name:          "proxy" // the name of the ingress port for sidecars - used by service discovery
 	redis_cluster_name:       "redis"
 	redis_host:               "\(redis_cluster_name).\(mesh.spec.install_namespace).svc.cluster.local"
@@ -52,11 +53,10 @@ defaults: {
 	redis_db:                 0
 	redis_username:           ""
 	redis_password:           ""
-	gitops_state_key_gm:      "gmHashes"  // the key in Redis for Grey Matter applied-state backups
-	gitops_state_key_k8s:     "k8sHashes" // the key in Redis for K8s applied-state backups
-	gitops_state_key_sidecar: "k8sHashes" // the key in Redis for K8s applied-state backups
-	spire_selinux_context:    string | *"s0:c30,c5"
-	sidecar_list:             [...string] | *["dashboard", "catalog", "controlensemble", "edge", "jwtsecurity"]
+	// key names for applied-state backups to Redis - they only need to be unique.
+	gitops_state_key_gm:      "\(config.operator_namespace).gmHashes"
+  gitops_state_key_k8s:     "\(config.operator_namespace).k8sHashes"
+  gitops_state_key_sidecar: "\(config.operator_namespace).sidecarHashes"
 
 	ports: {
 		default_ingress: 10808

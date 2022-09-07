@@ -118,7 +118,7 @@ controlensemble: [
 	rbacv1.#ClusterRole & {
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "ClusterRole"
-		metadata: name: Name
+		metadata: name: "\(config.operator_namespace)-\(Name)"
 		rules: [{
 			apiGroups: [""]
 			resources: ["pods"]
@@ -130,7 +130,7 @@ controlensemble: [
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "ClusterRoleBinding"
 		metadata: {
-			name:      Name
+			name:      "\(config.operator_namespace)-\(Name)-clusterrolebinding"
 			namespace: mesh.spec.install_namespace
 		}
 		subjects: [{
@@ -140,7 +140,7 @@ controlensemble: [
 		}]
 		roleRef: {
 			kind:     "ClusterRole"
-			name:     Name
+			name:     "\(config.operator_namespace)-\(Name)"
 			apiGroup: "rbac.authorization.k8s.io"
 		}
 	},

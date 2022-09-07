@@ -15,7 +15,7 @@ openshift_privileged_scc: [
 				"include.release.openshift.io/self-managed-high-availability": "true"
 				"rbac.authorization.kubernetes.io/autoupdate":                 "true"
 			}
-			name: "system:openshift:scc:gm-operator"
+			name: "\(config.operator_namespace)-system:openshift:scc:gm-operator"
 		}
 		rules: [{
 			apiGroups: ["security.openshift.io"]
@@ -28,12 +28,12 @@ openshift_privileged_scc: [
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "ClusterRoleBinding"
 		metadata: {
-			name: "system:openshift:scc:gm-operator"
+			name: "\(config.operator_namespace)-system:openshift:scc:gm-operator"
 		}
 		roleRef: {
 			apiGroup: "rbac.authorization.k8s.io"
 			kind:     "ClusterRole"
-			name:     "system:openshift:scc:gm-operator"
+			name:     "\(config.operator_namespace)-system:openshift:scc:gm-operator"
 		}
 		subjects: [{
 			kind:      "ServiceAccount"
@@ -92,7 +92,7 @@ openshift_spire_scc: [
 				"include.release.openshift.io/self-managed-high-availability": "true"
 				"rbac.authorization.kubernetes.io/autoupdate":                 "true"
 			}
-			name: "system:openshift:scc:spire"
+			name: "\(config.operator_namespace)-system:openshift:scc:spire"
 		}
 		rules: [{
 			apiGroups: ["security.openshift.io"]
@@ -105,12 +105,12 @@ openshift_spire_scc: [
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "ClusterRoleBinding"
 		metadata: {
-			name: "system:openshift:scc:spire:gm-operator"
+			name: "\(config.operator_namespace)-system:openshift:scc:spire:gm-operator"
 		}
 		roleRef: {
 			apiGroup: "rbac.authorization.k8s.io"
 			kind:     "ClusterRole"
-			name:     "system:openshift:scc:spire"
+			name:     "\(config.operator_namespace)-system:openshift:scc:spire"
 		}
 		subjects: [{
 			kind:      "ServiceAccount"

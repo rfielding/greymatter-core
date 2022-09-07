@@ -67,7 +67,7 @@ prometheus: [
 									mountPath: "/etc/prometheus"
 								},
 								{
-									name:      "\(Name)-data"
+									name:      "\(config.operator_namespace)-\(Name)-data"
 									mountPath: "/var/lib/prometheus/data"
 								},
 							]
@@ -95,7 +95,7 @@ prometheus: [
 				{
 					apiVersion: "v1"
 					kind:       "PersistentVolumeClaim"
-					metadata: name: "\(Name)-data"
+					metadata: name: "\(config.operator_namespace)-\(Name)-data"
 					spec: {
 						accessModes: ["ReadWriteOnce"]
 						resources: requests: storage: "40Gi"
@@ -117,7 +117,7 @@ prometheus: [
 	rbacv1.#ClusterRole & {
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "ClusterRole"
-		metadata: name: Name
+		metadata: name: "\(config.operator_namespace)-\(Name)"
 		rules: [{
 			apiGroups: [""]
 			resources: ["pods"]
@@ -129,7 +129,7 @@ prometheus: [
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "ClusterRoleBinding"
 		metadata: {
-			name:      Name
+			name:      "\(config.operator_namespace)-\(Name)-clusterrolebinding"
 			namespace: mesh.spec.install_namespace
 		}
 		subjects: [{
@@ -139,7 +139,7 @@ prometheus: [
 		}]
 		roleRef: {
 			kind:     "ClusterRole"
-			name:     Name
+			name:     "\(config.operator_namespace)-\(Name)"
 			apiGroup: "rbac.authorization.k8s.io"
 		}
 	},
