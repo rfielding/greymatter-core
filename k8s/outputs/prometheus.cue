@@ -1,4 +1,4 @@
-// Manifest for Prometheus statefulset
+// k8s manifests for Prometheus
 
 package greymatter
 
@@ -27,7 +27,7 @@ prometheus: [
 			template: {
 				metadata: {
 					labels: {
-						"greymatter.io/cluster": Name
+						"greymatter.io/cluster":  Name
 						"greymatter.io/workload": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 					}
 				}
@@ -72,16 +72,16 @@ prometheus: [
 								},
 							]
 							resources: {
-								limits: { cpu: "500m", memory: "2Gi" }
-								requests: { cpu: "200m", memory: "1Gi" }
-								
+								limits: {cpu: "500m", memory: "2Gi"}
+								requests: {cpu: "200m", memory: "1Gi"}
+
 							}
 						},
 
 					]
 
 					volumes: [
-						{
+							{
 							name: "\(Name)-configuration"
 							configMap: {name: Name}
 						},
@@ -330,7 +330,7 @@ prometheus_proxy: [
 			template: {
 				metadata: {
 					labels: {
-						"greymatter.io/cluster": Name
+						"greymatter.io/cluster":  Name
 						"greymatter.io/workload": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 					}
 				}
@@ -352,7 +352,7 @@ prometheus_proxy: [
 							if defaults.prometheus.tls.enabled == true {
 							{
 								name: "prometheus-tls-certs"
-								secret: {defaultMode: 420, secretName: defaults.prometheus.tls.cert_secret }
+								secret: {defaultMode: 420, secretName: defaults.prometheus.tls.cert_secret}
 							}
 						},
 					]

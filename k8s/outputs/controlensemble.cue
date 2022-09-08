@@ -1,4 +1,4 @@
-// Output forms for the 
+// k8s manifests for controlensemble
 
 package greymatter
 
@@ -26,7 +26,7 @@ controlensemble: [
 			template: {
 				metadata: {
 					labels: {
-						"greymatter.io/cluster": Name
+						"greymatter.io/cluster":  Name
 						"greymatter.io/workload": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 					}
 				}
@@ -57,8 +57,8 @@ controlensemble: [
 								{name: "GM_CONTROL_DIFF_IGNORE_CREATE", value:       "true"},
 							]
 							resources: {
-								limits: { cpu: "200m", memory: "1Gi" }
-								requests: { cpu: "125m", memory: "256Mi" }
+								limits: {cpu: "200m", memory: "1Gi"}
+								requests: {cpu: "125m", memory: "256Mi"}
 							}
 							imagePullPolicy: defaults.image_pull_policy
 						}, // control
@@ -85,8 +85,8 @@ controlensemble: [
 								{name: "GM_CONTROL_API_REDIS_DB", value:   "0"},
 							]
 							resources: {
-								limits: { cpu: "400m", memory: "512Mi" }
-								requests: { cpu: "250m", memory: "256Mi" }
+								limits: {cpu: "400m", memory: "512Mi"}
+								requests: {cpu: "250m", memory: "256Mi"}
 							}
 							imagePullPolicy: defaults.image_pull_policy
 						}, // control_api

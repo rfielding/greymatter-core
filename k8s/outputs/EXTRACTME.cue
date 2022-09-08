@@ -35,7 +35,12 @@ k8s_manifests: controlensemble +
 	[ for x in prometheus if config.enable_historical_metrics && len(defaults.prometheus.external_host) == 0 {x}] +
 	[ for x in prometheus_proxy if config.enable_historical_metrics && len(defaults.prometheus.external_host) > 0 {x}] +
 	[ for x in openshift_spire if config.openshift && config.spire {x}] +
-	[ for x in jwt_security_manifests if _enable_jwtsecurity {x}]
+	[ for x in openshift_spire if config.openshift && config.spire {x}] +
+	[ for x in vector if config.enable_audits {x}] +
+	[ for x in observables if config.enable_audits {x}]
+
+vector_manifests_yaml:      yaml.MarshalStream(vector)
+observables_manifests_yaml: yaml.MarshalStream(observables)
 
 prometheus_manifests: [ for x in prometheus if config.enable_historical_metrics && len(defaults.prometheus.external_host) == 0 {x}] +
 	[ for x in prometheus_proxy if config.enable_historical_metrics && len(defaults.prometheus.external_host) > 0 {x}]
