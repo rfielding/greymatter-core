@@ -61,7 +61,7 @@ operator_sts: [
               if !config.test {
                 args: [
                   "-repo", "git@github.com:greymatter-io/gitops-core.git",
-                  "-sshPrivateKeyPath", "/app/.ssh/id_ed25519",
+                  "-sshPrivateKeyPath", "/app/.ssh/ssh_private_key",
                   "-branch", "main"
                 ]
               }
@@ -91,7 +91,7 @@ operator_sts: [
                 "/app/operator",
                 "--",
                 "-repo", "git@github.com:greymatter-io/gitops-core.git",
-                "-sshPrivateKeyPath", "/app/.ssh/id_ed25519",
+                "-sshPrivateKeyPath", "/app/.ssh/ssh_private_key",
                 "-tag", "v0.9.3"
               ]
               imagePullPolicy: "Always"
