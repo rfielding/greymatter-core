@@ -5,6 +5,14 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+_authRealms: string | *"/realms/"
+if defaults.edge.oidc.keycloak_pre_17 != _|_ {
+	if defaults.edge.oidc.keycloak_pre_17 {
+		_authRealms: "/auth/realms/"
+	}
+
+}
+
 let Name = "dashboard"
 dashboard: [
 
@@ -22,7 +30,7 @@ dashboard: [
 			template: {
 				metadata: {
 					labels: {
-						"greymatter.io/cluster": Name
+						"greymatter.io/cluster":  Name
 						"greymatter.io/workload": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 					}
 				}
@@ -50,11 +58,11 @@ dashboard: [
 								{name: "REDIS_PORT", value:                   "6379"},
 								{name: "KEYCLOAK_CLIENT_ID", value:           "\(defaults.edge.oidc.client_id)"},
 								{name: "KEYCLOAK_CLIENT_SECRET", value:       "\(defaults.edge.oidc.client_secret)"},
-								{name: "KEYCLOAK_AUTH_URL", value:            "\(defaults.edge.oidc.endpoint)/auth/realms/\(defaults.edge.oidc.realm)/protocol/openid-connect/token"},
+								{name: "KEYCLOAK_AUTH_URL", value:            "\(defaults.edge.oidc.endpoint)\(_authRealms)\(defaults.edge.oidc.realm)/protocol/openid-connect/token"},
 							]
 							resources: {
-								limits: { cpu: "200m", memory: "1Gi" }
-								requests: { cpu: "100m", memory: "500Mi" }
+								limits: {cpu: "200m", memory: "1Gi"}
+								requests: {cpu: "100m", memory: "500Mi"}
 							}
 							volumeMounts: [
 								{

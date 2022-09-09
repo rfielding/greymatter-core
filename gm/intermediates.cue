@@ -2,6 +2,7 @@ package greymatter
 
 import (
 	greymatter "greymatter.io/api"
+	httpFilters "greymatter.io/api/filters/http:http"
 	rbac "envoyproxy.io/extensions/filters/http/rbac/v3"
 	ratelimit "envoyproxy.io/extensions/filters/network/ratelimit/v3"
 	jwt_authn "envoyproxy.io/extensions/filters/http/jwt_authn/v3"
@@ -107,11 +108,15 @@ import (
 	// the change within inputs.cue
 	_oidc_endpoint:      string
 	_oidc_service_url:   string
-	_oidc_provider:      string
 	_oidc_client_id:     string
 	_oidc_client_secret: string
 	_oidc_cookie_domain: string
 	_oidc_realm:         string
+
+	_keycloak_pre_17: bool | *false
+	if defaults.edge.oidc.keycloak_pre_17 != _|_ {
+		_keycloak_pre_17: defaults.edge.oidc.keycloak_pre_17
+	}
 
 	// Identifiers for the object within the mesh
 	listener_key: string
@@ -251,8 +256,18 @@ import (
 			gm_observables: {
 				topic: _gm_observables_topic
 			}
+
 			if _enable_oidc_authentication {
+				_authRealms:      string | *"realms"
+				_authAdminRealms: string | *"admin/realms"
+				if _keycloak_pre_17 {
+					_authRealms:      "auth/realms"
+					_authAdminRealms: "auth/admin/realms"
+				}
+				_oidc_provider:           "\(defaults.edge.oidc.endpoint)/\(_authRealms)/\(defaults.edge.oidc.realm)"
 				"gm_oidc-authentication": #oidc_authentication & {
+					authRealms:      _authRealms
+					authAdminRealms: _authAdminRealms
 					// These values are populated from inputs.cue
 					serviceUrl:   _oidc_service_url
 					provider:     _oidc_provider
@@ -274,7 +289,7 @@ import (
 					}
 				}
 				"gm_ensure-variables": #ensure_variables_filter
-				"gm_oidc-validation": {
+				"gm_oidc-validation":  httpFilters.#ValidationConfig & {
 					provider: _oidc_provider
 					enforce:  bool | *false
 					if enforce {
@@ -315,6 +330,11 @@ import (
 				}
 				"envoy_jwt_authn": #envoy_jwt_authn & {
 					providers: defaults.edge.oidc.jwt_authn_provider
+					providers: keycloak: issuer: _oidc_provider
+
+					if defaults.edge.oidc.jwt_authn_provider.keycloak.remote_jwks != _|_ {
+						providers: keycloak: remote_jwks: http_uri: uri: *"\(_oidc_provider)/protocol/openid-connect/certs" | string
+					}
 				}
 			}
 			if _enable_rbac {
@@ -443,7 +463,7 @@ import (
 		constraints: light: [{
 			cluster_key: _upstream_cluster_key
 			weight:      int | *1
-		}, ... ]
+		}, ...]
 	}]
 	zone_key:       mesh.spec.zone
 	prefix_rewrite: string | *"/"
@@ -510,8 +530,9 @@ import (
 // #ensure_variables_filter is used by OIDC/JWT authentication and ensures that
 // the access_token JWT that is present as a cookie is copied into the header
 // of the request so that it can be accessed by the envoy_jwt_authn filter.
-#ensure_variables_filter: {
-	rules: [...#ensure_variables_rules] | *[
+#ensure_variables_filter: httpFilters.#EnsureVariablesConfig & #ensure_variables_filter_default
+#ensure_variables_filter_default: {
+	rules: *[
 		{
 			copyTo: [
 				{
@@ -522,18 +543,7 @@ import (
 			key:      "access_token"
 			location: "cookie"
 		},
-	]
-}
-
-// #ensure_variables_rule provides a template for copying data from one filter to another,
-// such as cookies and headers.
-#ensure_variables_rules: {
-	key:      string
-	location: string
-	copyTo: [...{
-		key:      string
-		location: string
-	}]
+	] | _
 }
 
 // #envoy_jwt_authn allows for the JWT supplied by an OIDC provider to be validated and 
@@ -543,18 +553,11 @@ import (
 		// keycloak configuration is specific to Keycloak. If using another provider, you will need to
 		// create separate set of configurations and change the provider_name in the rules below.
 		keycloak?: {
-			issuer:    string | *""
-			audiences: [...string] | *[""]
 			remote_jwks?: {
 				http_uri: {
-					uri:     string | *""
-					cluster: string | *""
 					timeout: string | *"1s"
 				}
 				cache_duration: string | *"300s"
-			}
-			local_jwks?: {
-				inline_string: string | *""
 			}
 			forward:             bool | *true
 			from_headers:        [...] | *[{name: "access_token"}]
@@ -570,61 +573,51 @@ import (
 }
 
 // #oidc_authentication allows for authentication via an OIDC provider such as Keycloak.
-#oidc_authentication: {
-	provider:     string | *""
-	serviceUrl:   string | *""
-	callbackPath: string | *"/oauth"
-	clientId:     string | *""
-	clientSecret: string | *""
-
+#oidc_authentication: httpFilters.#AuthenticationConfig & #oidc_authentication_defaults
+#oidc_authentication_defaults: {
+	callbackPath: *"/oauth" | _
 	accessToken: {
-		// options are "header" | "cookie" | "queryString" | "metadata"
-		location: *"cookie" | _
-		key:      string | *"access_token"
+		location: "header" | "queryString" | "metadata" | *"cookie"
+		key:      *"access_token" | _
 		if location == "metadata" {
 			metadataFilter: string
 		}
 		if location == "cookie" {
 			cookieOptions: {
-				httpOnly: bool | *true
-				secure:   bool | *false
-				maxAge:   string | *"6h"
-				domain:   string | *""
-				path:     string | *"/"
+				httpOnly: *true | _
+				secure:   *false | _
+				maxAge:   *"6h" | _
+				domain:   *"" | _
+				path:     *"/" | _
 			}
 		}
 	}
 
 	idToken: {
 		location: *"cookie" | _
-		key:      string | *"authz_token"
+		key:      *"authz_token" | _
 		if location == "cookie" {
 			cookieOptions: {
-				httpOnly: bool | *true
-				secure:   bool | *false
-				maxAge:   string | *"6h"
-				domain:   string | *""
-				path:     string | *"/"
+				httpOnly: *true | _
+				secure:   *false | _
+				maxAge:   *"6h" | _
+				domain:   *"" | _
+				path:     *"/" | _
 			}
 		}
 	}
 
 	tokenRefresh: {
-		enabled:   bool | *true
-		endpoint:  string | *""
-		realm:     string | *""
-		timeoutMs: int | *5000
-		useTLS:    bool | *false
-		if useTLS {
-			certPath:           string | *""
-			keyPath:            string | *""
-			caPath:             string | *""
-			insecureSkipVerify: bool | *false
-		}
+		enabled:   *true | _
+		endpoint:  *"" | _
+		realm:     *"" | _
+		timeoutMs: *5000 | _
+		useTLS:    *false | _
 	}
 
 	// Optional requested permissions
 	additionalScopes: [...string] | *["openid"] //This scope is required for OIDC
+	...
 }
 
 #envoy_tcp_rate_limit: ratelimit.#RateLimit | *#default_rate_limit

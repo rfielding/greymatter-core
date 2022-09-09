@@ -129,7 +129,6 @@ defaults: {
 			realm:         ""
 			jwt_authn_provider: {
 				keycloak: {
-					issuer: "\(endpoint)/auth/realms/\(realm)"
 					audiences: ["\(defaults.edge.key)"]
 					local_jwks: {
 						inline_string: #"""
@@ -141,7 +140,6 @@ defaults: {
 					// in ./gm/outputs/edge.cue that you will also need to uncomment.
 					// remote_jwks: {
 					//  http_uri: {
-					//   uri:     "\(endpoint)/auth/realms/\(realm)/protocol/openid-connect/certs"
 					//   cluster: "edge_to_keycloak" // this key should be unique across the mesh
 					//  }
 					// }

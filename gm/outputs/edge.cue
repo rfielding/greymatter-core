@@ -22,7 +22,6 @@ edge_config: [
 		_enable_ext_authz:           false
 		_oidc_endpoint:              defaults.edge.oidc.endpoint
 		_oidc_service_url:           "https://\(defaults.edge.oidc.domain):\(defaults.ports.edge_ingress)"
-		_oidc_provider:              "\(defaults.edge.oidc.endpoint)/auth/realms/\(defaults.edge.oidc.realm)"
 		_oidc_client_id:             defaults.edge.oidc.client_id
 		_oidc_client_secret:         defaults.edge.oidc.client_secret
 		_oidc_cookie_domain:         defaults.edge.oidc.domain
