@@ -13,6 +13,66 @@ let Name = "vector-agent"
 let logs_namespaces = [mesh.spec.install_namespace] + mesh.spec.watch_namespaces
 let logs = strings.Join([ for namespace in logs_namespaces {"'/var/log/pods/\(namespace)*/sidecar/*.log'"}], ",")
 
+// vector_permissions need to be applied by the user. They will be used by
+// operator_manifests in k8s/EXTRACTME.cue.
+vector_permissions: [
+	corev1.#Namespace & {
+		apiVersion: "v1"
+		kind:       "Namespace"
+		metadata: {
+			labels: name: mesh.spec.install_namespace
+			name: mesh.spec.install_namespace
+		}
+	},
+
+	corev1.#ServiceAccount & {
+		apiVersion:                   "v1"
+		automountServiceAccountToken: true
+		kind:                         "ServiceAccount"
+		metadata: {
+			name:      Name
+			namespace: mesh.spec.install_namespace
+			labels: {
+				"app.kubernetes.io/instance": Name
+				"app.kubernetes.io/name":     Name
+				"app.kubernetes.io/part-of":  Name
+				"app.kubernetes.io/version":  "0.0.0"
+			}
+		}
+	},
+
+	rbacv1.#ClusterRole & {
+		apiVersion: "rbac.authorization.k8s.io/v1"
+		kind:       "ClusterRole"
+		metadata: name: "\(config.operator_namespace)-\(Name)"
+		rules: [{
+			apiGroups: [""]
+			resources: ["pods", "namespaces"]
+			verbs: ["list", "watch"]
+		}]
+	},
+
+	rbacv1.#ClusterRoleBinding & {
+		apiVersion: "rbac.authorization.k8s.io/v1"
+		kind:       "ClusterRoleBinding"
+		metadata: {
+			name:      "\(config.operator_namespace)-\(Name)-clusterrolebinding"
+			namespace: mesh.spec.install_namespace
+		}
+		subjects: [{
+			kind:      "ServiceAccount"
+			name:      Name
+			namespace: mesh.spec.install_namespace
+		}]
+		roleRef: {
+			kind:     "ClusterRole"
+			name:     "\(config.operator_namespace)-\(Name)"
+			apiGroup: "rbac.authorization.k8s.io"
+		}
+	},
+]
+
+// vector configs are applied by the operator when the mesh is installed.
 vector: [
 	appsv1.#DaemonSet & {
 		apiVersion: "apps/v1"
@@ -188,52 +248,6 @@ vector: [
 				}
 				type: "RollingUpdate"
 			}
-		}
-	},
-
-	corev1.#ServiceAccount & {
-		apiVersion:                   "v1"
-		automountServiceAccountToken: true
-		kind:                         "ServiceAccount"
-		metadata: {
-			name:      Name
-			namespace: mesh.spec.install_namespace
-			labels: {
-				"app.kubernetes.io/instance": Name
-				"app.kubernetes.io/name":     Name
-				"app.kubernetes.io/part-of":  Name
-				"app.kubernetes.io/version":  "0.0.0"
-			}
-		}
-	},
-
-	rbacv1.#ClusterRole & {
-		apiVersion: "rbac.authorization.k8s.io/v1"
-		kind:       "ClusterRole"
-		metadata: name: "\(config.operator_namespace)-\(Name)"
-		rules: [{
-			apiGroups: [""]
-			resources: ["pods", "namespaces"]
-			verbs: ["list", "watch"]
-		}]
-	},
-
-	rbacv1.#ClusterRoleBinding & {
-		apiVersion: "rbac.authorization.k8s.io/v1"
-		kind:       "ClusterRoleBinding"
-		metadata: {
-			name:      "\(config.operator_namespace)-\(Name)-clusterrolebinding"
-			namespace: mesh.spec.install_namespace
-		}
-		subjects: [{
-			kind:      "ServiceAccount"
-			name:      Name
-			namespace: mesh.spec.install_namespace
-		}]
-		roleRef: {
-			kind:     "ClusterRole"
-			name:     "\(config.operator_namespace)-\(Name)"
-			apiGroup: "rbac.authorization.k8s.io"
 		}
 	},
 

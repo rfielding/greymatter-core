@@ -21,7 +21,8 @@ operator_manifests: operator_namespace +
 	operator_k8s +
 	[ for x in openshift_privileged_scc if config.openshift {x}] +
 	[ for x in openshift_spire_scc if config.openshift && config.spire {x}] +
-	[ for x in spire_manifests if config.deploy_spire {x}]
+	[ for x in spire_manifests if config.deploy_spire {x}] +
+	[ for x in vector_permissions if config.enable_audits {x}]
 // For development convenience, not otherwise used
 all_but_operator_manifests: operator_namespace +
 	operator_k8s +
@@ -36,8 +37,8 @@ k8s_manifests: controlensemble +
 	[ for x in prometheus_proxy if config.enable_historical_metrics && len(defaults.prometheus.external_host) > 0 {x}] +
 	[ for x in openshift_spire if config.openshift && config.spire {x}] +
 	[ for x in openshift_spire if config.openshift && config.spire {x}] +
-	[ for x in vector if config.enable_audits {x}] +
-	[ for x in observables if config.enable_audits {x}]
+	[ for x in observables if config.enable_audits {x}] +
+	[ for x in vector if config.enable_audits {x}]
 
 vector_manifests_yaml:      yaml.MarshalStream(vector)
 observables_manifests_yaml: yaml.MarshalStream(observables)
