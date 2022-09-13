@@ -92,7 +92,7 @@ operator_sts: [
 								"--",
 								"-repo", "git@github.com:greymatter-io/gitops-core.git",
 								"-sshPrivateKeyPath", "/app/.ssh/ssh_private_key",
-								"-tag", "v0.9.3",
+								"-branch", "main",
 							]
 							imagePullPolicy: "Always"
 						}
