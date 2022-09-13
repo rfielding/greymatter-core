@@ -8,26 +8,28 @@ import (
 config: {
 	// Flags
 	// use Spire-based mTLS (ours or another)
-	spire:                       bool | *false           @tag(spire,type=bool)
+	spire: bool | *false @tag(spire,type=bool)
 	// deploy our own server and agent
-	deploy_spire:                bool | *spire           @tag(use_spire,type=bool)
+	deploy_spire: bool | *spire @tag(use_spire,type=bool)
 	// if we're deploying into OpenShift, request extra permissions
-	openshift:                   bool | *false           @tag(openshift,type=bool)
-	// launch and configure Prometheus for historical metrics in the Dashboard
-	enable_historical_metrics:   bool | *true            @tag(enable_historical_metrics,type=bool)
+	openshift: bool | *false @tag(openshift,type=bool)
+	// deploy and configure Prometheus for historical metrics in the Dashboard
+	enable_historical_metrics: bool | *true @tag(enable_historical_metrics,type=bool)
+	// deploy and configure audit pipeline for observability telemetry
+	enable_audits: bool | *true @tag(enable_audits,type=bool)
 	// whether to automatically copy the image pull secret to watched namespaces for sidecar injection
-	auto_copy_image_pull_secret: bool | *true            @tag(auto_copy_image_pull_secret, type=bool)
+	auto_copy_image_pull_secret: bool | *true @tag(auto_copy_image_pull_secret, type=bool)
 	// namespace the operator will deploy into
-	operator_namespace:          string | *"gm-operator" @tag(operator_namespace, type=string)
+	operator_namespace: string | *"gm-operator" @tag(operator_namespace, type=string)
 
 	// for a hypothetical future where we want to mount specific certificates for operator webhooks, etc.
 	generate_webhook_certs: bool | *true        @tag(generate_webhook_certs,type=bool)
 	cluster_ingress_name:   string | *"cluster" // For OpenShift deployments, this is used to look up the configured ingress domain
 
 	// currently just controls k8s/outputs/operator.cue for debugging
-	debug:                       bool | *false           @tag(debug,type=bool)
+	debug: bool | *false @tag(debug,type=bool)
 	// test=true turns off GitOps, telling the operator to use the baked-in CUE
-	test:                        bool | *false           @tag(test,type=bool)  // currently just turns off GitOps so CI integration tests can manipulate directly
+	test: bool | *false @tag(test,type=bool) // currently just turns off GitOps so CI integration tests can manipulate directly
 }
 
 mesh: meshv1.#Mesh & {
@@ -52,21 +54,21 @@ mesh: meshv1.#Mesh & {
 }
 
 defaults: {
-	image_pull_secret_name:   string | *"gm-docker-secret"
-	image_pull_policy:        corev1.#enumPullPolicy | *corev1.#PullAlways
-	xds_host:                 "controlensemble.\(mesh.spec.install_namespace).svc.cluster.local"
-	sidecar_list:             [...string] | *["dashboard", "catalog", "controlensemble", "edge", "redis", "prometheus", "jwtsecurity"]
-	proxy_port_name:          "proxy" // the name of the ingress port for sidecars - used by service discovery
-	redis_cluster_name:       "redis"
-	redis_host:               "\(redis_cluster_name).\(mesh.spec.install_namespace).svc.cluster.local"
-	redis_port:               6379
-	redis_db:                 0
-	redis_username:           ""
-	redis_password:           ""
+	image_pull_secret_name: string | *"gm-docker-secret"
+	image_pull_policy:      corev1.#enumPullPolicy | *corev1.#PullAlways
+	xds_host:               "controlensemble.\(mesh.spec.install_namespace).svc.cluster.local"
+	sidecar_list:           [...string] | *["dashboard", "catalog", "controlensemble", "edge", "redis", "prometheus", "jwtsecurity", "observables"]
+	proxy_port_name:        "proxy" // the name of the ingress port for sidecars - used by service discovery
+	redis_cluster_name:     "redis"
+	redis_host:             "\(redis_cluster_name).\(mesh.spec.install_namespace).svc.cluster.local"
+	redis_port:             6379
+	redis_db:               0
+	redis_username:         ""
+	redis_password:         ""
 	// key names for applied-state backups to Redis - they only need to be unique.
 	gitops_state_key_gm:      "\(config.operator_namespace).gmHashes"
-  gitops_state_key_k8s:     "\(config.operator_namespace).k8sHashes"
-  gitops_state_key_sidecar: "\(config.operator_namespace).sidecarHashes"
+	gitops_state_key_k8s:     "\(config.operator_namespace).k8sHashes"
+	gitops_state_key_sidecar: "\(config.operator_namespace).sidecarHashes"
 
 	ports: {
 		default_ingress: 10808
@@ -76,7 +78,9 @@ defaults: {
 	}
 
 	images: {
-		operator: string | *"quay.io/greymatterio/operator:0.9.2" @tag(operator_image)
+		operator:    string | *"quay.io/greymatterio/operator:0.9.2" @tag(operator_image)
+		vector:      string | *"timberio/vector:0.22.0-debian"
+		observables: string | *"quay.io/greymatterio/observables:1.1.3"
 	}
 
 	// The external_host field instructs greymatter to install Prometheus or
@@ -93,6 +97,23 @@ defaults: {
 			enabled:     false
 			cert_secret: "gm-prometheus-certs"
 		}
+	}
+
+	// audits configuration applies to greymatter's observability pipeline and are
+	// used when config.enable_audits is true.  
+	audits: {
+		// index determines the index ID in Elasticsearch. The default naming convention
+		// will generate a new index each month. The index configuration can be changed
+		// to create more or less indexes depending on your storage and performance requirements.
+		index: "gm-audits-%Y-%m"
+		// elasticsearch_host can be an IP address or DNS hostname to your Elasticsearch instace.
+		elasticsearch_host: ""
+		// elasticsearch_port is the port of your Elasticsearch instance.
+		elasticsearch_port: 443
+		// elasticsearch_endpoint is the full endpoint containing protocol, host, and port
+		// of your Elasticsearch instance. This is used by Vector to sink audit data
+		// with Elasticsearch.
+		elasticsearch_endpoint: "https://\(elasticsearch_host):\(elasticsearch_port)"
 	}
 
 	edge: {
