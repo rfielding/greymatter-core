@@ -1,12 +1,5 @@
 metadata:
   labels:
-    name: gm-operator
-  name: gm-operator
-kind: Namespace
-apiVersion: v1
----
-metadata:
-  labels:
     name: greymatter-operator
   name: greymatter-operator
   namespace: gm-operator
