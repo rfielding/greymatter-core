@@ -1,5 +1,11 @@
 # Changelog
 
+## vNEXT
+
+### Added
+
+- Updated `gm_oidc-authentication` filter to support pre/post Keycloak v17 
+
 ## 0.10.0 (September 13, 2022)
 
 ### Changed
