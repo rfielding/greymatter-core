@@ -39,7 +39,6 @@ mesh: meshv1.#Mesh & {
 	spec: {
 		install_namespace: string | *"greymatter"
 		watch_namespaces:  [...string] | *["default", "plus", "examples"]
-		zone:              string | *"default-zone"
 		images: {
 			proxy:        string | *"quay.io/greymatterio/gm-proxy:1.7.1"
 			catalog:      string | *"quay.io/greymatterio/gm-catalog:3.0.5"

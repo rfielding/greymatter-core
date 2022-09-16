@@ -5,12 +5,14 @@
 ### Added
 
 - Updated `gm_oidc-authentication` filter to support pre/post Keycloak v17 
+- `mesh.spec.zone` now defaults to `"default-zone"`
 
 ## 0.10.0 (September 13, 2022)
 
 ### Changed
 
 - Mesh CRD, webhooks, and associated permissions removed
+- Removed `zone` from inputs.cue to prevent breaking mesh changes
 
 ### Fixed
 
