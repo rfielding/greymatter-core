@@ -3,13 +3,15 @@
 package greymatter
 
 let Name = "catalog"
-let CatalogIngressName = "\(Name)_local"
+let CatalogIngressName = "\(Name)_ingress"
 let EgressToRedisName = "\(Name)_egress_to_redis"
 
 catalog_config: [
 
 	// Catalog HTTP ingress
-	#domain & {domain_key: CatalogIngressName},
+	#domain & {
+    domain_key: CatalogIngressName
+  },
 	#listener & {
 		listener_key:          CatalogIngressName
 		_spire_self:           Name
@@ -20,7 +22,10 @@ catalog_config: [
 	#route & {route_key:     CatalogIngressName},
 
 	// egress -> redis
-	#domain & {domain_key: EgressToRedisName, port: defaults.ports.redis_ingress},
+	#domain & {
+    domain_key: EgressToRedisName
+    port: defaults.ports.redis_ingress
+  },
 	#cluster & {
 		cluster_key:  EgressToRedisName
 		name:         defaults.redis_cluster_name

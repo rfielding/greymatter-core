@@ -3,12 +3,14 @@
 package greymatter
 
 let Name = "dashboard"
-let LocalName = "dashboard_local"
+let LocalName = "\(Name)_ingress"
 let EgressToRedisName = "\(Name)_egress_to_redis"
 
 dashboard_config: [
 	// sidecar -> dashboard
-	#domain & {domain_key: LocalName},
+	#domain & {
+    domain_key: LocalName
+  },
 	#listener & {
 		listener_key:          LocalName
 		_spire_self:           Name
@@ -19,7 +21,10 @@ dashboard_config: [
 	#route & {route_key:     LocalName},
 
 	// egress -> redis
-	#domain & {domain_key: EgressToRedisName, port: defaults.ports.redis_ingress},
+	#domain & {
+    domain_key: EgressToRedisName
+    port: defaults.ports.redis_ingress
+  },
 	#cluster & {
 		cluster_key:  EgressToRedisName
 		name:         defaults.redis_cluster_name

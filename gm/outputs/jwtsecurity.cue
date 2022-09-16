@@ -3,13 +3,15 @@
 package greymatter
 
 let Name = "jwt-security"
-let JWTsecurityIngressName = "\(Name)_local"
+let JWTsecurityIngressName = "\(Name)_ingress"
 let EgressToRedisName = "\(Name)_egress_to_redis"
 
 jwtsecurity_config: [
 
 	// jwtsecurity HTTP ingress
-	#domain & {domain_key: JWTsecurityIngressName},
+	#domain & {
+		domain_key: JWTsecurityIngressName
+	},
 	#listener & {
 		listener_key:          JWTsecurityIngressName
 		_spire_self:           Name
@@ -20,7 +22,10 @@ jwtsecurity_config: [
 	#route & {route_key:     JWTsecurityIngressName},
 
 	// egress -> Metrics redis
-	#domain & {domain_key: EgressToRedisName, port: defaults.ports.redis_ingress},
+	#domain & {
+		domain_key: EgressToRedisName
+		port: defaults.ports.redis_ingress
+	},
 	#cluster & {
 		cluster_key:  EgressToRedisName
 		name:         defaults.redis_cluster_name
