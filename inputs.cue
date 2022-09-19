@@ -58,7 +58,7 @@ defaults: {
 	xds_host:               "controlensemble.\(mesh.spec.install_namespace).svc.cluster.local"
 	sidecar_list:           [...string] | *["dashboard", "catalog", "controlensemble", "edge", "redis", "prometheus", "jwtsecurity", "observables"]
 	proxy_port_name:        "proxy" // the name of the ingress port for sidecars - used by service discovery
-	redis_cluster_name:     "redis"
+	redis_cluster_name:     "greymatter-datastore"
 	redis_host:             "\(redis_cluster_name).\(mesh.spec.install_namespace).svc.cluster.local"
 	redis_port:             6379
 	redis_db:               0

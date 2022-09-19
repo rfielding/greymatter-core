@@ -9,7 +9,8 @@ import (
 	"strings"
 )
 
-let Name = "vector-agent"
+let Name = "greymatter-audit-agent"
+let VectorConfig = "vector-config"
 let logs_namespaces = [mesh.spec.install_namespace] + mesh.spec.watch_namespaces
 let logs = strings.Join([ for namespace in logs_namespaces {"'/var/log/pods/\(namespace)*/sidecar/*.log'"}], ",")
 
@@ -36,7 +37,7 @@ vector_permissions: [
 				"app.kubernetes.io/instance": Name
 				"app.kubernetes.io/name":     Name
 				"app.kubernetes.io/part-of":  Name
-				"app.kubernetes.io/version":  "0.0.0"
+				"app.kubernetes.io/version":  "0.22.0"
 			}
 		}
 	},
@@ -82,7 +83,7 @@ vector: [
 				"app.kubernetes.io/instance": Name
 				"app.kubernetes.io/name":     Name
 				"app.kubernetes.io/part-of":  Name
-				"app.kubernetes.io/version":  "0.0.0"
+				"app.kubernetes.io/version":  "0.22.0"
 			}
 			name:      Name
 			namespace: mesh.spec.install_namespace
@@ -148,7 +149,7 @@ vector: [
 						}]
 						image:           defaults.images.vector
 						imagePullPolicy: defaults.image_pull_policy
-						name:            Name
+						name:            "vector"
 						ports: [{
 							containerPort: 9090
 							name:          "metrics"
@@ -215,7 +216,7 @@ vector: [
 						projected: {
 							sources: [{
 								configMap: {
-									name: Name
+									name: "\(VectorConfig)"
 								}
 							}, {
 								configMap: {
@@ -311,7 +312,7 @@ vector: [
 		apiVersion: "v1"
 		kind:       "ConfigMap"
 		metadata: {
-			name:      Name
+			name:      "\(VectorConfig)"
 			namespace: mesh.spec.install_namespace
 		}
 		data: {
