@@ -2,7 +2,7 @@ package greymatter
 
 import (
 	"list"
-	
+
 	greymatter "greymatter.io/api"
 	httpFilters "greymatter.io/api/filters/http:http"
 	rbac "envoyproxy.io/extensions/filters/http/rbac/v3"
@@ -37,12 +37,12 @@ import (
 	zone_key: mesh.spec.zone
 	// Configures TLS settings for incoming requests, utilizing 
 	// mounted certificates to allow for HTTPS traffic
-	_trust_file: string | *"/etc/proxy/tls/sidecar/ca.crt"
+	_trust_file:       string | *"/etc/proxy/tls/sidecar/ca.crt"
 	_certificate_path: string | *"/etc/proxy/tls/sidecar/server.crt"
-	_key_path: string | *"/etc/proxy/tls/sidecar/server.key"
-	if _force_https==true || (strings.Contains(domain_key, "_ingress") && defaults.edge.enable_tls){
+	_key_path:         string | *"/etc/proxy/tls/sidecar/server.key"
+	if _force_https == true || (strings.Contains(domain_key, "_ingress") && defaults.edge.enable_tls) {
 		force_https: true
-		ssl_config: greymatter.#SSLConfig & {
+		ssl_config:  greymatter.#SSLConfig & {
 			// Specify a TLS Protocol to use when communicating
 			// Supported options are:
 			// TLS_AUTO TLSv1_0 TLSv1_1 TLSv1_2 TLSv1_3
@@ -146,14 +146,14 @@ import (
 	_http_filter_weight: {
 		// Authentication always comes first so we can 
 		// block/deny/allow as necessary.
-		"envoy.lua": 1
-		"envoy.fault": 1
-		"gm.inheaders": 1
-		"gm.impersonation": 1
+		"envoy.lua":              1
+		"envoy.fault":            1
+		"gm.inheaders":           1
+		"gm.impersonation":       1
 		"gm.oidc-authentication": 1
-		"gm.ensure-variables": 1
-		"gm.oidc-validation": 1
-		
+		"gm.ensure-variables":    1
+		"gm.oidc-validation":     1
+
 		// the greymatter observability pipeline
 		// comes in the middle of the filter stack
 		// so we can collect stats.
@@ -163,8 +163,8 @@ import (
 		// observability pipeline.
 		"envoy.jwt_authn": 3
 		"envoy.ext_authz": 3
-		"envoy.rbac": 3
-		
+		"envoy.rbac":      3
+
 		// Metrics is last due to a known 
 		// cardinality issue that may overload the system.
 		"gm.metrics": 10
@@ -182,7 +182,7 @@ import (
 		// Rate limiting also receives a high priority
 		// since it can prevent DOS attacks.
 		"envoy.rate_limit": 2
-		
+
 		// TCP proxy and protocol filters should 
 		// always be last as they signal the proxy 
 		// what kind of connection its handling.
@@ -216,7 +216,7 @@ import (
 		// known mapping list and gets a middle weight assigned to all its 
 		// values.
 		_active_network_filters: [
-			...string
+			...string,
 		]
 
 		// We apply a middle weight to user inputted filters so they are in between
@@ -233,13 +233,12 @@ import (
 		// NB: Even if configuration exists in network_filters for a filter,
 		// only filters which are listed as active will be applied and used.
 		active_network_filters: list.Sort(
-			// the inputted array is the combined user defined filters and our
-			// known list of toggleable filters.
-			_active_network_filter_toggles + _active_network_filters, 
-			// the sort algorithm used is stable.
-			{x: string, y: string, less: _network_filter_weight[x] < _network_filter_weight[y]}
-		)
-
+					// the inputted array is the combined user defined filters and our
+					// known list of toggleable filters.
+					_active_network_filter_toggles+_active_network_filters,
+					// the sort algorithm used is stable.
+					{x: string, y: string, less: _network_filter_weight[x] < _network_filter_weight[y]},
+					)
 
 		network_filters: {
 			// Configures rate limiting for TCP listeners.
@@ -318,7 +317,7 @@ import (
 		// known mapping list and gets a middle weight assigned to all its 
 		// values.
 		_active_http_filters: [
-			...string
+			...string,
 		]
 
 		// We apply a middle weight to user inputted filters so they are in between
@@ -339,12 +338,12 @@ import (
 		// We use a special sort weight to correctly prioritize what filter order 
 		// these get applied in.
 		active_http_filters: list.Sort(
-			// the inputted array is the combined user defined filters and our
-			// known list of toggleable filters.
-			_active_http_filter_toggles + _active_http_filters, 
-			// the sort algorithm used is stable.
-			{x: string, y: string, less: _http_filter_weight[x] < _http_filter_weight[y]}
-		)
+					// the inputted array is the combined user defined filters and our
+					// known list of toggleable filters.
+					_active_http_filter_toggles+_active_http_filters,
+					// the sort algorithm used is stable.
+					{x: string, y: string, less: _http_filter_weight[x] < _http_filter_weight[y]},
+					)
 
 		// http_filters contains the configuration for HTTP filters (not TCP)
 		// potentially applied to the listener. Note again that the active_http_filters
@@ -426,10 +425,7 @@ import (
 						claims: ["name"]
 					}
 					TLSConfig?: {
-						useTLS:             bool | *false
-						certPath:           string | *""
-						keyPath:            string | *""
-						caPath:             string | *""
+						useTLS:             bool | *true
 						insecureSkipVerify: bool | *false
 					}
 				}
@@ -505,11 +501,11 @@ import (
 	_spire_other:             string // can specify an allowable upstream identity - defaults to "edge"
 	_enable_circuit_breakers: bool | *false
 	// We can expand options here for load balancers that superseed the lb_policy field
-	_load_balancer: "round_robin" | "least_request" | "maglev" | "ring_hash" | "random"
-	_trust_file: string | *"/etc/proxy/tls/sidecar/ca.crt"
+	_load_balancer:    "round_robin" | "least_request" | "maglev" | "ring_hash" | "random"
+	_trust_file:       string | *"/etc/proxy/tls/sidecar/ca.crt"
 	_certificate_path: string | *"/etc/proxy/tls/sidecar/server.crt"
-	_key_path: string | *"/etc/proxy/tls/sidecar/server.key"
-	
+	_key_path:         string | *"/etc/proxy/tls/sidecar/server.key"
+
 	cluster_key: string
 	name:        string | *cluster_key
 	instances:   [...greymatter.#Instance] | *[]
@@ -530,10 +526,10 @@ import (
 
 	if (defaults.edge.enable_tls && !(strings.Contains(cluster_key, "_ingress")) ) || _force_https {
 		require_tls: true
-		ssl_config:{
-			cert_key_pairs:[{
+		ssl_config: {
+			cert_key_pairs: [{
 				certificate_path: _certificate_path
-				key_path: _key_path
+				key_path:         _key_path
 			}]
 			trust_file: _trust_file
 		}
@@ -661,8 +657,8 @@ import (
 // #ensure_variables_filter is used by OIDC/JWT authentication and ensures that
 // the access_token JWT that is present as a cookie is copied into the header
 // of the request so that it can be accessed by the envoy_jwt_authn filter.
-#ensure_variables_filter: httpFilters.#EnsureVariablesConfig & #ensure_variables_filter_default
-#ensure_variables_filter_default: {
+#ensure_variables_filter: httpFilters.#EnsureVariablesConfig & _ensure_variables_filter_default
+_ensure_variables_filter_default: {
 	rules: *[
 		{
 			copyTo: [
@@ -704,9 +700,10 @@ import (
 }
 
 // #oidc_authentication allows for authentication via an OIDC provider such as Keycloak.
-#oidc_authentication: httpFilters.#AuthenticationConfig & #oidc_authentication_defaults
-#oidc_authentication_defaults: {
+
+_oidc_authentication_defaults: {
 	callbackPath: *"/oauth" | _
+	useTLS:       *true | _
 	accessToken: {
 		location: "header" | "queryString" | "metadata" | *"cookie"
 		key:      *"access_token" | _
@@ -740,16 +737,14 @@ import (
 
 	tokenRefresh: {
 		enabled:   *true | _
-		endpoint:  *"" | _
-		realm:     *"" | _
 		timeoutMs: *5000 | _
-		useTLS:    *false | _
+		useTLS:    *true | _
 	}
 
 	// Optional requested permissions
 	additionalScopes: [...string] | *["openid"] //This scope is required for OIDC
-	...
 }
+#oidc_authentication: httpFilters.#AuthenticationConfig & _oidc_authentication_defaults
 
 #envoy_tcp_rate_limit: ratelimit.#RateLimit | *#default_rate_limit
 
