@@ -314,19 +314,19 @@ kind: Namespace
 apiVersion: v1
 ---
 metadata:
-  name: vector-agent
+  name: greymatter-audit-agent
   namespace: greymatter
   labels:
-    app.kubernetes.io/instance: vector-agent
-    app.kubernetes.io/name: vector-agent
-    app.kubernetes.io/part-of: vector-agent
-    app.kubernetes.io/version: 0.0.0
+    app.kubernetes.io/instance: greymatter-audit-agent
+    app.kubernetes.io/name: greymatter-audit-agent
+    app.kubernetes.io/part-of: greymatter-audit-agent
+    app.kubernetes.io/version: 0.22.0
 automountServiceAccountToken: true
 kind: ServiceAccount
 apiVersion: v1
 ---
 metadata:
-  name: gm-operator-vector-agent
+  name: gm-operator-greymatter-audit-agent
 rules:
   - apiGroups:
       - ""
@@ -340,15 +340,15 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 ---
 metadata:
-  name: gm-operator-vector-agent-clusterrolebinding
+  name: gm-operator-greymatter-audit-agent-clusterrolebinding
   namespace: greymatter
 subjects:
   - kind: ServiceAccount
-    name: vector-agent
+    name: greymatter-audit-agent
     namespace: greymatter
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: gm-operator-vector-agent
+  name: gm-operator-greymatter-audit-agent
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
