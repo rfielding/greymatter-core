@@ -1,6 +1,8 @@
 package greymatter
 
 import (
+	"list"
+	
 	greymatter "greymatter.io/api"
 	httpFilters "greymatter.io/api/filters/http:http"
 	rbac "envoyproxy.io/extensions/filters/http/rbac/v3"
@@ -66,6 +68,9 @@ import (
 	_tcp_upstream?: string
 	// Specifiy if this listener is for ingress, which will activate default HTTP filters
 	_is_ingress: bool | *false
+	// This should be enabled if a listener will be proxying redis. The filter ordering
+	// requirements special treatment with this upstream.
+	_is_redis: bool | *false
 	// Unique topic name for observable audit collection
 	// See https://docs.greymatter.io/filters/observables for more details.
 	_gm_observables_topic: string
@@ -130,12 +135,63 @@ import (
 	// and listener keys.
 	domain_keys: [...string] | *[listener_key]
 
+	// _http_filter_weight establishes a baseline for greymatter
+	// filter priority. The ordering here does not matter as 
+	// the sorting algorithm will sort given the order in the 
+	// inputted array and in accordance with the assigned weights.
+	_http_filter_weight: {
+		// Authentication always comes first so we can 
+		// block/deny/allow as necessary.
+		"envoy.lua": 1
+		"envoy.fault": 1
+		"gm.inheaders": 1
+		"gm.impersonation": 1
+		"gm.oidc-authentication": 1
+		"gm.ensure-variables": 1
+		"gm.oidc-validation": 1
+		
+		// the greymatter observability pipeline
+		// comes in the middle of the filter stack
+		// so we can collect stats.
+		"gm.observables": 2
+
+		// This kind of auth needs to be tracked by the 
+		// observability pipeline.
+		"envoy.jwt_authn": 3
+		"envoy.ext_authz": 3
+		"envoy.rbac": 3
+		
+		// Metrics is last due to a known 
+		// cardinality issue that may overload the system.
+		"gm.metrics": 10
+	}
+
+	// _network_filter_weight establishes a baseline for greymatter
+	// filter priority. The ordering here does not matter as 
+	// the sorting algorithm will sort given the order in the 
+	// inputted array and in accordance with the assigned weights.
+	_network_filter_weight: {
+		// Authentication always comes first so we can 
+		// block/deny/allow as necessary.
+		"envoy.ext_authz": 1
+
+		// Rate limiting also receives a high priority
+		// since it can prevent DOS attacks.
+		"envoy.rate_limit": 2
+		
+		// TCP proxy and protocol filters should 
+		// always be last as they signal the proxy 
+		// what kind of connection its handling.
+		"envoy.tcp_proxy": 10
+
+		// The greymatter proxy requires redis to be 
+		// last in the network filter chain.
+		"envoy.redis_proxy": 11
+	}
+
 	// For TCP listeners.
 	if _tcp_upstream != _|_ {
-		// This active_network_filters list contains the filters which will be active on the listener.
-		// NB: Even if configuration exists in network_filters for a filter,
-		// only filters which are listed as active will be applied and used.
-		active_network_filters: [
+		_active_network_filter_toggles: [
 			if _enable_ext_authz {
 				"envoy.ext_authz"
 			},
@@ -144,8 +200,43 @@ import (
 			},
 			// Needs to be last in filter chain
 			"envoy.tcp_proxy",
+			if _is_redis {
+				"envoy.redis_proxy"
+			},
 			...string,
 		]
+
+		// Users input custom filters through this API.
+		// It is different than the active_network_filters list which is what 
+		// is sent to control-api through JSON. This list gets unified with the 
+		// known mapping list and gets a middle weight assigned to all its 
+		// values.
+		_active_network_filters: [
+			...string
+		]
+
+		// We apply a middle weight to user inputted filters so they are in between
+		// our boundaries and prioritized greymatter filters. This can be changed if necessary
+		// or if another toggle is added please adjust the networkFilterWeight mapping with a new 
+		// entry. The order of the user inputted list is also preserved in the stable sort.
+		for k, v in _active_network_filters {
+			_network_filter_weight: {
+				"\(v)": 5
+			}
+		}
+
+		// This active_network_filters list contains the filters which will be active on the listener.
+		// NB: Even if configuration exists in network_filters for a filter,
+		// only filters which are listed as active will be applied and used.
+		active_network_filters: list.Sort(
+			// the inputted array is the combined user defined filters and our
+			// known list of toggleable filters.
+			_active_network_filter_toggles + _active_network_filters, 
+			// the sort algorithm used is stable.
+			{x: string, y: string, less: _network_filter_weight[x] < _network_filter_weight[y]}
+		)
+
+
 		network_filters: {
 			// Configures rate limiting for TCP listeners.
 			// See #envoy_tcp_rate_limit below for the default 
@@ -172,13 +263,7 @@ import (
 
 	// Non-TCP listeners that are ingress can have HTTP filters applied to them
 	if _tcp_upstream == _|_ && _is_ingress == true {
-
-		// The active_http_filters list contains the filters which will be active on the listener.
-		// NB: Even if configuration exists in http_filters for a filter,
-		// only filters which are listed as active will be applied and used.
-		// To add custom filters, introduce a new toggle above and match the
-		// pattern below to place it correctly in the chain. 
-		active_http_filters: [
+		_active_http_filter_toggles: [
 			if _enable_fault_injection {
 				"envoy.fault"
 			},
@@ -190,12 +275,6 @@ import (
 			},
 			if _enable_impersonation {
 				"gm.impersonation"
-			},
-			// Note: when TLS is enabled, jwtsecurity should come after inheaders
-			// and impersonation else it may send an incorrect or invalid DN
-			// to jwt-security service
-			if _enable_jwt_security {
-				"gm.jwtsecurity"
 			},
 			// Note that only one filter can be added per conditional expression.
 			// These four filters allow the OIDC authentication flow to facilitate
@@ -227,8 +306,41 @@ import (
 			// This filter is essential to the operation of the mesh and should
 			// not be disabled.
 			"gm.metrics",
-			...string,
 		]
+
+		// Users input custom filters through this API.
+		// It is different than the active_http_filters list which is what 
+		// is sent to control-api. This list gets unified with the 
+		// known mapping list and gets a middle weight assigned to all its 
+		// values.
+		_active_http_filters: [
+			...string
+		]
+
+		// We apply a middle weight to user inputted filters so they are in between
+		// our boundaries and prioritized greymatter filters. This can be changed if necessary
+		// or if another toggle is added please adjust the httpFilterWeight mapping with a new 
+		// entry. The order of the user inputted list is also preserved in the stable sort.
+		for k, v in _active_http_filters {
+			_http_filter_weight: {
+				"\(v)": 5
+			}
+		}
+
+		// The active_http_filters list contains the filters which will be active on the listener.
+		// NB: Even if configuration exists in http_filters for a filter,
+		// only filters which are listed as active will be applied and used.
+		// To add custom filters, introduce a new toggle above and match the
+		// pattern below to place it correctly in the chain. 
+		// We use a special sort weight to correctly prioritize what filter order 
+		// these get applied in.
+		active_http_filters: list.Sort(
+			// the inputted array is the combined user defined filters and our
+			// known list of toggleable filters.
+			_active_http_filter_toggles + _active_http_filters, 
+			// the sort algorithm used is stable.
+			{x: string, y: string, less: _http_filter_weight[x] < _http_filter_weight[y]}
+		)
 
 		// http_filters contains the configuration for HTTP filters (not TCP)
 		// potentially applied to the listener. Note again that the active_http_filters
