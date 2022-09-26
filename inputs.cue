@@ -16,7 +16,7 @@ config: {
 	// deploy and configure Prometheus for historical metrics in the Dashboard
 	enable_historical_metrics: bool | *true @tag(enable_historical_metrics,type=bool)
 	// deploy and configure audit pipeline for observability telemetry
-	enable_audits: bool | *true @tag(enable_audits,type=bool)
+	enable_audits: bool | *false @tag(enable_audits,type=bool)
 	// whether to automatically copy the image pull secret to watched namespaces for sidecar injection
 	auto_copy_image_pull_secret: bool | *true @tag(auto_copy_image_pull_secret, type=bool)
 	// namespace the operator will deploy into
@@ -117,7 +117,13 @@ defaults: {
 
 	edge: {
 		key:        "edge"
-		enable_tls: false
+		// edge.enable_tls toggles internal mtls connections between greymatter core components
+		// by default the internal and external secrets are the same however if you want to
+		// have different certs for the ingress and internal connections (this is the case for prod)
+		// then you will need to add those certs to another secret and specity that
+		// below at defaults.core_internal_tls_certs.cert_secret.
+		enable_tls: true
+		secret_name: "gm-edge-ingress-certs"
 		oidc: {
 			endpoint_host: ""
 			endpoint_port: 0
@@ -158,6 +164,12 @@ defaults: {
 		ca_secret_name: "server-ca"
 		// should we request a host mount for the socket, or normal volume mount? If true, also requests hostPID permission
 		host_mount_socket: true
+	}
+
+	core_internal_tls_certs:{
+		// use npe cert for internal mtls
+		// Name of kubernetes secret to be mounted
+		cert_secret: string | *defaults.edge.secret_name 
 	}
 
 } // defaults

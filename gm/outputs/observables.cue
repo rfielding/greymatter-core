@@ -2,14 +2,16 @@ package greymatter
 
 // Name needs to match the greymatter.io/cluster value in the Kubernetes deployment
 let Name = "observables"
-let ObservablesAppIngressName = "\(Name)_local"
+let ObservablesAppIngressName = "\(Name)_ingress"
 let EgressToRedisName = "\(Name)_egress_to_redis"
 let EgressToElasticSearchName = "\(Name)_egress_to_elasticsearch"
 
 observables_config: [
 
 	// HTTP ingress
-	#domain & {domain_key: ObservablesAppIngressName},
+	#domain & {
+		domain_key: ObservablesAppIngressName
+	},
 	#listener & {
 		listener_key:          ObservablesAppIngressName
 		_spire_self:           Name
@@ -20,7 +22,9 @@ observables_config: [
 	#route & {route_key:     ObservablesAppIngressName},
 
 	// egress -> redis
-	#domain & {domain_key: EgressToRedisName, port: defaults.ports.redis_ingress},
+	#domain & {
+		domain_key: EgressToRedisName, port: defaults.ports.redis_ingress
+	},
 	#cluster & {
 		cluster_key:  EgressToRedisName
 		name:         defaults.redis_cluster_name
@@ -52,7 +56,7 @@ observables_config: [
 	#cluster & {
 		cluster_key:    EgressToElasticSearchName
 		name:           "elasticsearch"
-		require_tls:    true
+		_force_https:   true
 		_upstream_host: defaults.audits.elasticsearch_host
 		_upstream_port: defaults.audits.elasticsearch_port
 	},

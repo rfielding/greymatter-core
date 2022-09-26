@@ -32,7 +32,7 @@ edge: [
 								if defaults.edge.enable_tls == true {
 									{
 										name:      "tls-certs"
-										mountPath: "/etc/proxy/tls/sidecar"
+										mountPath: "/etc/proxy/tls/edge"
 									}
 								},
 							]
@@ -46,7 +46,10 @@ edge: [
 							if defaults.edge.enable_tls == true {
 							{
 								name: "tls-certs"
-								secret: {defaultMode: 420, secretName: "gm-edge-ingress-certs"}
+								secret: {
+									defaultMode: 420
+									secretName: defaults.edge.secret_name
+								}
 							}
 						},
 					]

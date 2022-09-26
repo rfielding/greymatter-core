@@ -1,11 +1,14 @@
 package greymatter
 
 let Name = defaults.redis_cluster_name
-let RedisIngressName = "\(Name)_local"
+let RedisIngressName = "\(Name)_ingress"
 
 redis_config: [
 	// Redis TCP ingress
-	#domain & {domain_key:   RedisIngressName, port:           defaults.ports.redis_ingress},
+	#domain & { 
+    domain_key: RedisIngressName
+    port: defaults.ports.redis_ingress
+  },
 	#cluster & {cluster_key: RedisIngressName, _upstream_port: 6379},
 	// unused route must exist for the cluster to be registered
 	#route & {route_key: RedisIngressName},

@@ -9,7 +9,9 @@ let EgressToRedisName = "\(Name)_egress_to_redis"
 controlensemble_config: [
 
 	// Control API HTTP ingress
-	#domain & {domain_key: ControlAPIIngressName},
+	#domain & {
+    domain_key: ControlAPIIngressName
+  },
 	#listener & {
 		listener_key:          ControlAPIIngressName
 		_spire_self:           Name
@@ -20,7 +22,10 @@ controlensemble_config: [
 	#route & {route_key:     ControlAPIIngressName},
 
 	// egress->redis
-	#domain & {domain_key: EgressToRedisName, port: defaults.ports.redis_ingress},
+	#domain & {
+    domain_key: EgressToRedisName
+    port: defaults.ports.redis_ingress
+  },
 	#cluster & {
 		cluster_key:  EgressToRedisName
 		name:         defaults.redis_cluster_name

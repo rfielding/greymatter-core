@@ -8,9 +8,13 @@ let EgressToRedisName = "\(defaults.edge.key)_egress_to_redis"
 // let EdgeToKeycloakName = defaults.edge.oidc.jwt_authn_provider.keycloak.remote_jwks.http_uri.cluster
 
 edge_config: [
+	// This domain is special because it uses edge certs instead of sidecar certs.  This secures outside -> in traffic
 	#domain & {
 		domain_key:   defaults.edge.key
 		_force_https: defaults.edge.enable_tls
+		_trust_file: "/etc/proxy/tls/edge/ca.crt"
+		_certificate_path: "/etc/proxy/tls/edge/server.crt"
+		_key_path: "/etc/proxy/tls/edge/server.key"
 	},
 	#listener & {
 		listener_key:                defaults.edge.key
@@ -29,10 +33,15 @@ edge_config: [
 	},
 	// This cluster must exist (though it never receives traffic)
 	// so that Catalog will be able to look-up edge instances
-	#cluster & {cluster_key: defaults.edge.key},
+	#cluster & {
+		cluster_key: defaults.edge.key
+	},
 
 	// egress -> redis
-	#domain & {domain_key: EgressToRedisName, port: defaults.ports.redis_ingress},
+	#domain & {
+		domain_key: EgressToRedisName
+		port: defaults.ports.redis_ingress
+	},
 	#cluster & {
 		cluster_key:  EgressToRedisName
 		name:         defaults.redis_cluster_name
