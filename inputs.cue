@@ -122,7 +122,7 @@ defaults: {
 		// have different certs for the ingress and internal connections (this is the case for prod)
 		// then you will need to add those certs to another secret and specity that
 		// below at defaults.core_internal_tls_certs.cert_secret.
-		enable_tls: true
+		enable_tls: false
 		secret_name: "gm-edge-ingress-certs"
 		oidc: {
 			endpoint_host: ""
