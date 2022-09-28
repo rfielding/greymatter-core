@@ -33,7 +33,7 @@ spec:
             - -repo
             - git@github.com:<your-org>/gitops-core.git
             - -sshPrivateKeyPath
-            - /app/.ssh/ssh_private_key
+            - /app/.ssh/ssh-private-key
             - -branch
             - main
           ports:
