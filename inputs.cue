@@ -47,7 +47,7 @@ mesh: meshv1.#Mesh & {
 			control_api:  string | *"quay.io/greymatterio/gm-control-api:1.7.3"
 			redis:        string | *"redis:latest"
 			prometheus:   string | *"prom/prometheus:v2.36.2"
-			jwt_security: string | *"quay.io/greymatterio/gm-jwt-security:1.3.1"
+			jwt_security: string | *"quay.io/greymatterio/gm-jwt-security:1.3.2-rc.1"
 		}
 	}
 }
