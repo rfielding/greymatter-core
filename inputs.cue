@@ -22,7 +22,7 @@ config: {
 	// namespace the operator will deploy into
 	operator_namespace: string | *"gm-operator" @tag(operator_namespace, type=string)
 
-	cluster_ingress_name:   string | *"cluster" // For OpenShift deployments, this is used to look up the configured ingress domain
+	cluster_ingress_name: string | *"cluster" // For OpenShift deployments, this is used to look up the configured ingress domain
 
 	// currently just controls k8s/outputs/operator.cue for debugging
 	debug: bool | *false @tag(debug,type=bool)
@@ -38,14 +38,13 @@ mesh: meshv1.#Mesh & {
 		install_namespace: string | *"greymatter"
 		watch_namespaces:  [...string] | *["default", "plus", "examples"]
 		images: {
-			proxy:        string | *"quay.io/greymatterio/gm-proxy:1.7.1"
-			catalog:      string | *"quay.io/greymatterio/gm-catalog:3.0.5"
-			dashboard:    string | *"quay.io/greymatterio/gm-dashboard:connections"
-			control:      string | *"quay.io/greymatterio/gm-control:1.7.3"
-			control_api:  string | *"quay.io/greymatterio/gm-control-api:1.7.3"
-			redis:        string | *"redis:latest"
-			prometheus:   string | *"prom/prometheus:v2.36.2"
-			jwt_security: string | *"quay.io/greymatterio/gm-jwt-security:1.3.2-rc.1"
+			proxy:       string | *"quay.io/greymatterio/gm-proxy:1.7.1"
+			catalog:     string | *"quay.io/greymatterio/gm-catalog:3.0.5"
+			dashboard:   string | *"quay.io/greymatterio/gm-dashboard:connections"
+			control:     string | *"quay.io/greymatterio/gm-control:1.7.3"
+			control_api: string | *"quay.io/greymatterio/gm-control-api:1.7.3"
+			redis:       string | *"redis:latest"
+			prometheus:  string | *"prom/prometheus:v2.36.2"
 		}
 	}
 }
@@ -114,13 +113,13 @@ defaults: {
 	}
 
 	edge: {
-		key:        "edge"
+		key: "edge"
 		// edge.enable_tls toggles internal mtls connections between greymatter core components
 		// by default the internal and external secrets are the same however if you want to
 		// have different certs for the ingress and internal connections (this is the case for prod)
 		// then you will need to add those certs to another secret and specity that
 		// below at defaults.core_internal_tls_certs.cert_secret.
-		enable_tls: false
+		enable_tls:  false
 		secret_name: "gm-edge-ingress-certs"
 		oidc: {
 			endpoint_host: ""
@@ -164,10 +163,10 @@ defaults: {
 		host_mount_socket: true
 	}
 
-	core_internal_tls_certs:{
+	core_internal_tls_certs: {
 		// use npe cert for internal mtls
 		// Name of kubernetes secret to be mounted
-		cert_secret: string | *defaults.edge.secret_name 
+		cert_secret: string | *defaults.edge.secret_name
 	}
 
 } // defaults

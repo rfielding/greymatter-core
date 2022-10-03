@@ -38,7 +38,8 @@ k8s_manifests: controlensemble +
 	[ for x in openshift_spire if config.openshift && config.spire {x}] +
 	[ for x in openshift_spire if config.openshift && config.spire {x}] +
 	[ for x in observables if config.enable_audits {x}] +
-	[ for x in vector if config.enable_audits {x}]
+	[ for x in vector if config.enable_audits {x}] +
+	[ for x in jwt_security_manifests if _enable_jwtsecurity {x}]
 
 vector_manifests_yaml:      yaml.MarshalStream(vector)
 observables_manifests_yaml: yaml.MarshalStream(observables)

@@ -24,14 +24,14 @@ redis_listener: redis_listener_object // special because we need to re-apply it 
 
 prometheus_mesh_configs: [ for x in prometheus_config if config.enable_historical_metrics {x}] + catalog_entries
 
-edge_configs: edge_config
-dashboard_configs: dashboard_config
-catalog_configs: catalog_config
+edge_configs:            edge_config
+dashboard_configs:       dashboard_config
+catalog_configs:         catalog_config
 controlensemble_configs: controlensemble_config
-prometheus_configs: prometheus_config
-redis_configs: redis_config
-observables_configs: observables_config
-jwtsecurity_configs: jwtsecurity_config
+prometheus_configs:      prometheus_config
+redis_configs:           redis_config
+observables_configs:     observables_config
+jwtsecurity_configs:     jwtsecurity_config
 
 // for CLI convenience,
 // e.g. `cue eval -c ./gm/outputs --out text -e mesh_configs_yaml`
