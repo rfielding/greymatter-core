@@ -122,7 +122,7 @@ observables_config: [
 		mesh_id:                   mesh.metadata.name
 		service_id:                "observables"
 		version:                   "0.0.1"
-		description:               "A standalone dashboard visualizaing data collected from Grey Matter audits."
+		description:               "A standalone dashboard visualizing data collected from Grey Matter audits."
 		api_endpoint:              "/services/observables"
 		business_impact:           "critical"
 		enable_instance_metrics:   true
