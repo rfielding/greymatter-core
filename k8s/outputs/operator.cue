@@ -199,7 +199,6 @@ operator_k8s: [
       config: {
         spire: \(config.spire)
         openshift: \(config.openshift)
-        generate_webhook_certs: \(config.generate_webhook_certs)
         enable_historical_metrics: \(config.enable_historical_metrics)
         auto_copy_image_pull_secret: \(config.auto_copy_image_pull_secret)
       }

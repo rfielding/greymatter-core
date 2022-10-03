@@ -22,8 +22,6 @@ config: {
 	// namespace the operator will deploy into
 	operator_namespace: string | *"gm-operator" @tag(operator_namespace, type=string)
 
-	// for a hypothetical future where we want to mount specific certificates for operator webhooks, etc.
-	generate_webhook_certs: bool | *true        @tag(generate_webhook_certs,type=bool)
 	cluster_ingress_name:   string | *"cluster" // For OpenShift deployments, this is used to look up the configured ingress domain
 
 	// currently just controls k8s/outputs/operator.cue for debugging
