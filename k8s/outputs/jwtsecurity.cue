@@ -6,6 +6,11 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 )
 
+_jwtsecurity_image: string | *"quay.io/greymatterio/gm-jwt-security:1.3.2-rc.1"
+if defaults.jwtsecurity_image != _|_ {
+	_jwtsecurity_image: defaults.jwtsecurity_image
+}
+
 let Name = "jwt-security"
 jwt_security: [
 	appsv1.#Deployment & {
@@ -31,7 +36,7 @@ jwt_security: [
 						#sidecar_container_block & {_Name: Name},
 						{
 							name:  Name
-							image: mesh.spec.images.jwt_security
+							image: _jwtsecurity_image
 							ports: [{
 								name:          "http"
 								containerPort: 8080
