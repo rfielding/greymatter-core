@@ -74,7 +74,7 @@ defaults: {
 	}
 
 	images: {
-		operator:    string | *"quay.io/greymatterio/operator:0.10.0" @tag(operator_image)
+		operator:    string | *"quay.io/greymatterio/operator:0.11.0" @tag(operator_image)
 		vector:      string | *"timberio/vector:0.22.0-debian"
 		observables: string | *"quay.io/greymatterio/observables:1.1.3"
 	}

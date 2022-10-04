@@ -25,7 +25,7 @@ spec:
                   name: bugsnag-api-token
                   key: token
                   optional: true
-          image: quay.io/greymatterio/operator:0.10.0
+          image: quay.io/greymatterio/operator:0.11.0
           name: operator
           command:
             - /app/operator
@@ -105,7 +105,6 @@ data:
     config: {
       spire: false
       openshift: false
-      generate_webhook_certs: true
       enable_historical_metrics: true
       auto_copy_image_pull_secret: true
     }
@@ -352,3 +351,4 @@ roleRef:
   name: gm-operator-greymatter-audit-agent
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
+
