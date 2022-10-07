@@ -43,8 +43,8 @@ mesh: meshv1.#Mesh & {
 			dashboard:   string | *"quay.io/greymatterio/gm-dashboard:connections"
 			control:     string | *"quay.io/greymatterio/gm-control:1.7.3"
 			control_api: string | *"quay.io/greymatterio/gm-control-api:1.7.3"
-			redis:       string | *"redis:latest"
-			prometheus:  string | *"prom/prometheus:v2.36.2"
+			redis:       string | *"quay.io/quay/redis:latest"
+			prometheus:  string | *"quay.io/prometheus/prometheus:v2.36.2"
 		}
 	}
 }
@@ -106,6 +106,8 @@ defaults: {
 		elasticsearch_host: ""
 		// elasticsearch_port is the port of your Elasticsearch instance.
 		elasticsearch_port: 443
+		// whether the egress-to-ES cluster should look for manually-mounted certificates in /etc/proxy/tls/sidecar
+		mounted_certs: bool | *false
 		// elasticsearch_endpoint is the full endpoint containing protocol, host, and port
 		// of your Elasticsearch instance. This is used by Vector to sink audit data
 		// with Elasticsearch.

@@ -1,5 +1,17 @@
 # Changelog
 
+## vNEXT
+
+### Changed
+
+- Prometheus and Redis now pulling from Quay because of Docker Hub rate limiting
+- Replaced `+` with `list.Concat` in long concatenations to improve performance
+
+### Fixed
+
+- OpenShift support for Prometheus and Vector
+- Regression where observables pipeline egress cluster looked for non-existent certificates
+
 ## 0.11.0 (October 4th, 2022)
 
 ### Added

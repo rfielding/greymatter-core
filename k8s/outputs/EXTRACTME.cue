@@ -3,7 +3,10 @@
 
 package greymatter
 
-import "encoding/yaml"
+import (
+	"encoding/yaml"
+	"list"
+)
 
 _enable_jwtsecurity: *false | bool
 if defaults.jwtsecurity != _|_ {
@@ -12,34 +15,44 @@ if defaults.jwtsecurity != _|_ {
 
 jwt_security_manifests: jwt_security
 // Spire-related manifests
-spire_manifests: spire_namespace +
-	spire_server +
-	spire_agent
+spire_manifests: list.Concat([
+	spire_namespace,
+	spire_server,
+	spire_agent,
+])
 // Deploys the operator and optionally spire (so these manifests are in place before anything else)
-operator_manifests: operator_namespace +
-	operator_sts +
-	operator_k8s +
-	[ for x in openshift_privileged_scc if config.openshift {x}] +
-	[ for x in openshift_spire_scc if config.openshift && config.spire {x}] +
-	[ for x in spire_manifests if config.deploy_spire {x}] +
-	[ for x in vector_permissions if config.enable_audits {x}]
+operator_manifests: list.Concat([
+	operator_namespace,
+	operator_sts,
+	operator_k8s,
+	[ for x in openshift_privileged_scc if config.openshift {x}],
+	[ for x in openshift_vector_scc if config.openshift && config.enable_audits {x}],
+	[ for x in openshift_spire_scc if config.openshift && config.spire {x}],
+	[ for x in spire_manifests if config.deploy_spire {x}],
+	[ for x in vector_permissions if config.enable_audits {x}],
+])
 // For development convenience, not otherwise used
-all_but_operator_manifests: operator_namespace +
-	operator_k8s +
-	[ for x in spire_manifests if config.spire {x}]
+all_but_operator_manifests: list.Concat([
+	operator_namespace,
+	operator_k8s,
+	[ for x in spire_manifests if config.spire {x}],
+])
+
 // Deployed by the operator when you ask for a Mesh
-k8s_manifests: controlensemble +
-	catalog +
-	redis +
-	edge +
-	dashboard +
-	[ for x in prometheus if config.enable_historical_metrics && len(defaults.prometheus.external_host) == 0 {x}] +
-	[ for x in prometheus_proxy if config.enable_historical_metrics && len(defaults.prometheus.external_host) > 0 {x}] +
-	[ for x in openshift_spire if config.openshift && config.spire {x}] +
-	[ for x in openshift_spire if config.openshift && config.spire {x}] +
-	[ for x in observables if config.enable_audits {x}] +
-	[ for x in vector if config.enable_audits {x}] +
-	[ for x in jwt_security_manifests if _enable_jwtsecurity {x}]
+k8s_manifests: list.Concat([
+  controlensemble,
+	catalog,
+	redis,
+	edge,
+	dashboard,
+	[ for x in prometheus if config.enable_historical_metrics && len(defaults.prometheus.external_host) == 0 {x}],
+	[ for x in prometheus_proxy if config.enable_historical_metrics && len(defaults.prometheus.external_host) > 0 {x}],
+	[ for x in openshift_vector_scc_bindings if config.openshift && config.enable_audits {x}],
+	[ for x in openshift_spire if config.openshift && config.spire {x}],
+	[ for x in observables if config.enable_audits {x}],
+	[ for x in vector if config.enable_audits {x}],
+	[ for x in jwt_security_manifests if _enable_jwtsecurity {x}],
+])
 
 vector_manifests_yaml:      yaml.MarshalStream(vector)
 observables_manifests_yaml: yaml.MarshalStream(observables)

@@ -120,6 +120,105 @@ openshift_spire_scc: [
 	},
 ]
 
+// SCC for permissioning Vector, applied at operator install time
+openshift_vector_scc: [
+	{
+		apiVersion: "security.openshift.io/v1"
+		kind:       "SecurityContextConstraints"
+		metadata: {
+			annotations: {
+				"include.release.openshift.io/self-managed-high-availability": "true"
+				"kubernetes.io/description":                                   "Customized policy for Vector to enable hostPath volumes."
+				"release.openshift.io/create-only":                            "true"
+			}
+			name: "vector-scc"
+		}
+		allowHostDirVolumePlugin: true
+		allowHostIPC:             true
+		allowHostNetwork:         false
+		allowHostPID:             true
+		allowHostPorts:           false
+		allowPrivilegeEscalation: false
+		allowPrivilegedContainer: false
+		allowedCapabilities:      null
+		allowedUnsafeSysctls:     null
+		defaultAddCapabilities:   null
+		fsGroup: type: "MustRunAs"
+		groups: []
+		priority:               null
+		readOnlyRootFilesystem: false
+		requiredDropCapabilities: [ "KILL", "MKNOD", "SETUID", "SETGID"]
+		runAsUser: type:          "RunAsAny"
+		seLinuxContext: type:     "MustRunAs"
+		supplementalGroups: type: "RunAsAny"
+		users: []
+		volumes: [
+			"hostPath",
+			"configMap",
+			"downwardAPI",
+			"emptyDir",
+			"persistentVolumeClaim",
+			"projected",
+			"secret",
+		]
+	},
+	rbacv1.#ClusterRole & {// vector-scc SCC cluster role bound by vector later
+		apiVersion: "rbac.authorization.k8s.io/v1"
+		kind:       "ClusterRole"
+		metadata: {
+			annotations: {
+				"include.release.openshift.io/self-managed-high-availability": "true"
+				"rbac.authorization.kubernetes.io/autoupdate":                 "true"
+			}
+			name: "\(config.operator_namespace)-vector-scc"
+		}
+		rules: [{
+			apiGroups: ["security.openshift.io"]
+			resourceNames: ["vector-scc"]
+			resources: ["securitycontextconstraints"]
+			verbs: ["use"]
+		}]
+	},
+	rbacv1.#ClusterRoleBinding & {// The operator's own binding to the vector-scc role, so it can grant it to other things
+		apiVersion: "rbac.authorization.k8s.io/v1"
+		kind:       "ClusterRoleBinding"
+		metadata: {
+			name: "\(config.operator_namespace)-vector-scc:gm-operator"
+		}
+		roleRef: {
+			apiGroup: "rbac.authorization.k8s.io"
+			kind:     "ClusterRole"
+			name:     "\(config.operator_namespace)-vector-scc"
+		}
+		subjects: [{
+			kind:      "ServiceAccount"
+			name:      "greymatter-operator"
+			namespace: config.operator_namespace
+		}]
+	},
+]
+
+// Bind Vector's ServiceAccount to the SCC - applied at mesh install time
+openshift_vector_scc_bindings: [
+	rbacv1.#ClusterRoleBinding & {
+		apiVersion: "rbac.authorization.k8s.io/v1"
+		kind:       "ClusterRoleBinding"
+		metadata: {
+			name: "\(config.operator_namespace)-vector-scc"
+		}
+		roleRef: {
+			apiGroup: "rbac.authorization.k8s.io"
+			kind:     "ClusterRole"
+			name:     "\(config.operator_namespace)-vector-scc"
+		}
+		subjects: [{
+			kind:      "ServiceAccount"
+			name:      "greymatter-audit-agent"
+			namespace: mesh.spec.install_namespace
+		}]
+	},
+]
+
 openshift_spire: [
 	// The actual ClusterRole these refer to is applied at install-time if openshift and spire are both on - see above
 	rbacv1.#RoleBinding & {
@@ -132,7 +231,7 @@ openshift_spire: [
 		roleRef: {
 			apiGroup: "rbac.authorization.k8s.io"
 			kind:     "ClusterRole"
-			name:     "system:openshift:scc:spire"
+			name:     "\(config.operator_namespace)-system:openshift:scc:spire"
 		}
 		subjects: [{
 			kind:      "ServiceAccount"
@@ -151,7 +250,7 @@ openshift_spire: [
 		roleRef: {
 			apiGroup: "rbac.authorization.k8s.io"
 			kind:     "ClusterRole"
-			name:     "system:openshift:scc:spire"
+			name:     "\(config.operator_namespace)-system:openshift:scc:spire"
 		}
 		subjects: [{
 			kind:      "ServiceAccount"
@@ -159,7 +258,25 @@ openshift_spire: [
 			namespace: mesh.spec.install_namespace
 		}]
 	},
-	rbacv1.#RoleBinding & {// default service account (used by all components except controlensemble)
+	rbacv1.#RoleBinding & {// prometheus
+		apiVersion: "rbac.authorization.k8s.io/v1"
+		kind:       "RoleBinding"
+		metadata: {
+			name:      "system:openshift:scc:spire:prometheus"
+			namespace: mesh.spec.install_namespace
+		}
+		roleRef: {
+			apiGroup: "rbac.authorization.k8s.io"
+			kind:     "ClusterRole"
+			name:     "\(config.operator_namespace)-system:openshift:scc:spire"
+		}
+		subjects: [{
+			kind:      "ServiceAccount"
+			name:      "prometheus"
+			namespace: mesh.spec.install_namespace
+		}]
+	},
+	rbacv1.#RoleBinding & {// default service account (used by sidecars without a service account)
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "RoleBinding"
 		metadata: {
@@ -169,7 +286,7 @@ openshift_spire: [
 		roleRef: {
 			apiGroup: "rbac.authorization.k8s.io"
 			kind:     "ClusterRole"
-			name:     "system:openshift:scc:spire"
+			name:     "\(config.operator_namespace)-system:openshift:scc:spire"
 		}
 		subjects: [{
 			kind:      "ServiceAccount"

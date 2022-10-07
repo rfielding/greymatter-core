@@ -32,11 +32,6 @@ prometheus: [
 					}
 				}
 				spec: #spire_permission_requests & {
-					securityContext: {
-						runAsUser:  2000
-						runAsGroup: 0
-						fsGroup:    2000
-					}
 					containers: [
 
 						#sidecar_container_block & {_Name: Name},
@@ -122,7 +117,7 @@ prometheus: [
 			apiGroups: [""]
 			resources: ["pods"]
 			verbs: ["get", "list", "watch"]
-		}]
+		},]
 	},
 
 	rbacv1.#ClusterRoleBinding & {

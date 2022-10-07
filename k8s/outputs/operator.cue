@@ -396,6 +396,7 @@ operator_k8s: [
 			verbs: [
 				"get",
 				"create",
+				"update",
 			]
 		}, {
 			apiGroups: [
