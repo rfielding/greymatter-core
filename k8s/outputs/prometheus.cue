@@ -32,6 +32,15 @@ prometheus: [
 					}
 				}
 				spec: #spire_permission_requests & {
+
+					if !config.openshift {
+						securityContext: {
+							runAsUser:  2000
+							runAsGroup: 0
+							fsGroup:    2000
+						}
+					}
+
 					containers: [
 
 						#sidecar_container_block & {_Name: Name},
