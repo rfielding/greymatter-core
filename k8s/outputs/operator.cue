@@ -60,7 +60,7 @@ operator_sts: [
 							]
 							if !config.test {
 								args: [
-									"-repo", "git@github.com:greymatter-io/gitops-core.git",
+									"-repo", "git@github.com:greymatter-io/greymatter-core.git",
 									"-sshPrivateKeyPath", "/app/.ssh/ssh-private-key",
 									"-branch", "main",
 								]
@@ -90,7 +90,7 @@ operator_sts: [
 								"--continue",
 								"/app/operator",
 								"--",
-								"-repo", "git@github.com:greymatter-io/gitops-core.git",
+								"-repo", "git@github.com:greymatter-io/greymatter-core.git",
 								"-sshPrivateKeyPath", "/app/.ssh/ssh-private-key",
 								"-branch", "main",
 							]
