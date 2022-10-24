@@ -2,6 +2,10 @@
 
 ## vNEXT
 
+## Added
+
+- Add CI configuration for testing builds and publishing releases
+
 ### Changed
 
 - Prometheus and Redis now pulling from Quay because of Docker Hub rate limiting

@@ -102,14 +102,15 @@ defaults: {
 		// will generate a new index each month. The index configuration can be changed
 		// to create more or less indexes depending on your storage and performance requirements.
 		index: "gm-audits-%Y-%m"
-		// elasticsearch_host can be an IP address or DNS hostname to your Elasticsearch instace.
+		// elasticsearch_host can be an IP address or DNS hostname to your Elasticsearch instance.
 		elasticsearch_host: ""
 		// elasticsearch_port is the port of your Elasticsearch instance.
 		elasticsearch_port: 443
-		// whether the egress-to-ES cluster should look for manually-mounted certificates in /etc/proxy/tls/sidecar
+		// mounted_certs determines whether the observables application uses certificates
+		// mounted at /etc/proxy/tls/sidecar in the observables application's sidecar. 
 		mounted_certs: bool | *false
 		// elasticsearch_endpoint is the full endpoint containing protocol, host, and port
-		// of your Elasticsearch instance. This is used by Vector to sink audit data
+		// of your Elasticsearch instance. This is used by to sync audit data
 		// with Elasticsearch.
 		elasticsearch_endpoint: "https://\(elasticsearch_host):\(elasticsearch_port)"
 	}

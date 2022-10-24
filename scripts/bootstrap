@@ -4,10 +4,10 @@ set -e
 
 for dependency in git
 do
-    if ! which $dependency &> /dev/null; then
-        echo "$dependency is missing from your \$PATH"
-        exit 1
-    elif [ "$dependency" == "git" ]; then
-        git submodule update --init --recursive --remote
-    fi
+  if ! which $dependency &> /dev/null; then
+    echo "$dependency is missing from your \$PATH"
+    exit 1
+  elif [ "$dependency" == "git" ]; then
+    git submodule update --init --recursive
+  fi
 done

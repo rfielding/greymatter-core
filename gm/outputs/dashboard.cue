@@ -9,8 +9,8 @@ let EgressToRedisName = "\(Name)_egress_to_redis"
 dashboard_config: [
 	// sidecar -> dashboard
 	#domain & {
-    domain_key: LocalName
-  },
+		domain_key: LocalName
+	},
 	#listener & {
 		listener_key:          LocalName
 		_spire_self:           Name
@@ -22,9 +22,9 @@ dashboard_config: [
 
 	// egress -> redis
 	#domain & {
-    domain_key: EgressToRedisName
-    port: defaults.ports.redis_ingress
-  },
+		domain_key: EgressToRedisName
+		port:       defaults.ports.redis_ingress
+	},
 	#cluster & {
 		cluster_key:  EgressToRedisName
 		name:         defaults.redis_cluster_name
@@ -54,6 +54,22 @@ dashboard_config: [
 		cluster_key:  Name
 		_spire_other: Name
 	},
-	#route & {domain_key: defaults.edge.key, route_key: Name},
-
+	#route & {
+		domain_key: defaults.edge.key
+		route_key:  Name
+		// If you want the dashboard to be served from it's own sub-route
+		// in the mesh, you can use the following configuration. You may
+		// change the "path" and "from" values accordingly to meet your
+		// enterprise routing needs.
+		// route_match: {
+		//     path:       "/dashboard/"
+		// }
+		// redirects: [
+		//     {
+		//         from:          "^/dashboard$"
+		//         to:            route_match.path
+		//         redirect_type: "permanent"
+		//     },
+		// ]
+	},
 ]

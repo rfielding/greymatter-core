@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -e
+
+cmd_pin () {
+  git submodule update --recursive
+}
+
+cmd_latest () {
+  git submodule update --recursive --remote
+}
+
+cmd_help () {
+  echo "valid commands: pin, latest, help
+  
+pin:
+  Will get the greymatter-cue submodule via the pinned commit in this repo.
+latest:
+  Will pull down greymatter-cue submodule from the latest commit.
+help:
+  Print this message and exit."
+}
+
+if [ $# -eq 0 ]; then
+  cmd_help
+else
+  MODE="${1:-}"
+  case "$MODE" in
+    help|pin|latest)
+      shift
+      "cmd_$MODE" "$@"
+      ;;
+    *)
+      cmd_help
+      ;;
+  esac
+fi
