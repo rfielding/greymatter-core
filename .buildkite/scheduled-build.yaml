@@ -1,0 +1,7 @@
+agents:
+  queue: default
+  container_image: ubuntu-2204-ci
+
+steps:
+  - label: "Scheduled build"
+    command: ./scripts/cibuild build

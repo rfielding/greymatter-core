@@ -1,0 +1,104 @@
+#!/bin/bash
+
+set -e
+
+# Tar and push bundle to Artifactory; we expect built artifacts on disk
+release_bundle() {
+  if [[ "$BUILDKITE_BRANCH" == "main" ]]; then
+    bundle_and_push "latest"
+  fi
+  if [[ -n "$BUILDKITE_TAG" ]]; then
+    bundle_and_push ${BUILDKITE_TAG:1}
+  fi
+}
+
+# Convenience function to push tarball to Artifactory
+bundle_and_push() {
+  local tag=$1
+  local workspace="/tmp/greymatter-core"
+  local tarball="greymatter_core_${tag}.tar.gz"
+
+  mkdir -p $workspace
+
+  # Create the tarball and exclude unnecessary files for the release bundle.
+  tar \
+    --exclude-vcs \
+    --exclude=".buildkite" \
+    --exclude="CHANGELOG.md"\
+    --exclude="scripts/cibuild" \
+    --exclude="scripts/bootstrap" \
+    --exclude="scripts/update" \
+    -cvzf "$workspace/$tarball" .
+
+  cd $workspace
+
+  # Nexus upload. We are not using the nexus-upload-archive script because this
+  # tarball does not need to meet OS architecture constraints. It is simply a
+  # tarball of directory contents.
+  curl -u "$NEXUS_USER:$NEXUS_PASS" --upload-file "./$tarball" "https://nexus.greymatter.io/repository/raw/development/greymatter-core/$tarball"
+
+  # Artifactory upload
+  buildkite-agent artifact upload "$tarball" "rt://dev-generic/greymatter-core"
+  
+  # Cleanup the tarball
+  rm $tarball
+}
+
+#### Commands
+
+# Parse CHANGELOG into structured data suitable for powering templates
+# on our documentation site.
+cmd_changelog() {
+  export changelog_toml="/tmp/changelog.toml"
+  parse-changelog CHANGELOG.md $changelog_toml
+  buildkite-agent artifact upload $changelog_toml
+}
+
+# There isn't a build per se. We just need to make sure that we have
+# greymatter-cue submodule on disk.
+cmd_build() {
+  ./scripts/bootstrap
+
+  # always push latest tarball when merging to main
+  if [[ "$BUILDKITE_BRANCH" == "main" ]]; then
+    release_bundle
+  fi
+}
+
+# Install the greymatter-cue and run 'cue eval' tests.
+cmd_test() {
+  ./scripts/bootstrap
+  ./scripts/test eval_all
+}
+
+# Pushes the greymatter-core tarball to Artifactory if merging into main or if a tag
+# was detected.
+cmd_release() {
+  if [[ "$BUILDKITE_BRANCH" != "main" && -z $BUILDKITE_TAG ]]; then
+    echo "Skipping release: Release conditions not detected."
+    return 0
+  fi
+
+  # Most commands will call bootstrap since each step may run on a different
+  # machine, one which may not have the dependancies installed.
+  ./scripts/bootstrap
+
+  release_bundle
+}
+
+if [ $# -eq 0 ]; then
+  echo "missing argument"
+  exit 1
+fi
+
+CMD=$1
+shift
+case $CMD in
+  build|changelog|release|test)
+    cmd_$CMD "$@"
+    ;;
+  *)
+    echo "invalid argument: $CMD"
+    exit 1
+    ;;
+esac
