@@ -14,6 +14,7 @@ prometheusName: [
 catalog_entries: [
 	#catalog_entry & {
 		name:                      "Edge"
+		owner:                     "greymatter.io"
 		mesh_id:                   mesh.metadata.name
 		service_id:                defaults.edge.key
 		version:                   strings.Split(mesh.spec.images.proxy, ":")[1]
@@ -25,6 +26,7 @@ catalog_entries: [
 	},
 	#catalog_entry & {
 		name:                      "Control"
+		owner:                     "greymatter.io"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "controlensemble"
 		version:                   strings.Split(mesh.spec.images.control_api, ":")[1]
@@ -37,6 +39,7 @@ catalog_entries: [
 	},
 	#catalog_entry & {
 		name:                      "Catalog"
+		owner:                     "greymatter.io"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "catalog"
 		version:                   strings.Split(mesh.spec.images.catalog, ":")[1]
@@ -49,6 +52,7 @@ catalog_entries: [
 	},
 	#catalog_entry & {
 		name:                      "Sense"
+		owner:                     "greymatter.io"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "dashboard"
 		version:                   strings.Split(mesh.spec.images.dashboard, ":")[1]
