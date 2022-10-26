@@ -48,7 +48,7 @@ catalog_entries: [
 		enable_historical_metrics: config.enable_historical_metrics
 	},
 	#catalog_entry & {
-		name:                      "Dashboard"
+		name:                      "Sense"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "dashboard"
 		version:                   strings.Split(mesh.spec.images.dashboard, ":")[1]

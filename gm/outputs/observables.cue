@@ -118,7 +118,7 @@ observables_config: [
 
 	// greymatter Catalog service entry.
 	#catalog_entry & {
-		name:                      "Observables App"
+		name:                      "Audits"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "observables"
 		version:                   "0.0.1"
