@@ -13,7 +13,7 @@ prometheusName: [
 
 catalog_entries: [
 	#catalog_entry & {
-		name:                      "greymatter Edge"
+		name:                      "Edge"
 		mesh_id:                   mesh.metadata.name
 		service_id:                defaults.edge.key
 		version:                   strings.Split(mesh.spec.images.proxy, ":")[1]
@@ -24,7 +24,7 @@ catalog_entries: [
 		enable_historical_metrics: config.enable_historical_metrics
 	},
 	#catalog_entry & {
-		name:                      "greymatter Control"
+		name:                      "Control"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "controlensemble"
 		version:                   strings.Split(mesh.spec.images.control_api, ":")[1]
@@ -36,7 +36,7 @@ catalog_entries: [
 		enable_historical_metrics: config.enable_historical_metrics
 	},
 	#catalog_entry & {
-		name:                      "greymatter Catalog"
+		name:                      "Catalog"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "catalog"
 		version:                   strings.Split(mesh.spec.images.catalog, ":")[1]
@@ -48,7 +48,7 @@ catalog_entries: [
 		enable_historical_metrics: config.enable_historical_metrics
 	},
 	#catalog_entry & {
-		name:                      "greymatter Dashboard"
+		name:                      "Dashboard"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "dashboard"
 		version:                   strings.Split(mesh.spec.images.dashboard, ":")[1]

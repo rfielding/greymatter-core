@@ -270,7 +270,7 @@ spire_server: [
           bind_port = "8443"
           ca_subject = {
             country = ["US"],
-            organization = ["greymatter"],
+            organization = ["greymatter.io"],
             common_name = "Mesh",
           }
           data_dir = "/run/spire/data"
