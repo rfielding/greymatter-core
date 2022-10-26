@@ -568,11 +568,11 @@ import (
 // Setting _enable_circuit_breakers: true on the #cluster will use these values
 // unless overriden.
 #circuit_breakers_default: {
-	max_connections:      int64 | *512
-	max_pending_requests: int64 | *512
-	max_requests:         int64 | *512
-	max_retries:          int64 | *2
-	max_connection_pools: int64 | *512
+	max_connections:      int64 | *1024
+	max_pending_requests: int64 | *1024
+	max_requests:         int64 | *1024
+	max_retries:          int64 | *3
+	max_connection_pools: int64 | *1024
 	track_remaining:      bool | *false
 }
 
