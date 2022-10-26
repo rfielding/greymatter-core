@@ -6,9 +6,9 @@ package v1alpha1
 
 import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-// MeshSpec defines the desired state of a greymatter mesh.
+// MeshSpec defines the desired state of a Grey Matter mesh.
 #MeshSpec: {
-	// The version of greymatter to install for this mesh.
+	// The version of Grey Matter to install for this mesh.
 	// +kubebuilder:validation:Enum="1.6";"1.7";"latest"
 	// +kubebuilder:default="latest"
 	release_version: string @go(ReleaseVersion)
@@ -54,12 +54,12 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	prometheus?:   string @go(Prometheus)
 }
 
-// MeshStatus describes the observed state of a greymatter mesh.
+// MeshStatus describes the observed state of a Grey Matter mesh.
 #MeshStatus: {
 	sidecar_list?: [...string] @go(SidecarList,[]string)
 }
 
-// Mesh defines a greymatter mesh's desired state and describes its observed state.
+// Mesh defines a Grey Matter mesh's desired state and describes its observed state.
 #Mesh: {
 	metav1.#TypeMeta
 	metadata?: metav1.#ObjectMeta @go(ObjectMeta)
@@ -69,7 +69,7 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	status?: #MeshStatus @go(Status)
 }
 
-// MeshList contains a list of Mesh custom resources managed by the greymatter Operator.
+// MeshList contains a list of Mesh custom resources managed by the Grey Matter Operator.
 #MeshList: {
 	metav1.#TypeMeta
 	metadata?: metav1.#ListMeta @go(ListMeta)
