@@ -127,6 +127,11 @@ import (
 		_keycloak_pre_17: defaults.edge.oidc.keycloak_pre_17
 	}
 
+	protocol: *"http_auto" | "tcp"
+	if _tcp_upstream != _|_ {
+		protocol: "tcp"
+	}
+
 	// Identifiers for the object within the mesh
 	listener_key: string
 	name:         listener_key
@@ -486,7 +491,6 @@ import (
 	}
 
 	zone_key: mesh.spec.zone
-	protocol: "http_auto"
 }
 
 // #cluster represents "upstream" or outgoing traffic from the proxy. Generally, this is
