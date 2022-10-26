@@ -1,4 +1,4 @@
-// All necessary Grey Matter configuration for an injected sidecar
+// All necessary greymatter configuration for an injected sidecar
 // created during deployment assist.
 
 package greymatter

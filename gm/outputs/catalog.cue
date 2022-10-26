@@ -1,4 +1,4 @@
-// Grey Matter configuration for Catalog's sidecar
+// greymatter configuration for Catalog's sidecar
 
 package greymatter
 

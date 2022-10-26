@@ -116,13 +116,13 @@ observables_config: [
 		prefix_rewrite: "/"
 	},
 
-	// Grey Matter Catalog service entry.
+	// greymatter Catalog service entry.
 	#catalog_entry & {
 		name:                      "Observables App"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "observables"
 		version:                   "0.0.1"
-		description:               "A standalone dashboard visualizing data collected from Grey Matter audits."
+		description:               "A standalone dashboard visualizing data collected from greymatter audits."
 		api_endpoint:              "/services/observables"
 		business_impact:           "critical"
 		enable_instance_metrics:   true

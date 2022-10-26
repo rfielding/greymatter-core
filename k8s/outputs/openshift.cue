@@ -239,7 +239,7 @@ openshift_spire: [
 			namespace: defaults.spire.namespace
 		}]
 	},
-	// RoleBindings for Grey Matter services so they can access their agent.sock
+	// RoleBindings for greymatter services so they can access their agent.sock
 	rbacv1.#RoleBinding & {// controlensemble
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "RoleBinding"

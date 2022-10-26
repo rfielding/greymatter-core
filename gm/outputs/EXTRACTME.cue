@@ -1,4 +1,4 @@
-// All Grey Matter config objects for core componenents drawn together
+// All greymatter config objects for core componenents drawn together
 // for simultaneous application
 
 package greymatter

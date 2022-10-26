@@ -7,13 +7,13 @@ import (
 )
 
 prometheusName: [
-		if len(defaults.prometheus.external_host) > 0 {"Grey Matter Prometheus Proxy"},
-		"Grey Matter Prometheus",
+		if len(defaults.prometheus.external_host) > 0 {"greymatter Prometheus Proxy"},
+		"greymatter Prometheus",
 ][0]
 
 catalog_entries: [
 	#catalog_entry & {
-		name:                      "Grey Matter Edge"
+		name:                      "greymatter Edge"
 		mesh_id:                   mesh.metadata.name
 		service_id:                defaults.edge.key
 		version:                   strings.Split(mesh.spec.images.proxy, ":")[1]
@@ -24,11 +24,11 @@ catalog_entries: [
 		enable_historical_metrics: config.enable_historical_metrics
 	},
 	#catalog_entry & {
-		name:                      "Grey Matter Control"
+		name:                      "greymatter Control"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "controlensemble"
 		version:                   strings.Split(mesh.spec.images.control_api, ":")[1]
-		description:               "Manages the configuration of the Grey Matter data plane."
+		description:               "Manages the configuration of the greymatter data plane."
 		api_endpoint:              "/services/control-api/"
 		business_impact:           "critical"
 		api_spec_endpoint:         "/services/control-api/"
@@ -36,7 +36,7 @@ catalog_entries: [
 		enable_historical_metrics: config.enable_historical_metrics
 	},
 	#catalog_entry & {
-		name:                      "Grey Matter Catalog"
+		name:                      "greymatter Catalog"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "catalog"
 		version:                   strings.Split(mesh.spec.images.catalog, ":")[1]
@@ -48,7 +48,7 @@ catalog_entries: [
 		enable_historical_metrics: config.enable_historical_metrics
 	},
 	#catalog_entry & {
-		name:                      "Grey Matter Dashboard"
+		name:                      "greymatter Dashboard"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "dashboard"
 		version:                   strings.Split(mesh.spec.images.dashboard, ":")[1]

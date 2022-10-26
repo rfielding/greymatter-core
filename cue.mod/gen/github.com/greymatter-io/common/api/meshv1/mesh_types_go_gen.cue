@@ -2,7 +2,7 @@ package meshv1
 
 import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-// MeshSpec defines the desired state of a Grey Matter mesh.
+// MeshSpec defines the desired state of a greymatter mesh.
 #MeshSpec: {
 	// A list of OCI image strings and their respective pull secret names.
 	// These are treated as overrides to the specified "release_version".
@@ -45,12 +45,12 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	prometheus?:   string @go(Prometheus)
 }
 
-// MeshStatus describes the observed state of a Grey Matter mesh.
+// MeshStatus describes the observed state of a greymatter mesh.
 #MeshStatus: {
 	sidecar_list?: [...string] @go(SidecarList,[]string)
 }
 
-// Mesh defines a Grey Matter mesh's desired state and describes its observed state.
+// Mesh defines a greymatter mesh's desired state and describes its observed state.
 #Mesh: {
 	metav1.#TypeMeta
 	metadata?: metav1.#ObjectMeta @go(ObjectMeta)
@@ -60,7 +60,7 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	status?: #MeshStatus @go(Status)
 }
 
-// MeshList contains a list of Mesh custom resources managed by the Grey Matter Operator.
+// MeshList contains a list of Mesh custom resources managed by the greymatter Operator.
 #MeshList: {
 	metav1.#TypeMeta
 	metadata?: metav1.#ListMeta @go(ListMeta)

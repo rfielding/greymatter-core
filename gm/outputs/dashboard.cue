@@ -1,4 +1,4 @@
-// Grey Matter configuration for Dashboard's sidecar
+// greymatter configuration for Dashboard's sidecar
 
 package greymatter
 

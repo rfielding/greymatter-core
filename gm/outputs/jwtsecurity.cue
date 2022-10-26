@@ -1,4 +1,4 @@
-// Grey Matter configuration for jwt_security's sidecar
+// greymatter configuration for jwt_security's sidecar
 
 package greymatter
 

@@ -1,4 +1,4 @@
-// Grey Matter configuration for Prometheus's sidecar
+// greymatter configuration for Prometheus's sidecar
 
 package greymatter
 
