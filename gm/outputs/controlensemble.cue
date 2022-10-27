@@ -1,4 +1,4 @@
-// Grey Matter configuration for Control API's sidecar (inside the controlensemble pod)
+// greymatter configuration for Control API's sidecar (inside the controlensemble pod)
 
 package greymatter
 

@@ -1,4 +1,4 @@
-// Grey Matter configuration for Edge
+// greymatter configuration for Edge
 
 package greymatter
 
