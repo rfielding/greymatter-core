@@ -119,6 +119,7 @@ observables_config: [
 	// greymatter Catalog service entry.
 	#catalog_entry & {
 		name:                      "Audits"
+		owner:                     "greymatter.io"
 		mesh_id:                   mesh.metadata.name
 		service_id:                "observables"
 		version:                   "0.0.1"
