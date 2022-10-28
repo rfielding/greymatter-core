@@ -10,11 +10,11 @@ let EgressToRedisName = "\(defaults.edge.key)_egress_to_redis"
 edge_config: [
 	// This domain is special because it uses edge certs instead of sidecar certs.  This secures outside -> in traffic
 	#domain & {
-		domain_key:   defaults.edge.key
-		_force_https: defaults.edge.enable_tls
-		_trust_file: "/etc/proxy/tls/edge/ca.crt"
+		domain_key:        defaults.edge.key
+		_force_https:      defaults.edge.enable_tls
+		_trust_file:       "/etc/proxy/tls/edge/ca.crt"
 		_certificate_path: "/etc/proxy/tls/edge/server.crt"
-		_key_path: "/etc/proxy/tls/edge/server.key"
+		_key_path:         "/etc/proxy/tls/edge/server.key"
 	},
 	#listener & {
 		listener_key:                defaults.edge.key
@@ -25,11 +25,15 @@ edge_config: [
 		_enable_fault_injection:     false
 		_enable_ext_authz:           false
 		_oidc_endpoint:              defaults.edge.oidc.endpoint
-		_oidc_service_url:           "https://\(defaults.edge.oidc.domain):\(defaults.ports.edge_ingress)"
-		_oidc_client_id:             defaults.edge.oidc.client_id
-		_oidc_client_secret:         defaults.edge.oidc.client_secret
-		_oidc_cookie_domain:         defaults.edge.oidc.domain
-		_oidc_realm:                 defaults.edge.oidc.realm
+		_edge_protocol:              string | *"http"
+		if defaults.edge.enable_tls == true {
+			_edge_protocol: "https"
+		}
+		_oidc_service_url:   "\(_edge_protocol)://\(defaults.edge.oidc.domain):\(defaults.ports.edge_ingress)"
+		_oidc_client_id:     defaults.edge.oidc.client_id
+		_oidc_client_secret: defaults.edge.oidc.client_secret
+		_oidc_cookie_domain: defaults.edge.oidc.domain
+		_oidc_realm:         defaults.edge.oidc.realm
 	},
 	// This cluster must exist (though it never receives traffic)
 	// so that Catalog will be able to look-up edge instances
@@ -40,7 +44,7 @@ edge_config: [
 	// egress -> redis
 	#domain & {
 		domain_key: EgressToRedisName
-		port: defaults.ports.redis_ingress
+		port:       defaults.ports.redis_ingress
 	},
 	#cluster & {
 		cluster_key:  EgressToRedisName
@@ -76,7 +80,7 @@ edge_config: [
 	//  }
 	//  require_tls: true
 	// },
-	// #route & {route_key:   EdgeToKeycloakName},
+	// #route & {route_key: EdgeToKeycloakName},
 	// #domain & {domain_key: EdgeToKeycloakName, port: defaults.edge.oidc.endpoint_port},
 	// #listener & {
 	//  listener_key: EdgeToKeycloakName
