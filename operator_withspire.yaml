@@ -25,7 +25,7 @@ spec:
                   name: bugsnag-api-token
                   key: token
                   optional: true
-          image: quay.io/greymatterio/operator:0.11.0
+          image: quay.io/greymatterio/operator:0.12.0
           name: operator
           command:
             - /app/operator
