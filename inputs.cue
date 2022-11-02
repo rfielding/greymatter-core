@@ -38,11 +38,11 @@ mesh: meshv1.#Mesh & {
 		install_namespace: string | *"greymatter"
 		watch_namespaces:  [...string] | *["default", "plus", "examples"]
 		images: {
-			proxy:       string | *"quay.io/greymatterio/gm-proxy:1.7.1"
-			catalog:     string | *"quay.io/greymatterio/gm-catalog:3.0.5"
-			dashboard:   string | *"quay.io/greymatterio/gm-dashboard:connections"
-			control:     string | *"quay.io/greymatterio/gm-control:1.7.3"
-			control_api: string | *"quay.io/greymatterio/gm-control-api:1.7.3"
+			proxy:       string | *"quay.io/greymatterio/gm-proxy:1.7.4"
+			catalog:     string | *"quay.io/greymatterio/gm-catalog:3.0.7"
+			dashboard:   string | *"quay.io/greymatterio/gm-dashboard:6.0.3"
+			control:     string | *"quay.io/greymatterio/gm-control:1.7.5"
+			control_api: string | *"quay.io/greymatterio/gm-control-api:1.7.5"
 			redis:       string | *"quay.io/quay/redis:latest"
 			prometheus:  string | *"quay.io/prometheus/prometheus:v2.36.2"
 		}
