@@ -39,7 +39,7 @@ observables: [
 							}]
 							env: [{
 								name:  "BASE_PATH"
-								value: "/services/observables"
+								value: "/services/audits"
 							}, {
 								name:  "ES_INDEX"
 								value: "gm-audits*"
