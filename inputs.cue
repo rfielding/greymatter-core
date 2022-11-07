@@ -103,7 +103,8 @@ defaults: {
 		// to create more or less indexes depending on your storage and performance requirements.
 		index: "gm-audits-%Y-%m"
 		// elasticsearch_host can be an IP address or DNS hostname to your Elasticsearch instance.
-		elasticsearch_host: ""
+		// It's set to a non-empty value so that the audit-pipeline starts successfully.
+		elasticsearch_host: "localhost"
 		// elasticsearch_port is the port of your Elasticsearch instance.
 		elasticsearch_port: 443
 		// mounted_certs determines whether the observables application uses certificates
@@ -113,6 +114,8 @@ defaults: {
 		// of your Elasticsearch instance. This is used by to sync audit data
 		// with Elasticsearch.
 		elasticsearch_endpoint: "https://\(elasticsearch_host):\(elasticsearch_port)"
+		// Default Elasticsearch password secret name.
+		elasticsearch_password_secret: "elasticsearch-password"
 	}
 
 	edge: {

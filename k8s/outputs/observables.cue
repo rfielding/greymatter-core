@@ -56,7 +56,7 @@ observables: [
 								name: "ES_PASSWORD"
 								valueFrom: {
 									secretKeyRef: {
-										name: "elasticsearch-password"
+										name: defaults.audits.elasticsearch_password_secret
 										key:  "password"
 									}
 								}
