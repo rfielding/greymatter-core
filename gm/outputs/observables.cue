@@ -86,11 +86,11 @@ observables_config: [
 		domain_key: "edge"
 		route_key:  Name
 		route_match: {
-			path: "/services/observables/"
+			path: "/services/audits/"
 		}
 		redirects: [
 			{
-				from:          "^/services/observables$"
+				from:          "^/services/audits$"
 				to:            route_match.path
 				redirect_type: "permanent"
 			},
@@ -104,11 +104,11 @@ observables_config: [
 		route_key:             "\(Name)_edge_plus"
 		_upstream_cluster_key: Name
 		route_match: {
-			path: "/services/observables/"
+			path: "/services/audits/"
 		}
 		redirects: [
 			{
-				from:          "^/services/observables$"
+				from:          "^/services/audits$"
 				to:            route_match.path
 				redirect_type: "permanent"
 			},
@@ -124,9 +124,10 @@ observables_config: [
 		service_id:                "observables"
 		version:                   "0.0.1"
 		description:               "A standalone dashboard visualizing data collected from greymatter audits."
-		api_endpoint:              "/services/observables"
+		api_endpoint:              "/services/audits"
 		business_impact:           "critical"
 		enable_instance_metrics:   true
 		enable_historical_metrics: false
+		capability:                "Mesh"
 	},
 ]
