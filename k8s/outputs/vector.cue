@@ -142,8 +142,8 @@ vector: [
 							name: "ELASTICSEARCH_PASSWORD"
 							valueFrom: {
 								secretKeyRef: {
+									name: defaults.audits.elasticsearch_password_secret
 									key:  "password"
-									name: "elasticsearch-password"
 								}
 							}
 						}]
