@@ -31,9 +31,9 @@ catalog_entries: [
 		service_id:                "controlensemble"
 		version:                   strings.Split(mesh.spec.images.control_api, ":")[1]
 		description:               "Manages the configuration of the greymatter data plane."
-		api_endpoint:              "/services/control-api/"
+		api_endpoint:              "/services/control-api"
 		business_impact:           "critical"
-		api_spec_endpoint:         "/services/control-api/"
+		api_spec_endpoint:         "/services/control-api"
 		enable_instance_metrics:   true
 		enable_historical_metrics: config.enable_historical_metrics
 	},
@@ -44,8 +44,8 @@ catalog_entries: [
 		service_id:                "catalog"
 		version:                   strings.Split(mesh.spec.images.catalog, ":")[1]
 		description:               "Interfaces with the control plane to expose the current state of the mesh."
-		api_endpoint:              "/services/catalog/"
-		api_spec_endpoint:         "/services/catalog/"
+		api_endpoint:              "/services/catalog"
+		api_spec_endpoint:         "/services/catalog"
 		business_impact:           "high"
 		enable_instance_metrics:   true
 		enable_historical_metrics: config.enable_historical_metrics
