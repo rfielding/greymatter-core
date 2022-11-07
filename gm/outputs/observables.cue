@@ -128,5 +128,6 @@ observables_config: [
 		business_impact:           "critical"
 		enable_instance_metrics:   true
 		enable_historical_metrics: false
+		capability:                "Mesh"
 	},
 ]

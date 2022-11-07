@@ -23,6 +23,7 @@ catalog_entries: [
 		business_impact:           "critical"
 		enable_instance_metrics:   true
 		enable_historical_metrics: config.enable_historical_metrics
+		capability:                "Mesh"
 	},
 	#catalog_entry & {
 		name:                      "Control"
@@ -36,6 +37,7 @@ catalog_entries: [
 		api_spec_endpoint:         "/services/control-api"
 		enable_instance_metrics:   true
 		enable_historical_metrics: config.enable_historical_metrics
+		capability:                "Mesh"
 	},
 	#catalog_entry & {
 		name:                      "Catalog"
@@ -49,6 +51,7 @@ catalog_entries: [
 		business_impact:           "high"
 		enable_instance_metrics:   true
 		enable_historical_metrics: config.enable_historical_metrics
+		capability:                "Mesh"
 	},
 	#catalog_entry & {
 		name:                      "Sense"
@@ -60,6 +63,7 @@ catalog_entries: [
 		business_impact:           "high"
 		enable_instance_metrics:   true
 		enable_historical_metrics: config.enable_historical_metrics
+		capability:                "Mesh"
 	},
 	if config.enable_historical_metrics {
 		#catalog_entry & {
@@ -72,6 +76,7 @@ catalog_entries: [
 			api_endpoint:              "/services/prometheus/graph"
 			enable_instance_metrics:   true
 			enable_historical_metrics: config.enable_historical_metrics
+			capability:                "Mesh"
 		}
 	},
 ]
