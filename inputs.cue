@@ -107,9 +107,6 @@ defaults: {
 		elasticsearch_host: "localhost"
 		// elasticsearch_port is the port of your Elasticsearch instance.
 		elasticsearch_port: 443
-		// mounted_certs determines whether the observables application uses certificates
-		// mounted at /etc/proxy/tls/sidecar in the observables application's sidecar. 
-		mounted_certs: bool | *false
 		// elasticsearch_endpoint is the full endpoint containing protocol, host, and port
 		// of your Elasticsearch instance. This is used by to sync audit data
 		// with Elasticsearch.
