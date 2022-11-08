@@ -127,7 +127,7 @@ observables_config: [
 		api_endpoint:              "/services/audits"
 		business_impact:           "critical"
 		enable_instance_metrics:   true
-		enable_historical_metrics: false
+		enable_historical_metrics: config.enable_historical_metrics
 		capability:                "Mesh"
 	},
 ]
