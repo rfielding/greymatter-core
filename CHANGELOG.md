@@ -1,6 +1,6 @@
 # Changelog
 
-## vNext
+## 0.13.1 (November 9th, 2022)
 
 ### Changed
 
