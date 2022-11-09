@@ -38,13 +38,13 @@ mesh: meshv1.#Mesh & {
 		install_namespace: string | *"greymatter"
 		watch_namespaces:  [...string] | *["default", "plus", "examples"]
 		images: {
-			proxy:       string | *"quay.io/greymatterio/gm-proxy:1.7.4"
-			catalog:     string | *"quay.io/greymatterio/gm-catalog:3.0.7"
-			dashboard:   string | *"quay.io/greymatterio/gm-dashboard:6.0.3"
-			control:     string | *"quay.io/greymatterio/gm-control:1.7.5"
-			control_api: string | *"quay.io/greymatterio/gm-control-api:1.7.5"
-			redis:       string | *"quay.io/quay/redis:latest"
-			prometheus:  string | *"quay.io/prometheus/prometheus:v2.36.2"
+			proxy:       string | *"greymatter.jfrog.io/oci/greymatter-proxy:1.7.5-ubi8.6-2022-11-09"
+			catalog:     string | *"greymatter.jfrog.io/oci/greymatter-catalog:3.0.8-ubi8.6-2022-11-09"
+			dashboard:   string | *"greymatter.jfrog.io/oci/greymatter-dashboard:6.0.4-ubi8.6-2022-11-09"
+			control:     string | *"greymatter.jfrog.io/oci/greymatter-control:1.7.6-ubi8.6-2022-11-09"
+			control_api: string | *"greymatter.jfrog.io/oci/greymatter-control-api:1.7.6-ubi8.6-2022-11-09"
+			redis:       string | *"index.docker.io/library/redis:6.2.7"
+			prometheus:  string | *"index.docker.io/prom/prometheus:v2.40.1"
 		}
 	}
 }
@@ -74,9 +74,9 @@ defaults: {
 	}
 
 	images: {
-		operator:    string | *"quay.io/greymatterio/operator:0.12.0" @tag(operator_image)
+		operator:    string | *"greymatter.jfrog.io/oci/greymatter-operator:0.13.0-ubi8.6-2022-11-09" @tag(operator_image)
 		vector:      string | *"timberio/vector:0.22.0-debian"
-		observables: string | *"quay.io/greymatterio/observables:1.1.3"
+		observables: string | *"greymatter.jfrog.io/oci/greymatter-audits:1.1.4-ubi8.6-2022-11-09"
 	}
 
 	// The external_host field instructs greymatter to install Prometheus or
