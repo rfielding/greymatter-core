@@ -1,5 +1,11 @@
 # Changelog
 
+## vNext
+
+### Changed
+
+- Regenerated operator.yaml and operator_withspire.yaml
+
 ## 0.13.0 (November 9th, 2022)
 
 ### Added

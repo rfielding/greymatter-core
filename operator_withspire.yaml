@@ -25,7 +25,7 @@ spec:
                   name: bugsnag-api-token
                   key: token
                   optional: true
-          image: quay.io/greymatterio/operator:0.12.0
+          image: greymatter.jfrog.io/oci/greymatter-operator:0.13.0-ubi8.6-2022-11-09
           name: operator
           command:
             - /app/operator
@@ -243,6 +243,7 @@ rules:
     verbs:
       - get
       - create
+      - update
   - apiGroups:
       - ""
     resources:
@@ -794,3 +795,4 @@ roleRef:
   name: gm-operator-greymatter-audit-agent
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
+
