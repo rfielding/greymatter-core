@@ -16,7 +16,7 @@ release_bundle() {
 bundle_and_push() {
   local tag=$1
   local workspace="/tmp/greymatter-core"
-  local tarball="greymatter_core_${tag}_none_none.tar.gz"
+  local tarball="greymatter-core_${tag}_none_none.tar.gz"
 
   mkdir -p $workspace
 
