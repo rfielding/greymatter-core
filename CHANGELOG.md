@@ -1,8 +1,22 @@
 # Changelog
 
+## 0.13.0 (November 9th, 2022)
+
+### Added
+
+- Defaults for Elasticsearch configuration
+
+### Changed
+
+- Update egress from greymatter-audits to Elasticsearch to use TLS
+- Observables to greymatter-audits
+- Greymatter components are pulling from Artifactory by default
+- Update default Prometheus version
+- Explictly define default Redis version
+
 ## 0.12.0 (October 31st, 2022)
 
-## Added
+### Added
 
 - Add CI configuration for testing builds and publishing releases
 
