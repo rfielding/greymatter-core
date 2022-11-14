@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Changed the order that operator resources are created
 - Remove "plus" from default watched namespaces
 
 ## 0.13.1 (November 9th, 2022)
