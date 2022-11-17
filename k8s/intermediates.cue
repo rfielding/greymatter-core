@@ -55,7 +55,7 @@ import (
 			mountPath: defaults.spire.socket_mount_path
 		}]
 	}
-	if defaults.edge.enable_tls {
+	if defaults.edge.enable_tls && !(config.spire && defaults.spire.host_mount_socket) {
 		[{
 			name: "internal-tls-certs"
 			mountPath: "/etc/proxy/tls/sidecar/"
@@ -71,7 +71,7 @@ import (
 			hostPath: {path: defaults.spire.socket_mount_path, type: "DirectoryOrCreate"}
 		}]
 	}
-	if defaults.edge.enable_tls {
+	if defaults.edge.enable_tls && !(config.spire && defaults.spire.host_mount_socket) {
 		[{
 			name: "internal-tls-certs"
 			secret: {defaultMode: 420, secretName: defaults.edge.secret_name}
