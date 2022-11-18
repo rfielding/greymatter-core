@@ -15,14 +15,14 @@ keycloak_config: [
 	// Keycloak HTTP ingress
 	#domain & {
 		domain_key: KeycloakIngressName
-		port:       defaults.edge.oidc.endpoint_port
+		port:       defaults.keycloak.keycloak_ingress_port
 	},
 	#listener & {
 		listener_key:          KeycloakIngressName
 		_spire_self:           Name
 		_gm_observables_topic: Name
 		_is_ingress:           true
-		port:                  defaults.edge.oidc.endpoint_port
+		port:                  defaults.keycloak.keycloak_ingress_port
 	},
 	#cluster & {cluster_key: KeycloakIngressName, _upstream_port: 8080},
 	#route & {route_key:     KeycloakIngressName},
