@@ -455,8 +455,11 @@ import (
 					providers: defaults.edge.oidc.jwt_authn_provider
 					providers: keycloak: issuer: _oidc_provider
 
-					if defaults.edge.oidc.jwt_authn_provider.keycloak.remote_jwks != _|_ {
-						providers: keycloak: remote_jwks: http_uri: uri: *"\(_oidc_provider)/protocol/openid-connect/certs" | string
+					if defaults.edge.oidc.enable_remote_jwks {
+						providers: keycloak: remote_jwks: http_uri: {
+							cluster: defaults.edge.oidc.remote_jwks_cluster
+							uri:     *"\(_oidc_provider)/protocol/openid-connect/certs" | string
+						}
 					}
 				}
 			}

@@ -14,15 +14,16 @@ if defaults.jwtsecurity != _|_ {
 }
 
 mesh_configs: list.Concat([
-	redis_config,
-	edge_config,
-	catalog_config,
-	controlensemble_config,
-	dashboard_config,
-	catalog_entries,
-	[ for x in prometheus_config if config.enable_historical_metrics {x}],
-	[ for x in jwtsecurity_config if _enable_jwtsecurity {x}],
-	[ for x in observables_config if config.enable_audits {x}],
+		[ for x in remote_jwks_config if defaults.edge.oidc.enable_remote_jwks {x}],
+		redis_config,
+		edge_config,
+		catalog_config,
+		controlensemble_config,
+		dashboard_config,
+		catalog_entries,
+		[ for x in prometheus_config if config.enable_historical_metrics {x}],
+		[ for x in jwtsecurity_config if _enable_jwtsecurity {x}],
+		[ for x in observables_config if config.enable_audits {x}],
 ])
 
 redis_listener: redis_listener_object // special because we need to re-apply it when Spire is enabled for every new sidecar
