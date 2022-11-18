@@ -17,6 +17,8 @@ config: {
 	enable_historical_metrics: bool | *true @tag(enable_historical_metrics,type=bool)
 	// deploy and configure audit pipeline for observability telemetry
 	enable_audits: bool | *true @tag(enable_audits,type=bool)
+	// deploy and configure Keycloak for oAuth and user identity management
+	enable_keycloak: bool | *false @tag(enable_keycloak,type=bool)
 	// whether to automatically copy the image pull secret to watched namespaces for sidecar injection
 	auto_copy_image_pull_secret: bool | *true @tag(auto_copy_image_pull_secret, type=bool)
 	// namespace the operator will deploy into
@@ -74,9 +76,11 @@ defaults: {
 	}
 
 	images: {
-		operator:    string | *"greymatter.jfrog.io/oci/greymatter-operator:0.13.0-ubi8.6-2022-11-09" @tag(operator_image)
-		vector:      string | *"timberio/vector:0.22.0-debian"
-		observables: string | *"greymatter.jfrog.io/oci/greymatter-audits:1.1.4-ubi8.6-2022-11-09"
+		operator:          string | *"greymatter.jfrog.io/oci/greymatter-operator:0.13.0-ubi8.6-2022-11-09" @tag(operator_image)
+		vector:            string | *"timberio/vector:0.22.0-debian"
+		observables:       string | *"greymatter.jfrog.io/oci/greymatter-audits:1.1.4-ubi8.6-2022-11-09"
+		keycloak:          string | *"quay.io/keycloak/keycloak:19.0.3"
+		keycloak_postgres: string | *"postgres:15.0"
 	}
 
 	// The external_host field instructs greymatter to install Prometheus or
@@ -115,6 +119,30 @@ defaults: {
 		elasticsearch_password_secret: "elasticsearch-password"
 	}
 
+	// Keycloak configuration for a Keycloak instance installed into the
+	// the greymatter mesh. These configurations are only relevant to Keycloak
+	// inside the mesh, not an externally hosted Keycloak instance. These
+	// configurations will be used when enable_keycloak is true.
+	keycloak: {
+		// database_name: name of Postgres database
+		database_name: "keycloak"
+		// database_user: user for Postgres database
+		database_user: "keycloak"
+		// database_ingress_port: port for sidecar ingress to Postgres
+		database_ingress_port: 10809
+		// database_egress_cluster is the name of the cluster used by the
+		// Keycloak sidecar to send requests out to the Keycloak database's
+		// sidecar.
+		database_egress_cluster: "keycloak-postgres_egress"
+		// keycloak_postgres_cluster_name: upstream cluster name for sidecar
+		// egress from Keycloak to Postgres
+		keycloak_postgres_cluster_name: "keycloak-postgres"
+		// Default Keycloak admin password secret name
+		keycloak_admin_secret: "keycloak-admin-password"
+		// Default Keycloak Postgres password secret name
+		keycloak_postgres_secret: "keycloak-postgres-password"
+	}
+
 	edge: {
 		key: "edge"
 		// edge.enable_tls toggles internal mtls connections between greymatter core components
@@ -129,9 +157,6 @@ defaults: {
 			upstream_host: "foobar.oidc.com"
 			// upstream_port is the port your OIDC service is listening on.
 			upstream_port: 443
-			// egress_port is the port used by the edge proxy to make egress
-			// connections to your upstream OIDC service.
-			egress_port: 8443
 			// endpoint is the protocol, host, and port of your OIDC service.
 			// If the upstream_port is 443, it's unnecessary to provide it. If
 			// the upstream_port is not 443, you must provide it with: "https://\(upstream_host):\(upstream_port)".
@@ -156,6 +181,10 @@ defaults: {
 			// remote_jwks_cluster is the name of the egress cluster used by
 			// the edge proxy to make connections to your OIDC service.
 			remote_jwks_cluster: "edge_egress_to_oidc"
+			// remote_jwks_egress_port is the port used by the edge proxy to make egress
+			// connections to your upstream OIDC service's JWKS endpoint. This is fairly
+			// static and you should not have to change the value.
+			remote_jwks_egress_port: 8443
 			// jwt_authn_provider contains configuration for JWT authentication.
 			// This is used in conjunction with remote JWKS or local JWKS.
 			jwt_authn_provider: {

@@ -31,11 +31,15 @@ edge_config: [
 		_enable_fault_injection:     false
 		_enable_ext_authz:           false
 		_oidc_endpoint:              defaults.edge.oidc.endpoint
-		_oidc_service_url:           "https://\(defaults.edge.oidc.edge_domain):\(defaults.ports.edge_ingress)"
-		_oidc_client_id:             defaults.edge.oidc.client_id
-		_oidc_client_secret:         defaults.edge.oidc.client_secret
-		_oidc_cookie_domain:         defaults.edge.oidc.edge_domain
-		_oidc_realm:                 defaults.edge.oidc.realm
+		_edge_protocol:              string | *"http"
+		if defaults.edge.enable_tls == true {
+			_edge_protocol: "https"
+		}
+		_oidc_service_url:   "\(_edge_protocol)://\(defaults.edge.oidc.edge_domain):\(defaults.ports.edge_ingress)"
+		_oidc_client_id:     defaults.edge.oidc.client_id
+		_oidc_client_secret: defaults.edge.oidc.client_secret
+		_oidc_cookie_domain: defaults.edge.oidc.edge_domain
+		_oidc_realm:         defaults.edge.oidc.realm
 	},
 	// This cluster must exist (though it never receives traffic)
 	// so that Catalog will be able to look-up edge instances
