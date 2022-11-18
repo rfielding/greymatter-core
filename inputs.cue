@@ -18,7 +18,7 @@ config: {
 	// deploy and configure audit pipeline for observability telemetry
 	enable_audits: bool | *true @tag(enable_audits,type=bool)
 	// deploy and configure Keycloak for oAuth and user identity management
-	enable_keycloak: bool | *true @tag(enable_keycloak,type=bool)
+	enable_keycloak: bool | *false @tag(enable_keycloak,type=bool)
 	// whether to automatically copy the image pull secret to watched namespaces for sidecar injection
 	auto_copy_image_pull_secret: bool | *true @tag(auto_copy_image_pull_secret, type=bool)
 	// namespace the operator will deploy into
