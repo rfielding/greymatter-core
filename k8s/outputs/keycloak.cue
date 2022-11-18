@@ -35,7 +35,7 @@ keycloak: [
 							ports: [{
 								// keycloak listens on a non-default sidecar port
 								name:          "proxy"
-								containerPort: defaults.keycloak.keycloak_ingress_port
+								containerPort: defaults.edge.oidc.upstream_port
 							}]
 						},
 						{
@@ -111,8 +111,8 @@ keycloak: [
 			ports: [
 				{
 					name:       Name
-					port:       defaults.keycloak.keycloak_ingress_port
-					targetPort: defaults.keycloak.keycloak_ingress_port
+					port:       defaults.edge.oidc.upstream_port
+					targetPort: defaults.edge.oidc.upstream_port
 				},
 			]
 			type: "LoadBalancer"

@@ -134,9 +134,6 @@ defaults: {
 		// Keycloak sidecar to send requests out to the Keycloak database's
 		// sidecar.
 		database_egress_cluster: "keycloak-postgres_egress"
-		// keycloak_ingress_port is the port the Keycloak sidecar will listen
-		// on for HTTP requests.
-		keycloak_ingress_port: 10810
 		// keycloak_postgres_cluster_name: upstream cluster name for sidecar
 		// egress from Keycloak to Postgres
 		keycloak_postgres_cluster_name: "keycloak-postgres"
@@ -160,9 +157,6 @@ defaults: {
 			upstream_host: "foobar.oidc.com"
 			// upstream_port is the port your OIDC service is listening on.
 			upstream_port: 443
-			// egress_port is the port used by the edge proxy to make egress
-			// connections to your upstream OIDC service.
-			egress_port: 8443
 			// endpoint is the protocol, host, and port of your OIDC service.
 			// If the upstream_port is 443, it's unnecessary to provide it. If
 			// the upstream_port is not 443, you must provide it with: "https://\(upstream_host):\(upstream_port)".
@@ -187,6 +181,10 @@ defaults: {
 			// remote_jwks_cluster is the name of the egress cluster used by
 			// the edge proxy to make connections to your OIDC service.
 			remote_jwks_cluster: "edge_egress_to_oidc"
+			// remote_jwks_egress_port is the port used by the edge proxy to make egress
+			// connections to your upstream OIDC service's JWKS endpoint. This is fairly
+			// static and you should not have to change the value.
+			remote_jwks_egress_port: 8443
 			// jwt_authn_provider contains configuration for JWT authentication.
 			// This is used in conjunction with remote JWKS or local JWKS.
 			jwt_authn_provider: {

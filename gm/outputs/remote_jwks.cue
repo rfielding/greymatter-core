@@ -5,7 +5,7 @@ let EdgeToKeycloakName = defaults.edge.oidc.remote_jwks_cluster
 remote_jwks_config: [
 	#domain & {
 		domain_key: EdgeToKeycloakName
-		port:       defaults.edge.oidc.egress_port
+		port:       defaults.edge.oidc.remote_jwks_egress_port
 	},
 	#cluster & {
 		cluster_key:    EdgeToKeycloakName
@@ -21,6 +21,6 @@ remote_jwks_config: [
 	#route & {route_key: EdgeToKeycloakName},
 	#listener & {
 		listener_key: EdgeToKeycloakName
-		port:         defaults.edge.oidc.egress_port
+		port:         defaults.edge.oidc.remote_jwks_egress_port
 	},
 ]
