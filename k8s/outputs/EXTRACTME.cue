@@ -28,8 +28,8 @@ keycloak_postgres_manifests: keycloak_postgres
 // Deploys the operator and optionally spire (so these manifests are in place before anything else)
 operator_manifests: list.Concat([
 			operator_namespace,
-			operator_sts,
 			operator_k8s,
+			operator_sts,
 			[ for x in openshift_privileged_scc if config.openshift {x}],
 			[ for x in openshift_vector_scc if config.openshift && config.enable_audits {x}],
 			[ for x in openshift_spire_scc if config.openshift && config.spire {x}],

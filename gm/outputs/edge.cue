@@ -2,10 +2,16 @@
 
 package greymatter
 
-let EgressToRedisName = "\(defaults.edge.key)_egress_to_redis"
+import (
+	"list"
+)
 
-// Uncomment the below line for use with a remote JWKS provider (in this case, Keycloak)
-// let EdgeToKeycloakName = defaults.edge.oidc.jwt_authn_provider.keycloak.remote_jwks.http_uri.cluster
+let egress_to_redis = "\(defaults.edge.key)_egress_to_redis"
+
+let upstream_clusters = list.Concat([
+	[defaults.edge.key, egress_to_redis],
+	[ if defaults.edge.oidc.enable_remote_jwks {defaults.edge.oidc.remote_jwks_cluster}],
+])
 
 edge_config: [
 	// This domain is special because it uses edge certs instead of sidecar certs.  This secures outside -> in traffic
@@ -29,10 +35,10 @@ edge_config: [
 		if defaults.edge.enable_tls == true {
 			_edge_protocol: "https"
 		}
-		_oidc_service_url:   "\(_edge_protocol)://\(defaults.edge.oidc.domain):\(defaults.ports.edge_ingress)"
+		_oidc_service_url:   "\(_edge_protocol)://\(defaults.edge.oidc.edge_domain):\(defaults.ports.edge_ingress)"
 		_oidc_client_id:     defaults.edge.oidc.client_id
 		_oidc_client_secret: defaults.edge.oidc.client_secret
-		_oidc_cookie_domain: defaults.edge.oidc.domain
+		_oidc_cookie_domain: defaults.edge.oidc.edge_domain
 		_oidc_realm:         defaults.edge.oidc.realm
 	},
 	// This cluster must exist (though it never receives traffic)
@@ -43,18 +49,18 @@ edge_config: [
 
 	// egress -> redis
 	#domain & {
-		domain_key: EgressToRedisName
+		domain_key: egress_to_redis
 		port:       defaults.ports.redis_ingress
 	},
 	#cluster & {
-		cluster_key:  EgressToRedisName
+		cluster_key:  egress_to_redis
 		name:         defaults.redis_cluster_name
 		_spire_self:  defaults.edge.key
 		_spire_other: defaults.redis_cluster_name
 	},
-	#route & {route_key: EgressToRedisName},
+	#route & {route_key: egress_to_redis},
 	#listener & {
-		listener_key: EgressToRedisName
+		listener_key: egress_to_redis
 		// egress listeners are local-only
 		ip:            "127.0.0.1"
 		port:          defaults.ports.redis_ingress
@@ -62,28 +68,8 @@ edge_config: [
 	},
 
 	#proxy & {
-		proxy_key: defaults.edge.key
-		domain_keys: [defaults.edge.key, EgressToRedisName]
-		listener_keys: [defaults.edge.key, EgressToRedisName]
-	}
-
-	// egress -> Keycloak for OIDC/JWT Authentication (only necessary with remote JWKS provider)
-	// NB: You need to add the EdgeToKeycloakName key to the domain_keys and listener_keys 
-	// in the #proxy above for the cluster to be discoverable by Envoy
-	// #cluster & {
-	//  cluster_key:    EdgeToKeycloakName
-	//  _upstream_host: defaults.edge.oidc.endpoint_host
-	//  _upstream_port: defaults.edge.oidc.endpoint_port
-	//  ssl_config: {
-	//   protocols: ["TLSv1_2"]
-	//   sni: defaults.edge.oidc.endpoint_host
-	//  }
-	//  require_tls: true
-	// },
-	// #route & {route_key: EdgeToKeycloakName},
-	// #domain & {domain_key: EdgeToKeycloakName, port: defaults.edge.oidc.endpoint_port},
-	// #listener & {
-	//  listener_key: EdgeToKeycloakName
-	//  port:         defaults.edge.oidc.endpoint_port
-	// },
+		proxy_key:     defaults.edge.key
+		domain_keys:   upstream_clusters
+		listener_keys: upstream_clusters
+	},
 ]

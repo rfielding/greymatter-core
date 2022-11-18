@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.2 (November 15th, 2022)
+
+### Changed
+
+- Changed the order that operator resources are created
+- Remove "plus" from default watched namespaces
+
 ## 0.13.1 (November 9th, 2022)
 
 ### Changed

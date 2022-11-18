@@ -14,6 +14,7 @@ if defaults.jwtsecurity != _|_ {
 }
 
 mesh_configs: list.Concat([
+		[ for x in remote_jwks_config if defaults.edge.oidc.enable_remote_jwks {x}],
 		redis_config,
 		edge_config,
 		catalog_config,

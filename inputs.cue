@@ -38,7 +38,7 @@ mesh: meshv1.#Mesh & {
 	}
 	spec: {
 		install_namespace: string | *"greymatter"
-		watch_namespaces:  [...string] | *["default", "plus", "examples"]
+		watch_namespaces:  [...string] | *["default", "examples"]
 		images: {
 			proxy:       string | *"greymatter.jfrog.io/oci/greymatter-proxy:1.7.5-ubi8.6-2022-11-09"
 			catalog:     string | *"greymatter.jfrog.io/oci/greymatter-catalog:3.0.8-ubi8.6-2022-11-09"
@@ -153,28 +153,50 @@ defaults: {
 		enable_tls:  false
 		secret_name: "gm-edge-ingress-certs"
 		oidc: {
-			endpoint_host: "localhost"
-			endpoint_port: 10810
-			endpoint:      "https://\(endpoint_host):\(endpoint_port)"
-			domain:        ""
-			client_id:     "greymatter"
+			// upstream_host is the FQDN of your OIDC service.
+			upstream_host: "foobar.oidc.com"
+			// upstream_port is the port your OIDC service is listening on.
+			upstream_port: 443
+			// egress_port is the port used by the edge proxy to make egress
+			// connections to your upstream OIDC service.
+			egress_port: 8443
+			// endpoint is the protocol, host, and port of your OIDC service.
+			// If the upstream_port is 443, it's unnecessary to provide it. If
+			// the upstream_port is not 443, you must provide it with: "https://\(upstream_host):\(upstream_port)".
+			endpoint: "https://\(upstream_host)"
+			// edge_domain is the FQDN of your edge service. It's used by
+			// greymatter's OIDC filters, and will be used to redirect the user
+			// back to the mesh, upon successful authentication.
+			edge_domain: "foobar.com"
+			// realm is the ID of a realm in your OIDC provider.
+			realm: "greymatter"
+			// client_id is the ID of a client in a realm in your OIDC provider.
+			client_id: "greymatter"
+			// client_secret is the secret key of a client in a realm in your
+			// OIDC provider. 
 			client_secret: ""
-			realm:         "greymatter"
+			// enable_remote_jwks is a toggle that automatically enables remote
+			// JSON Web Key Sets (JWKS) verification with your OIDC provider.
+			// Alternatively, you can disable this and use local_jwks below.
+			// It's advised to enable remote JWKS because it is reslient to 
+			// key rotation.
+			enable_remote_jwks: false
+			// remote_jwks_cluster is the name of the egress cluster used by
+			// the edge proxy to make connections to your OIDC service.
+			remote_jwks_cluster: "edge_egress_to_oidc"
+			// jwt_authn_provider contains configuration for JWT authentication.
+			// This is used in conjunction with remote JWKS or local JWKS.
 			jwt_authn_provider: {
 				keycloak: {
 					audiences: ["greymatter"]
-					local_jwks: {
-						inline_string: #"""
-					  {}
-					  """#
-					}
-					// If you want to use a remote JWKS provider, comment out local_jwks above, and
-					// uncomment the below remote_jwks configuration. There are coinciding configurations
-					// in ./gm/outputs/edge.cue that you will also need to uncomment.
-					// remote_jwks: {
-					//  http_uri: {
-					//   cluster: "edge_to_keycloak" // this key should be unique across the mesh
-					//  }
+					// If using local JWKS verification, disable enable_remote_jwks above and
+					// uncomment local_jwks below. You will need to paste the JWKS JSON
+					// from your OIDC provider inside the inline_string's starting and ending
+					// triple quotes.
+					// local_jwks: {
+					//  inline_string: #"""
+					//   {}
+					//   """#
 					// }
 				}
 			}
