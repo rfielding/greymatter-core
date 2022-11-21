@@ -117,6 +117,10 @@ defaults: {
 		elasticsearch_endpoint: "https://\(elasticsearch_host):\(elasticsearch_port)"
 		// Default Elasticsearch password secret name.
 		elasticsearch_password_secret: "elasticsearch-password"
+		// elasticsearch_tls_verify_certificate determines if the audit agent verifies
+		// Elasticsearch's TLS certificate during the TLS handshake. If your Elasticsearch is
+		// using a self-signed certificate, set this to false.
+		elasticsearch_tls_verify_certificate: true
 	}
 
 	// Keycloak configuration for a Keycloak instance installed into the
