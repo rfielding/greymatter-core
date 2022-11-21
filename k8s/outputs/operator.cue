@@ -195,7 +195,6 @@ operator_k8s: [
 		data: {
 			"overrides.cue": """
       package greymatter
-
       config: {
         spire: \(config.spire)
         openshift: \(config.openshift)
