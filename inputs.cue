@@ -43,8 +43,8 @@ mesh: meshv1.#Mesh & {
 			proxy:       string | *"greymatter.jfrog.io/oci/greymatter-proxy:1.8.0-ubi8.6-2022-11-22"
 			catalog:     string | *"greymatter.jfrog.io/oci/greymatter-catalog:3.0.8-ubi8.6-2022-11-09"
 			dashboard:   string | *"greymatter.jfrog.io/oci/greymatter-dashboard:6.0.5-ubi8.6-2022-11-22"
-			control:     string | *"greymatter.jfrog.io/oci/greymatter-control:1.8.1-ubi8.6-2022-11-22"
-			control_api: string | *"greymatter.jfrog.io/oci/greymatter-control-api:1.8.1-ubi8.6-2022-11-22"
+			control:     string | *"greymatter.jfrog.io/oci/greymatter-control:1.8.2-ubi8.6-2022-11-22"
+			control_api: string | *"greymatter.jfrog.io/oci/greymatter-control-api:1.8.2-ubi8.6-2022-11-22"
 			redis:       string | *"index.docker.io/library/redis:6.2.7"
 			prometheus:  string | *"index.docker.io/prom/prometheus:v2.40.1"
 		}
