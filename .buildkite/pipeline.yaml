@@ -34,7 +34,36 @@ steps:
         changelog_filename: "greymatter-core.toml"
     async: true
 
-  - label: "Release"
-    depends_on: test
+  - label: "Generate manifests"
+    key: "generate-manifests"
+    agents:
+      container_image: ubuntu-2204-ci
+      queue: default
+    depends_on: 
+      - build
+      - test
     commands:
+      - mkdir generated-manifests/
+      - cue eval -c ./k8s/outputs -e operator_manifests_yaml --out=text > generated-manifests/operator.yaml
+      - sed -i 's/git@github.com:greymatter-io\/greymatter-core.git/git@github.com:<your-org>\/greymatter-core.git/g' generated-manifests/operator.yaml 
+      
+      - cue eval -c ./k8s/outputs -e operator_manifests_yaml --out=text -t spire=true > generated-manifests/operator-spire.yaml
+      - sed -i 's/git@github.com:greymatter-io\/greymatter-core.git/git@github.com:<your-org>\/greymatter-core.git/g' generated-manifests/operator-spire.yaml
+      
+      - cue eval -c ./k8s/outputs -e operator_manifests_yaml --out=text -t openshift=true > generated-manifests/operator-openshift.yaml
+      - sed -i 's/git@github.com:greymatter-io\/greymatter-core.git/git@github.com:<your-org>\/greymatter-core.git/g' generated-manifests/operator-openshift.yaml
+      
+      - cue eval -c ./k8s/outputs -e operator_manifests_yaml --out=text -t openshift=true -t spire=true > generated-manifests/operator-openshift-spire.yaml
+      - sed -i 's/git@github.com:greymatter-io\/greymatter-core.git/git@github.com:<your-org>\/greymatter-core.git/g' generated-manifests/operator-openshift-spire.yaml
+      
+      - buildkite-agent artifact upload "generated-manifests/*"
+
+  - label: "Release"
+    depends_on:
+      - test
+      - generate-manifests
+    commands:
+      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
+      - cp ./generated-manifests/operator.yaml ./operator.yaml
+      - cp ./generated-manifests/operator-spire.yaml ./operator_withspire.yaml
       - ./scripts/cibuild release
