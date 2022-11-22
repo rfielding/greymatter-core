@@ -288,6 +288,7 @@ operator_k8s: [
 				"list",
 				"create",
 				"update",
+				"delete",
 			]
 		}, {
 			apiGroups: [
@@ -315,6 +316,7 @@ operator_k8s: [
 				"create",
 				"update",
 				"patch",
+				"delete",
 			]
 		}, {
 			apiGroups: [
