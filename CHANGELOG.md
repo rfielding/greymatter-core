@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.13.3 (November 22nd, 2022)
+
+### Added
+
+- Added toggle for elasticsearch tls cert verification
+- Added auto generation of operator manifests
+
+### Changed
+
+- Updated images
+- Updated jwks configs
+- Spire enabled takes precedence over manual PKI
+- Updated keycloak integration
+- Enabled operator manage full lifecycle of deployments and configmaps
+- Removed backed in manifest files
+
 ## 0.13.2 (November 15th, 2022)
 
 ### Changed
