@@ -1,0 +1,187 @@
+#!/bin/bash
+
+#TODO: add greymatter-core to this somehow
+
+# attempt to promote each image (indiscriminate if it was changed or not)
+
+# Promote will parse the path that is presented to it then 
+# will promote the oci and generic artifacts associated with it
+# THIS RELIES ON THE NAMING CONVENTION BEING FOLLOWED
+# input must look like 'release-oci/greymatter-audits/1.1.4-ubi8.6-2022-11-09'
+parse_and_promote(){
+    input=${1}
+
+    repo=$(echo ${input} | awk -F/ '{print $1}')
+    component=$(echo ${input} | awk -F/ '{print $2}')
+    image_tag=$(echo ${input} | awk -F/ '{print $3}')
+    version=$(echo ${image_tag} | awk -F- '{print $1}')
+    addl=$(echo ${image_tag} | sed "s|${version}||g")
+
+    if [[ -n ${component} || -n ${version} ]]; then
+        promote_oci ${component} ${version} ${addl}
+        promote_generic ${component} ${version}
+    else
+        echo "Count not promote the image or binary.  promote() was unable to parse a component or version"
+        exit 2
+    fi
+
+
+    if [[ ${dry_run_arg} -eq "" ]]; then
+        echo "${component}:${version}" >> release-versions.yaml
+    fi
+
+}
+
+# coppies the template and subs in the newly defined versions
+# will only run if release-versions.yaml is present... this only happens when not running a dry run
+create_download_script(){
+    # assumes branch name of form 'release/v#.#.#-rc#'
+    # this is a system version
+    release_version=""
+    new_name=$(git rev-parse --abbrev-ref HEAD | awk -F/ '{print $2}')
+    if [[ ! -z ${new_name} ]]; then
+        release_version="-${new_name}"
+    fi
+
+    cp scripts/greymatter-download-template.sh "greymatter-download${release_version}.sh"
+    # uses the versions in the inputs.cue to drive the files in the download script
+    if [[ -f release-versions.yaml ]]; then
+
+        lines=$(cat release-versions.yaml)
+        # echo ${lines}
+        for l in ${lines[@]}; do
+            echo "$l"
+            component=$(echo $l | awk -F: '{print $1}')
+            version=$(echo $l | awk -F: '{print $2}')
+            sed -i "s|${component}_<VERSION>|${component}_${version}|g" "greymatter-download${release_version}.sh"
+        done
+    fi
+
+    if [[ -n ${BUILDKITE_TAG} ]];then
+        sed -i "s|greymatter-core_<VERSION>|greymatter-core_${BUILDKITE_TAG:1}|g" "greymatter-download${release_version}.sh"
+    fi
+}
+
+
+
+
+# validates the <component>/version-additional image exists in 
+# the src_oci registry and promotes it to dest_oci set as environment variables
+promote_oci(){
+    component=${1}
+    version=${2}
+    addl=${3}
+
+    src_path=${SRC_OCI}/${component}/${version}${addl}
+
+    echo "Validating the source image [${src_path}] exist"
+    (jf rt search "${src_path}/" --fail-no-op=true)
+    if [[ $? -eq 0 ]]; then
+        echo "Promoting [${src_path}] to ${DEST_OCI}"
+        jf rt cp ${src_path} ${DEST_OCI} ${dry_run_arg}
+    else
+        echo "Validation failed: Did not find any images in [${src_path}]"
+        exit 4
+    fi
+
+}
+
+# validates the <component>/version-additional image exists in the 
+# src_generic registry and promotes all of that version to dest_generic set as environment variables
+promote_generic(){
+    component=${1}
+    version=${2}
+
+    bins=$(jf rt search "${SRC_GENERIC}/${component}/${component}_${version}*" | jq -r '.[].path')
+    arr=($bins)
+    echo "Validating the source generic artifacts in [${src_path}] exist"
+    if [[ ${#arr[@]} -gt 0  ]]; then
+        for i in "${arr[@]}"; do
+            echo "Moving [${i}] to ${DEST_GENERIC}"
+            jf rt cp ${i} ${DEST_GENERIC}/ ${dry_run_arg}
+        done
+    else
+        echo "Validation failed: Did not find any artifacts in [${src_path}]"
+        exit 4
+    fi
+}
+
+# imputs of location of images in cue eval of inputs.cue
+# finds all images that are in greymatter.jfrog.io and will push them to promotion
+get_and_promote_from_cue_inputs(){
+    images_block=$(cue eval inputs.cue --out json | jq ".${1}")
+
+    for i in $(echo ${images_block} | jq -r '. | keys[]'); do
+        echo ${i}
+        image_path=$(echo ${images_block} | jq '.' | jq -r --arg comp ${i} '.[$comp]' | sed "s|:|/|g" )
+        if [[ $(echo ${image_path} | awk -F/ '{print $1}') == "greymatter.jfrog.io" ]]; then
+            echo "Will promote greymatter internal image [${image_path}]"
+            jf_image_path=$(echo ${image_path} | sed "s|greymatter.jfrog.io/||g")
+            if [[ ${jf_image_path} != null ]]; then
+                echo "found image path [${jf_image_path}] for component [${i}] in inputs.cue"
+                parse_and_promote ${jf_image_path}
+            else
+                echo "did not find an image path for component [${i}] in inputs.cue under .defaults.image"
+                exit 4
+            fi
+        else
+            echo "will not promote non greymatter internal images [${image_path}]"
+        fi
+    done
+
+}
+
+# ######### Main ########
+
+
+dry_run_arg="--dry-run"
+if [[ ${1} == "--yes" ]]; then
+    dry_run_arg=""
+else
+    echo "Running in --dry-run mode"
+    echo "****************************************"
+    echo "if you would like to run this for real "
+    echo "add the --yes argument"
+    echo "ex:"
+    echo "./scripts/promotion --yes"
+    echo "****************************************"
+fi
+
+export SRC_GENERIC=${SRC_GENERIC_CI:-"dev-generic"}
+export DEST_GENERIC=${DEST_GENERIC_CI:-"generic"}
+export SRC_OCI=${SRC_OCI_CI:-"release-oci"}
+export DEST_OCI=${DEST_OCI_CI:-"oci"}
+
+echo "Promoting Generic Artifacts from ${SRC_GENERIC} to ${DEST_GENERIC}"
+echo "Promoting OCI Artifacts from ${SRC_OCI} to ${DEST_OCI}"
+
+
+get_and_promote_from_cue_inputs "mesh.spec.images"
+get_and_promote_from_cue_inputs "defaults.images"
+
+create_download_script
+cat inputs.cue | sed "s|greymatter.jfrog.io/$SRC_OCI|greymatter.jfrog.io/$DEST_OCI|g" > inputs-output.cue
+
+# if this is a tag then promote it and change the name to release
+if [[ -n ${BUILDKITE_TAG} ]]; then
+    # pull from staging
+    jf rt download ${SRC_GENERIC}/greymatter-core/greymatter-core_latest_none_none.tar.gz .
+    # g unzip
+    gzip -d greymatter-core_latest_none_none.tar.gz
+    # tar update file with new inputs.cue w/ updated input.cue
+    tar -u greymatter-core_latest_none_none.tar inputs.cue 
+    # gzip it
+    gzip greymatter-core_latest_none_none.tar
+    # push to release
+    jF rt upload greymatter-core_latest_none_none.tar ${DEST_GENERIC}/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz 
+else 
+    # standart promotion; when no tag move to staging
+    promote_generic "greymatter-core" "latest"
+fi
+
+echo "Completed promotion Pipeline"
+
+unset SRC_GENERIC
+unset DEST_GENERIC
+unset SRC_OCI
+unset DEST_OCI

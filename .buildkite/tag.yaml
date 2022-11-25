@@ -1,0 +1,40 @@
+steps:
+  - label: "validate changelog has been updated"
+    key: "validate-changelog-tag"
+    if: build.message !~ /skip changelog validation/
+    commands:
+      - echo "STUB for validate changelog diff between last tag and this tag"
+      - git diff --name-only ${BUILDKITE_TAG} $(git tag --sort=-creatordate | grep -A 1 ${BUILDKITE_TAG} | tail -n 1) | grep CHANGELOG.md > diff.txt
+      - if [[ $(awk 'END {print NR}' diff.txt) -ne 1 ]]; then exit 9; fi
+
+  # this is in place of automated smoke test
+  - block: "I have run a smoke test on generated inputs-staging.cue"
+
+  - label: "test-promote artifacts to oci/ generic"
+    key: "promote-test-tag"
+    env:
+      SRC_GENERIC_CI: "ci-staging-generic"
+      DEST_GENERIC_CI: "generic"
+      SRC_OCI_CI: "ci-staging-oci"
+      DEST_OCI_CI: "oci"
+    # promotion defaults to dry run
+    command: ./scripts/promotion 
+
+  # promotes artifacts to their release repos
+  # TODO: validates updates greymatter-download-<version><-rc>.sh file
+  - label: "promote artifacts to oci/ generic"
+    key: "promote-tag"
+    depends_on: 
+      - promote-test-tag
+    env:
+      SRC_GENERIC_CI: "ci-staging-generic"
+      DEST_GENERIC_CI: "generic"
+      SRC_OCI_CI: "ci-staging-oci"
+      DEST_OCI_CI: "oci"
+    # --yes flag for promotion results in actual promotion
+    command: ./scripts/promotion --yes
+    # eventually we will want to automatically push greymatter-download*.sh to artifactory
+    artifact_paths:
+      - release-versions.yaml
+      - greymatter-download*.sh
+      - inputs-output.cue
