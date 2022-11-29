@@ -169,6 +169,7 @@ cp inputs-output.cue inputs.cue
 if [[ -n ${BUILDKITE_TAG} ]]; then
     echo "Found Buildkite tag"
     if [[ ${dry_run_arg} -eq "" ]]; then
+        set -x
         rm -f greymatter-core_latest_none_none.tar.gz
         rm -f greymatter-core_latest_none_none.tar
 
@@ -181,6 +182,7 @@ if [[ -n ${BUILDKITE_TAG} ]]; then
 
         RELEASE=$(buildkite-agent meta-data get release)
         jf rt upload greymatter-download.sh ${DEST_GENERIC}/greymatter-download_${RELEASE}.sh ${dry_run_arg}
+        set +x
     fi
 else 
     # standart promotion; when no tag move to staging
