@@ -7,9 +7,6 @@ release_bundle() {
   if [[ "$BUILDKITE_BRANCH" == "main" ]]; then
     bundle_and_push "latest"
   fi
-  if [[ -n "$BUILDKITE_TAG" ]]; then
-    bundle_and_push ${BUILDKITE_TAG:1}
-  fi
 }
 
 # Convenience function to push tarball to Artifactory
@@ -28,6 +25,8 @@ bundle_and_push() {
     --exclude="scripts/cibuild" \
     --exclude="scripts/bootstrap" \
     --exclude="scripts/update" \
+    --exclude="scripts/promotion" \
+    --exclude="greymatter-download-template.sh" \
     -cvzf "$workspace/$tarball" .
 
   cd $workspace
@@ -39,7 +38,7 @@ bundle_and_push() {
 
   # Artifactory upload
   buildkite-agent artifact upload "$tarball" "rt://dev-generic/greymatter-core"
-  
+
   # Cleanup the tarball
   rm $tarball
 }
