@@ -171,9 +171,9 @@ if [[ -n ${BUILDKITE_TAG} ]]; then
     jf rt download ${SRC_GENERIC}/greymatter-core/greymatter-core_latest_none_none.tar.gz --flat
     gzip -d greymatter-core_latest_none_none.tar.gz
     tar rf greymatter-core_latest_none_none.tar.gz inputs.cue
-    gzip greymatter-core_latest_none_none.tar.gz
+    gzip greymatter-core_latest_none_none.tar
 
-    jf rt upload greymatter-core_latest_none_none.tar ${DEST_GENERIC}/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz ${dry_run_arg}
+    jf rt upload greymatter-core_latest_none_none.tar.gz ${DEST_GENERIC}/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz ${dry_run_arg}
 
     RELEASE=$(buildkite-agent meta-data get release)
     jf rt upload greymatter-download.sh ${DEST_GENERIC}/greymatter-download_${RELEASE}.sh ${dry_run_arg}
