@@ -173,7 +173,7 @@ if [[ -n ${BUILDKITE_TAG} ]]; then
     tar rf greymatter-core_latest_none_none.tar.gz inputs.cue
     gzip greymatter-core_latest_none_none.tar.gz
 
-    jf rt upload greymatter-core_latest_none_none.tar ${DEST_GENERIC}/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz 
+    jf rt upload greymatter-core_latest_none_none.tar ${DEST_GENERIC}/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz ${dry_run_arg}
 
 else 
     # standart promotion; when no tag move to staging
