@@ -131,6 +131,8 @@ get_and_promote_from_cue_inputs(){
 
 }
 
+
+
 # ######### Main ########
 
 
@@ -160,20 +162,19 @@ get_and_promote_from_cue_inputs "mesh.spec.images"
 get_and_promote_from_cue_inputs "defaults.images"
 
 create_download_script
-cat inputs.cue | sed "s|greymatter.jfrog.io/$SRC_OCI|greymatter.jfrog.io/$DEST_OCI|g" > inputs-output.cue
 
+cat inputs.cue | sed "s|greymatter.jfrog.io/release-oci|greymatter.jfrog.io/$DEST_OCI|g" > inputs-output.cue
+cp inputs-output.cue inputs.cue
 # if this is a tag then promote it and change the name to release
 if [[ -n ${BUILDKITE_TAG} ]]; then
-    # pull from staging
-    jf rt download ${SRC_GENERIC}/greymatter-core/greymatter-core_latest_none_none.tar.gz .
-    # g unzip
+    echo "Found Buildkite tag"
+    jf rt download ${SRC_GENERIC}/greymatter-core/greymatter-core_latest_none_none.tar.gz --flat
     gzip -d greymatter-core_latest_none_none.tar.gz
-    # tar update file with new inputs.cue w/ updated input.cue
-    tar -u greymatter-core_latest_none_none.tar inputs.cue 
-    # gzip it
-    gzip greymatter-core_latest_none_none.tar
-    # push to release
-    jF rt upload greymatter-core_latest_none_none.tar ${DEST_GENERIC}/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz 
+    tar rf greymatter-core_latest_none_none.tar.gz inputs.cue
+    gzip greymatter-core_latest_none_none.tar.gz
+
+    jf rt upload greymatter-core_latest_none_none.tar ${DEST_GENERIC}/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz 
+
 else 
     # standart promotion; when no tag move to staging
     promote_generic "greymatter-core" "latest"
