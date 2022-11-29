@@ -1,8 +1,12 @@
 steps:
 
-
   # this is in place of automated smoke test
   - block: "I have run a smoke test on generated inputs-staging.cue"
+
+  - input: "Information please"
+    fields:
+      - text: "What is this Release Called"
+        key: "release"
 
   - label: "test-promote artifacts to oci/ generic"
     key: "promote-test-tag"

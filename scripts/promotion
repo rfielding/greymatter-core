@@ -175,6 +175,8 @@ if [[ -n ${BUILDKITE_TAG} ]]; then
 
     jf rt upload greymatter-core_latest_none_none.tar ${DEST_GENERIC}/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz ${dry_run_arg}
 
+    RELEASE=$(buildkite-agent meta-data get release)
+    jf rt upload greymatter-download.sh ${DEST_GENERIC}/greymatter-download_${RELEASE}.sh ${dry_run_arg}
 else 
     # standart promotion; when no tag move to staging
     promote_generic "greymatter-core" "latest"
