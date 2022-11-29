@@ -168,6 +168,9 @@ cp inputs-output.cue inputs.cue
 # if this is a tag then promote it and change the name to release
 if [[ -n ${BUILDKITE_TAG} ]]; then
     echo "Found Buildkite tag"
+    rm -f greymatter-core_latest_none_none.tar.gz
+    rm -f greymatter-core_latest_none_none.tar
+
     jf rt download ${SRC_GENERIC}/greymatter-core/greymatter-core_latest_none_none.tar.gz --flat
     gzip -d greymatter-core_latest_none_none.tar.gz
     tar rf greymatter-core_latest_none_none.tar.gz inputs.cue
