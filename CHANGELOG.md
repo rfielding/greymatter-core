@@ -1,5 +1,11 @@
 # Changelog
 
+## vNext
+
+### Changed
+
+- automate release
+
 ## 0.13.3 (November 22nd, 2022)
 
 ### Added
