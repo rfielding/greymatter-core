@@ -79,24 +79,3 @@ steps:
     # promotion defaults to dry run
     command: ./scripts/promotion 
 
-
-  # promotes artifacts to their release repos
-  # updates greymatter-download-<version><-rc>.sh file
-  
-  - label: "promote artifacts to staging"
-    key: "promote"
-    if: | 
-      build.pull_request.base_branch == "main"
-    depends_on: 
-      - promote-test
-    env:
-      SRC_GENERIC_CI: "dev-generic"
-      DEST_GENERIC_CI: "ci-staging-generic"
-      SRC_OCI_CI: "release-oci"
-      DEST_OCI_CI: "ci-staging-oci"
-    # --yes flag for promotion results in actual promotion
-    command: ./scripts/promotion --yes
-    artifact_paths:
-      - release-versions.yaml
-      - greymatter-download*.sh
-      - inputs-output.cue
