@@ -1,5 +1,5 @@
 agents:
-  container_image: container_image=ubuntu-2004-ci
+  container_image: ubuntu-2004-ci
 
 # promotes artifacts to their release repos
 # updates greymatter-download-<version><-rc>.sh file

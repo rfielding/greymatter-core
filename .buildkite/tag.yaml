@@ -1,5 +1,6 @@
+agents:
+  container_image: ubuntu-2004-ci
 steps:
-
   # this is in place of automated smoke test
   - block: "I have run a smoke test on generated inputs-staging.cue"
 
