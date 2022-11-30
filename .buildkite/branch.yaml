@@ -1,3 +1,6 @@
+agents:
+  container_image: ubuntu-2004-ci
+
 steps:
   - label: ":shipit: Build"
     key: build
