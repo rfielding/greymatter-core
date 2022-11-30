@@ -71,6 +71,8 @@ promote_oci(){
     component=${1}
     version=${2}
     addl=${3}
+    # remove fips from add
+    addl=$(echo ${addl} | sed 's|-fips||g' )
 
     src_path=${SRC_OCI}/${component}/${version}${addl}
 
@@ -97,8 +99,10 @@ promote_generic(){
     echo "Validating the source generic artifacts in [${src_path}] exist"
     if [[ ${#arr[@]} -gt 0  ]]; then
         for i in "${arr[@]}"; do
-            echo "Moving [${i}] to ${DEST_GENERIC}"
-            jf rt cp ${i} ${DEST_GENERIC}/ ${dry_run_arg}
+            # hack to remove fips from name if present (this should be moved to component release)
+            outputName=$(echo ${i} | sed 's|-fips||g' | sed "s|${SRC_GENERIC}|${DEST_GENERIC}|g")
+            echo "Moving [${i}] to ${outputName}"
+            jf rt cp ${i} ${outputName} ${dry_run_arg}
         done
     else
         echo "Validation failed: Did not find any artifacts in [${src_path}]"

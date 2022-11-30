@@ -1,6 +1,9 @@
-  # promotes artifacts to their release repos
-  # updates greymatter-download-<version><-rc>.sh file
-  
+agents:
+  container_image: container_image=ubuntu-2004-ci
+
+# promotes artifacts to their release repos
+# updates greymatter-download-<version><-rc>.sh file
+steps:
   - label: "promote artifacts to staging"
     key: "promote"
     env:
