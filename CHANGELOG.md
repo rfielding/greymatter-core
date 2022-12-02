@@ -1,10 +1,11 @@
 # Changelog
 
-## vNext
+## v0.14.0 (December 2nd, 2022)
 
 ### Changed
 
 - automate release
+- Update all images to targets for RC6
 
 ## 0.13.3 (November 22nd, 2022)
 

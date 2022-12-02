@@ -72,13 +72,13 @@ steps:
       - cp ./generated-manifests/operator-spire.yaml ./operator_withspire.yaml
       - ./scripts/cibuild release
 
-  - label: "test-promote artifacts to staging"
-    key: "promote-test"
-    env:
-      SRC_GENERIC_CI: "dev-generic"
-      DEST_GENERIC_CI: "ci-staging-generic"
-      SRC_OCI_CI: "release-oci"
-      DEST_OCI_CI: "ci-staging-oci"
-    # promotion defaults to dry run
-    command: ./scripts/promotion 
+  # - label: "test-promote artifacts to staging"
+  #   key: "promote-test"
+  #   env:
+  #     SRC_GENERIC_CI: "dev-generic"
+  #     DEST_GENERIC_CI: "ci-staging-generic"
+  #     SRC_OCI_CI: "release-oci"
+  #     DEST_OCI_CI: "ci-staging-oci"
+  #   # promotion defaults to dry run
+  #   command: ./scripts/promotion 
 
