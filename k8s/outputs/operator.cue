@@ -209,8 +209,6 @@ operator_k8s: [
 		apiVersion: "v1"
 		imagePullSecrets: [{
 			name: "gm-docker-secret"
-		}, {
-			name: "quay-secret"
 		}]
 		kind: "ServiceAccount"
 		metadata: {
