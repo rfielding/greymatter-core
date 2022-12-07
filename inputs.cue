@@ -41,7 +41,7 @@ mesh: meshv1.#Mesh & {
 		watch_namespaces:  [...string] | *["default", "examples"]
 		images: {
 			proxy:       string | *"greymatter.jfrog.io/release-oci/greymatter-proxy:1.8.1"
-			catalog:     string | *"greymatter.jfrog.io/release-oci/greymatter-catalog:3.0.8"
+			catalog:     string | *"greymatter.jfrog.io/release-oci/greymatter-catalog:3.0.10"
 			dashboard:   string | *"greymatter.jfrog.io/release-oci/greymatter-dashboard:6.0.6"
 			control:     string | *"greymatter.jfrog.io/release-oci/greymatter-control:1.8.3"
 			control_api: string | *"greymatter.jfrog.io/release-oci/greymatter-control-api:1.8.3"
