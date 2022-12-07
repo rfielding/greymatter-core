@@ -779,6 +779,7 @@ _oidc_authentication_defaults: {
 		},
 	]
 	rate_limit_service: {
+		transport_api_version: "V3"
 		grpc_service: {
 			envoy_grpc: {
 				cluster_name: "ratelimit"
@@ -811,6 +812,7 @@ _oidc_authentication_defaults: {
 // See https://www.envoyproxy.io/docs/envoy/v1.16.5/configuration/http/http_filters/ext_authz_filter for additional configuration including
 // interfacing with a traditional HTTP/1 authorization service.
 #envoy_ext_authz: ext_authz.#ExtAuthz | *{
+	transport_api_version: "V3"
 	grpc_service: {
 		envoy_grpc: {
 			cluster_name: "opa" // Needs to match the name of your cluster. Since its a grpc connection, you must create an http/2 cluster
@@ -825,6 +827,7 @@ _oidc_authentication_defaults: {
 }
 
 #envoy_tcp_ext_authz: ext_authz_tcp.#ExtAuthz | *{
+	transport_api_version: "V3"
 	grpc_service: {
 		envoy_grpc: {
 			cluster_name: "ext_authz_tcp" // Needs to match the name of your cluster
