@@ -103,10 +103,15 @@ defaults: {
 	// audits configuration applies to greymatter's observability pipeline and are
 	// used when config.enable_audits is true.  
 	audits: {
-		// index determines the index ID in Elasticsearch. The default naming convention
-		// will generate a new index each month. The index configuration can be changed
-		// to create more or less indexes depending on your storage and performance requirements.
-		index: "gm-audits-%Y-%m"
+		// storage_index is the index name to write audit events to. The default
+		// naming convention will generate a new index for each month of each year.
+		// The naming configuration can be changed to create more or less indexes
+		// depending on your storage and performance requirements.
+		storage_index: "gm-audits-%Y-%m"
+		// query_index is the index pattern used by the audit application to
+		// query audit documents in Elasticsearch. If you change storage_index,
+		// you may need to change this pattern too. 
+		query_index: "gm-audits*"
 		// elasticsearch_host can be an IP address or DNS hostname to your Elasticsearch instance.
 		// It's set to a non-empty value so that the audit-pipeline starts successfully.
 		elasticsearch_host: "localhost"
@@ -116,7 +121,9 @@ defaults: {
 		// of your Elasticsearch instance. This is used by to sync audit data
 		// with Elasticsearch.
 		elasticsearch_endpoint: "https://\(elasticsearch_host):\(elasticsearch_port)"
-		// Default Elasticsearch password secret name.
+		// Default Elasticsearch basic authentication user name.
+		elasticsearch_username: "elastic"
+		// Kubernetes secret name containing default Elasticsearch basic authentication password.
 		elasticsearch_password_secret: "elasticsearch-password"
 		// elasticsearch_tls_verify_certificate determines if the audit agent verifies
 		// Elasticsearch's TLS certificate during the TLS handshake. If your Elasticsearch is
@@ -149,6 +156,9 @@ defaults: {
 	}
 
 	edge: {
+		// key is the unique key of the edge proxy. Certain features of the mesh
+		// rely on this value, such as the audit app's queries to Elasticsearch. 
+		// The value should not need to be changed.
 		key: "edge"
 		// edge.enable_tls toggles internal mtls connections between greymatter core components
 		// by default the internal and external secrets are the same however if you want to

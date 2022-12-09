@@ -298,10 +298,10 @@ vector: [
 			inputs = [\"modify\"]
 			endpoint = "\(defaults.audits.elasticsearch_endpoint)"
 			mode = \"bulk\"
-			bulk.index = "\(defaults.audits.index)"
+			bulk.index = "\(defaults.audits.storage_index)"
 			compression = \"none\"
 			auth.strategy = \"basic\"
-			auth.user = \"elastic\"
+			auth.user = "\(defaults.audits.elasticsearch_username)"
 			auth.password = \"${ELASTICSEARCH_PASSWORD}\"
 			suppress_type_name = true
 			tls.verify_certificate = \(defaults.audits.elasticsearch_tls_verify_certificate)
