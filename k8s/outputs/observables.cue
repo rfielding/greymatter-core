@@ -42,16 +42,16 @@ observables: [
 								value: "/services/audits"
 							}, {
 								name:  "ES_INDEX"
-								value: "gm-audits*"
+								value: defaults.audits.query_index
 							}, {
 								name:  "ES_EDGE_TOPIC"
-								value: "edge"
+								value: defaults.edge.key
 							}, {
 								name:  "TARGET_PRODUCT"
 								value: "gm"
 							}, {
 								name:  "ES_USER"
-								value: "elastic"
+								value: defaults.audits.elasticsearch_username
 							}, {
 								name: "ES_PASSWORD"
 								valueFrom: {
