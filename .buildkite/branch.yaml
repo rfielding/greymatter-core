@@ -68,8 +68,6 @@ steps:
       - generate-manifests
     commands:
       - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
-      - cp ./generated-manifests/operator.yaml ./operator.yaml
-      - cp ./generated-manifests/operator-spire.yaml ./operator_withspire.yaml
       - ./scripts/cibuild release
 
   - label: "test-promote artifacts to staging"
