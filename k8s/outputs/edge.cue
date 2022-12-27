@@ -29,7 +29,7 @@ edge: [
 						#sidecar_container_block & {
 							_Name: defaults.edge.key
 							_volume_mounts: [
-								if defaults.edge.enable_tls == true {
+								if _security_spec.edge.type == "tls" {
 									{
 										name:      "tls-certs"
 										mountPath: "/etc/proxy/tls/edge"
@@ -43,12 +43,12 @@ edge: [
 						},
 					]
 					volumes: #sidecar_volumes + [
-							if defaults.edge.enable_tls == true {
+							if _security_spec.edge.type == "tls" {
 							{
 								name: "tls-certs"
 								secret: {
 									defaultMode: 420
-									secretName: defaults.edge.secret_name
+									secretName: _security_spec.edge.secret_name
 								}
 							}
 						},

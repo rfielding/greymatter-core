@@ -30,7 +30,7 @@ redis_listener_object: #listener & {
 	// this _actually_ connects the cluster to the listener
 	_tcp_upstream: RedisIngressName
 	// custom secret instead of listener helpers because we need to accept multiple subjects in this listener
-	if config.spire {
+	if _security_spec.internal.type == "spire" {
 		secret: #spire_secret & {
 			_name:     Name
 			_subjects: defaults.sidecar_list

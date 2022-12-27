@@ -165,7 +165,7 @@ defaults: {
 		// have different certs for the ingress and internal connections (this is the case for prod)
 		// then you will need to add those certs to another secret and specity that
 		// below at defaults.core_internal_tls_certs.cert_secret.
-		enable_tls:  false
+		enable_tls:  bool | *false @tag(edge_enable_tls,type=bool)
 		secret_name: "gm-edge-ingress-certs"
 		oidc: {
 			// upstream_host is the FQDN of your OIDC service.
@@ -233,6 +233,7 @@ defaults: {
 	}
 
 	core_internal_tls_certs: {
+		enable: bool | *defaults.edge.enable_tls @tag(internal_enable_tls,type=bool)
 		// use npe cert for internal mtls
 		// Name of kubernetes secret to be mounted
 		cert_secret: string | *defaults.edge.secret_name

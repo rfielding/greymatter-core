@@ -4,7 +4,7 @@
 package greymatter
 
 _sslRequired: *"none" | string
-if defaults.edge.enable_tls {_sslRequired: "external"}
+if _security_spec.edge.type == "tls" {_sslRequired: "external"}
 
 realm_data: {
 	"id":                                  "fd023dcc-aaec-4001-aafe-56988e38eaea"
