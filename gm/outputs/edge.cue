@@ -17,7 +17,10 @@ edge_config: [
 	// This domain is special because it uses edge certs instead of sidecar certs.  This secures outside -> in traffic
 	#domain & {
 		domain_key:        defaults.edge.key
-		_force_https:      defaults.edge.enable_tls
+		_force_https:[
+			if _security_spec.edge.type == "tls" {true}
+			if _security_spec.edge.type == "plaintext" {false}
+		][0]
 		_trust_file:       "/etc/proxy/tls/edge/ca.crt"
 		_certificate_path: "/etc/proxy/tls/edge/server.crt"
 		_key_path:         "/etc/proxy/tls/edge/server.key"
@@ -31,15 +34,15 @@ edge_config: [
 		_enable_fault_injection:     false
 		_enable_ext_authz:           false
 		_oidc_endpoint:              defaults.edge.oidc.endpoint
-		_edge_protocol:              string | *"http"
-		if defaults.edge.enable_tls == true {
-			_edge_protocol: "https"
-		}
+		_edge_protocol:[
+			if _security_spec.edge.type == "tls" {"https"}
+			if _security_spec.edge.type == "plaintext" {"http"}
+		][0]
 		_oidc_service_url:   "\(_edge_protocol)://\(defaults.edge.oidc.edge_domain):\(defaults.ports.edge_ingress)"
 		_oidc_client_id:     defaults.edge.oidc.client_id
 		_oidc_client_secret: defaults.edge.oidc.client_secret
 		_oidc_cookie_domain: defaults.edge.oidc.edge_domain
-		_oidc_realm:         defaults.edge.oidc.realm
+		_oidc_realm: defaults.edge.oidc.realm
 	},
 	// This cluster must exist (though it never receives traffic)
 	// so that Catalog will be able to look-up edge instances

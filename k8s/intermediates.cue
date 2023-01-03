@@ -29,7 +29,7 @@ import (
 		{name: "XDS_ZONE", value:             mesh.spec.zone},
 		{name: "XDS_HOST", value:             defaults.xds_host},
 		{name: "XDS_PORT", value:             "50000"},
-		if config.spire {
+		if _security_spec.internal.type == "spire" {
 			{name: "SPIRE_PATH", value: "\(defaults.spire.socket_mount_path)/agent.sock"}
 		},
 	]
@@ -49,29 +49,30 @@ import (
 }
 
 #sidecar_volume_mounts: {
-	if config.spire && defaults.spire.host_mount_socket {
+	if _security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket {
 		[{
 			name:      "spire-socket"
 			mountPath: defaults.spire.socket_mount_path
 		}]
 	}
-	if defaults.edge.enable_tls && !(config.spire && defaults.spire.host_mount_socket) {
+	if _security_spec.edge.type == "tls" && !(_security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket) {
 		[{
 			name: "internal-tls-certs"
 			mountPath: "/etc/proxy/tls/sidecar/"
 		}]
 	}
+
 	[...]
 }
 
 #sidecar_volumes: {
-	if config.spire && defaults.spire.host_mount_socket {
+	if _security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket {
 		[{
 			name: "spire-socket"
 			hostPath: {path: defaults.spire.socket_mount_path, type: "DirectoryOrCreate"}
 		}]
 	}
-	if defaults.edge.enable_tls && !(config.spire && defaults.spire.host_mount_socket) {
+	if _security_spec.edge.type == "tls" && !(_security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket) {
 		[{
 			name: "internal-tls-certs"
 			secret: {defaultMode: 420, secretName: defaults.edge.secret_name}
@@ -81,7 +82,7 @@ import (
 }
 
 #spire_permission_requests: {
-	if config.spire && defaults.spire.host_mount_socket {
+	if _security_spec.internal.type == "spire" && defaults.spire.host_mount_socket {
 		hostPID: true
 		// hostNetwork: true
 		// dnsPolicy: "ClusterFirstWithHostNet"

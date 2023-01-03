@@ -196,7 +196,7 @@ operator_k8s: [
 			"overrides.cue": """
       package greymatter
       config: {
-        spire: \(config.spire)
+        spire: \(_security_spec.internal.type == "spire")
         openshift: \(config.openshift)
         enable_historical_metrics: \(config.enable_historical_metrics)
         auto_copy_image_pull_secret: \(config.auto_copy_image_pull_secret)

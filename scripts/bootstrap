@@ -2,7 +2,7 @@
 
 set -e
 
-for dependency in git
+for dependency in git pip3 pytest
 do
   if ! which $dependency &> /dev/null; then
     echo "$dependency is missing from your \$PATH"

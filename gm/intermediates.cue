@@ -45,7 +45,8 @@ import (
 	_trust_file:       string | *"/etc/proxy/tls/sidecar/ca.crt"
 	_certificate_path: string | *"/etc/proxy/tls/sidecar/server.crt"
 	_key_path:         string | *"/etc/proxy/tls/sidecar/server.key"
-	if _force_https == true || (strings.Contains(domain_key, "_ingress") && defaults.edge.enable_tls) {
+	if (_security_spec.edge.type == "tls" && name == defaults.edge.key ) || ( _security_spec.internal.type == "manual-certs" && name != defaults.edge.key) || _force_https{
+	// if _force_https == true || (strings.Contains(domain_key, "_ingress") && _security_spec.edge.type == "tls") {
 		force_https: true
 		ssl_config:  greymatter.#SSLConfig & {
 			// Specify a TLS Protocol to use when communicating
@@ -487,7 +488,7 @@ import (
 		}
 	}
 
-	if config.spire && _spire_self != _|_ {
+	if _security_spec.internal.type == "spire" && _spire_self != _|_ {
 		secret: #spire_secret & {
 			// Expects _name and _subject to be passed in like so from above:
 			// _spire_self: "dashboard"
@@ -526,7 +527,7 @@ import (
 	if _upstream_port != _|_ {
 		instances: [{host: _upstream_host, port: _upstream_port}]
 	}
-	if config.spire && _spire_other != _|_ {
+	if _security_spec.internal.type == "spire" && _spire_other != _|_ {
 		require_tls: true
 		secret:      #spire_secret & {
 			// Expects _name and _subject to be passed in like so from above:
@@ -537,14 +538,16 @@ import (
 		}
 	}
 
-	if (defaults.edge.enable_tls && !(strings.Contains(cluster_key, "_ingress")) ) || _force_https {
-		require_tls: true
-		ssl_config: {
-			cert_key_pairs: [{
-				certificate_path: _certificate_path
-				key_path:         _key_path
-			}]
-			trust_file: _trust_file
+	if name != "edge"{
+		if ( _security_spec.edge.type == "tls" && name == defaults.edge.key ) || (_security_spec.internal.type == "manual-certs" && !strings.Contains(cluster_key, "_ingress")) || _force_https {
+			require_tls: true
+			ssl_config: {
+				cert_key_pairs: [{
+					certificate_path: _certificate_path
+					key_path:         _key_path
+				}]
+				trust_file: _trust_file
+			}
 		}
 	}
 	zone_key: mesh.spec.zone
