@@ -1,2 +1,3 @@
 /greymatter-download*.sh
 release-versions.yaml
+scripts/__pycache__
