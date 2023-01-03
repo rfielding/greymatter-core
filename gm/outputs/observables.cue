@@ -18,12 +18,18 @@ observables_config: [
 		_gm_observables_topic: Name
 		_is_ingress:           true
 	},
-	#cluster & {cluster_key: ObservablesAppIngressName, _upstream_port: 5000},
-	#route & {route_key:     ObservablesAppIngressName},
+	#cluster & {
+		cluster_key: ObservablesAppIngressName
+		_upstream_port: 5000
+	},
+	#route & {
+		route_key:     ObservablesAppIngressName
+	},
 
 	// egress -> redis
 	#domain & {
-		domain_key: EgressToRedisName, port: defaults.ports.redis_ingress
+		domain_key: EgressToRedisName
+		port: defaults.ports.redis_ingress
 	},
 	#cluster & {
 		cluster_key:  EgressToRedisName
@@ -32,7 +38,9 @@ observables_config: [
 		_spire_other: defaults.redis_cluster_name
 	},
 	// unused route must exist for the cluster to be registered with sidecar
-	#route & {route_key: EgressToRedisName},
+	#route & {
+		route_key: EgressToRedisName
+	},
 	#listener & {
 		listener_key: EgressToRedisName
 		// egress listeners are local-only
@@ -55,7 +63,9 @@ observables_config: [
 		_upstream_port: defaults.audits.elasticsearch_port
 	},
 	// unused route must exist for the cluster to be registered with sidecar
-	#route & {route_key: EgressToElasticSearchName},
+	#route & {
+		route_key: EgressToElasticSearchName
+	},
 	#listener & {
 		listener_key: EgressToElasticSearchName
 		// egress listeners are local-only

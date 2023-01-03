@@ -18,7 +18,9 @@ remote_jwks_config: [
 		}
 		require_tls: true
 	},
-	#route & {route_key: EdgeToKeycloakName},
+	#route & {
+		route_key: EdgeToKeycloakName
+	},
 	#listener & {
 		listener_key: EdgeToKeycloakName
 		port:         defaults.edge.oidc.remote_jwks_egress_port

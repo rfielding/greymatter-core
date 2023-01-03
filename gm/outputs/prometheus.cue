@@ -41,7 +41,9 @@ prometheus_config: [
 		}
 	},
 
-	#route & {route_key: LocalName},
+	#route & {
+		route_key: LocalName
+	},
 
 	// egress -> redis
 	#domain & {

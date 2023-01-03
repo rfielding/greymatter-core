@@ -17,8 +17,13 @@ dashboard_config: [
 		_gm_observables_topic: Name
 		_is_ingress:           true
 	},
-	#cluster & {cluster_key: LocalName, _upstream_port: 1337},
-	#route & {route_key:     LocalName},
+	#cluster & {
+		cluster_key: LocalName
+		_upstream_port: 1337
+	},
+	#route & {
+		route_key:     LocalName
+	},
 
 	// egress -> redis
 	#domain & {
@@ -32,7 +37,9 @@ dashboard_config: [
 		_spire_other: defaults.redis_cluster_name
 	},
 	// unused route must exist for the cluster to be registered with sidecar
-	#route & {route_key: EgressToRedisName},
+	#route & {
+		route_key: EgressToRedisName
+	},
 	#listener & {
 		listener_key: EgressToRedisName
 		// egress listeners are local-only

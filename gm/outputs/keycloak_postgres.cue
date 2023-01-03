@@ -23,8 +23,13 @@ keycloak_postgres_config: [
 		_spire_self:   Name
 		_tcp_upstream: KeycloakPostgresIngressName
 	},
-	#cluster & {cluster_key: KeycloakPostgresIngressName, _upstream_port: 5432},
-	#route & {route_key:     KeycloakPostgresIngressName},
+	#cluster & {
+		cluster_key: KeycloakPostgresIngressName
+		_upstream_port: 5432
+	},
+	#route & {
+		route_key:     KeycloakPostgresIngressName
+	},
 
 	// egress -> redis
 	#domain & {
@@ -38,7 +43,9 @@ keycloak_postgres_config: [
 		_spire_other: defaults.redis_cluster_name
 	},
 	// unused route must exist for the cluster to be registered with sidecar
-	#route & {route_key: EgressToRedisName},
+	#route & {
+		route_key: EgressToRedisName
+	},
 	#listener & {
 		listener_key: EgressToRedisName
 		// egress listeners are local-only

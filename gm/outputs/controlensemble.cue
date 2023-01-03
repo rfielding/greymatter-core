@@ -10,22 +10,27 @@ controlensemble_config: [
 
 	// Control API HTTP ingress
 	#domain & {
-    domain_key: ControlAPIIngressName
-  },
+		domain_key: ControlAPIIngressName
+	},
 	#listener & {
 		listener_key:          ControlAPIIngressName
 		_spire_self:           Name
 		_gm_observables_topic: Name
 		_is_ingress:           true
 	},
-	#cluster & {cluster_key: ControlAPIIngressName, _upstream_port: 5555},
-	#route & {route_key:     ControlAPIIngressName},
+	#cluster & {
+		cluster_key: ControlAPIIngressName
+		_upstream_port: 5555
+	},
+	#route & {
+		route_key:     ControlAPIIngressName
+	},
 
 	// egress->redis
 	#domain & {
-    domain_key: EgressToRedisName
-    port: defaults.ports.redis_ingress
-  },
+		domain_key: EgressToRedisName
+		port: defaults.ports.redis_ingress
+	},
 	#cluster & {
 		cluster_key:  EgressToRedisName
 		name:         defaults.redis_cluster_name
@@ -33,7 +38,9 @@ controlensemble_config: [
 		_spire_other: defaults.redis_cluster_name
 	},
 	// unused route must exist for the cluster to be registered with sidecar
-	#route & {route_key: EgressToRedisName},
+	#route & {
+		route_key: EgressToRedisName
+	},
 	#listener & {
 		listener_key: EgressToRedisName
 		// egress listeners are local-only

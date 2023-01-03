@@ -61,7 +61,9 @@ edge_config: [
 		_spire_self:  defaults.edge.key
 		_spire_other: defaults.redis_cluster_name
 	},
-	#route & {route_key: egress_to_redis},
+	#route & {
+		route_key: egress_to_redis
+	},
 	#listener & {
 		listener_key: egress_to_redis
 		// egress listeners are local-only

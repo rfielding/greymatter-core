@@ -10,22 +10,27 @@ catalog_config: [
 
 	// Catalog HTTP ingress
 	#domain & {
-    domain_key: CatalogIngressName
-  },
+		domain_key: CatalogIngressName
+	},
 	#listener & {
 		listener_key:          CatalogIngressName
 		_spire_self:           Name
 		_gm_observables_topic: Name
 		_is_ingress:           true
 	},
-	#cluster & {cluster_key: CatalogIngressName, _upstream_port: 8080},
-	#route & {route_key:     CatalogIngressName},
+	#cluster & {
+		cluster_key: CatalogIngressName
+		_upstream_port: 8080
+	},
+	#route & {
+		route_key:     CatalogIngressName
+	},
 
 	// egress -> redis
 	#domain & {
-    domain_key: EgressToRedisName
-    port: defaults.ports.redis_ingress
-  },
+		domain_key: EgressToRedisName
+		port: defaults.ports.redis_ingress
+	},
 	#cluster & {
 		cluster_key:  EgressToRedisName
 		name:         defaults.redis_cluster_name
@@ -33,7 +38,9 @@ catalog_config: [
 		_spire_other: defaults.redis_cluster_name
 	},
 	// unused route must exist for the cluster to be registered with sidecar
-	#route & {route_key: EgressToRedisName},
+	#route & {
+		route_key: EgressToRedisName
+	},
 	#listener & {
 		listener_key: EgressToRedisName
 		// egress listeners are local-only
