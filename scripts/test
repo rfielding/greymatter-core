@@ -3,7 +3,7 @@
 set -uo pipefail
 
 cmd_eval_all () {
-  cmd_eval_gm
+  cmd_eval_gm_basic
   cmd_eval_k8s
   cmd_eval_spire
   cmd_eval_k8s_spire_enabled_and_edge_tls_enabled
@@ -13,7 +13,7 @@ cmd_eval_all () {
   cmd_eval_gm
 }
 
-cmd_eval_gm () {
+cmd_eval_gm_basic () {
   echo "Running cue eval on greymatter configs..."
   result=$(cue eval -c ./gm/outputs --out json)
   if echo $result | jq -e 'has("controlensemble_config")' >/dev/null; then

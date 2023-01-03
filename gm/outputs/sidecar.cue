@@ -11,18 +11,28 @@ package greymatter
 
 	objects: [
 		// sidecar -> local service
-		#domain & {domain_key: LocalName},
+		#domain & {
+			domain_key: LocalName
+		},
 		#listener & {
 			listener_key:          LocalName
 			_spire_self:           Name
 			_gm_observables_topic: Name
 			_is_ingress:           true
 		},
-		#cluster & {cluster_key: LocalName, _upstream_port: Port},
-		#route & {route_key:     LocalName},
+		#cluster & {
+			cluster_key: LocalName
+			_upstream_port: Port
+		},
+		#route & {
+			route_key:     LocalName
+		},
 
 		// egress -> redis
-		#domain & {domain_key: EgressToRedisName, port: defaults.ports.redis_ingress},
+		#domain & {
+			domain_key: EgressToRedisName
+			port: defaults.ports.redis_ingress
+		},
 		#cluster & {
 			cluster_key:  EgressToRedisName
 			name:         defaults.redis_cluster_name
@@ -30,7 +40,9 @@ package greymatter
 			_spire_other: defaults.redis_cluster_name
 		},
 		// unused route must exist for the cluster to be registered with sidecar
-		#route & {route_key: EgressToRedisName},
+		#route & {
+			route_key: EgressToRedisName
+		},
 		#listener & {
 			listener_key: EgressToRedisName
 			// egress listeners are local-only
