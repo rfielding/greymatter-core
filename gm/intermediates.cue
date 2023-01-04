@@ -12,7 +12,6 @@ import (
 	ext_authz "envoyproxy.io/extensions/filters/http/ext_authz/v3"
 	ext_authz_tcp "envoyproxy.io/extensions/filters/network/ext_authz/v3"
 	lua "envoyproxy.io/extensions/filters/http/lua/v3"
-	"strings"
 )
 
 /////////////////////////////////////////////////////////////
@@ -45,8 +44,28 @@ import (
 	_trust_file:       string | *"/etc/proxy/tls/sidecar/ca.crt"
 	_certificate_path: string | *"/etc/proxy/tls/sidecar/server.crt"
 	_key_path:         string | *"/etc/proxy/tls/sidecar/server.key"
-	if (_security_spec.edge.type == "tls" && name == defaults.edge.key ) || ( _security_spec.internal.type == "manual-certs" && name != defaults.edge.key) || _force_https{
-	// if _force_https == true || (strings.Contains(domain_key, "_ingress") && _security_spec.edge.type == "tls") {
+
+	_enable_ssl_block:[
+		if (domain_key != defaults.edge.key && (_security_spec.internal.type == "manual-tls" || _security_spec.internal.type == "manual-mtls")) {true}
+		if (domain_key == defaults.edge.key && (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls" )) {true}
+		if _security_spec.internal.type == "plaintext" {false}
+		if _security_spec.internal.type == "spire" {false}
+	][0]
+
+	if  _enable_ssl_block{
+		if domain_key != defaults.edge.key {
+			_require_client_certs:[
+				if _security_spec.internal.type == "manual-tls" {false}
+				if _security_spec.internal.type == "manual-mtls" {true}
+			][0]
+		}
+		if domain_key == defaults.edge.key {
+			_require_client_certs:[
+				if _security_spec.edge.type == "tls" {false}
+				if _security_spec.edge.type == "mtls" {true}
+			][0]
+		}
+
 		force_https: true
 		ssl_config:  greymatter.#SSLConfig & {
 			// Specify a TLS Protocol to use when communicating
@@ -538,18 +557,25 @@ import (
 		}
 	}
 
-	if name != "edge"{
-		if ( _security_spec.edge.type == "tls" && name == defaults.edge.key ) || (_security_spec.internal.type == "manual-certs" && !strings.Contains(cluster_key, "_ingress")) || _force_https {
-			require_tls: true
-			ssl_config: {
-				cert_key_pairs: [{
-					certificate_path: _certificate_path
-					key_path:         _key_path
-				}]
-				trust_file: _trust_file
-			}
+	_enable_ssl_block:[
+		if (_security_spec.internal.type == "manual-mtls") {true}
+		if (_security_spec.internal.type == "manual-tls") {true}
+		if ( _security_spec.internal.type == "plaintext" ) {false}
+		if ( _security_spec.internal.type == "spire") {false}
+	][0]
+
+	// if len(instances) == 0 then it is using service discovery (so a cluster from a sidecar going to another sidecar)
+	if  (name != defaults.edge.key && _enable_ssl_block && len(instances) == 0) || _force_https {
+		require_tls: true
+		ssl_config: {
+			cert_key_pairs: [{
+				certificate_path: _certificate_path
+				key_path:         _key_path
+			}]
+			trust_file: _trust_file
 		}
 	}
+
 	zone_key: mesh.spec.zone
 
 	if _enable_circuit_breakers {
