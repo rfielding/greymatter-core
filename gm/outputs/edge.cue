@@ -18,12 +18,16 @@ edge_config: [
 	#domain & {
 		domain_key:        defaults.edge.key
 		_force_https:[
-			if _security_spec.edge.type == "tls" {true}
+			if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") {true}
 			if _security_spec.edge.type == "plaintext" {false}
 		][0]
 		_trust_file:       "/etc/proxy/tls/edge/ca.crt"
 		_certificate_path: "/etc/proxy/tls/edge/server.crt"
 		_key_path:         "/etc/proxy/tls/edge/server.key"
+		_require_client_certs: [
+			if _security_spec.edge.type == "mtls" {true}
+			if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "plaintext") {false}
+		][0]
 	},
 	#listener & {
 		listener_key:                defaults.edge.key
@@ -35,7 +39,7 @@ edge_config: [
 		_enable_ext_authz:           false
 		_oidc_endpoint:              defaults.edge.oidc.endpoint
 		_edge_protocol:[
-			if _security_spec.edge.type == "tls" {"https"}
+			if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") {"https"}
 			if _security_spec.edge.type == "plaintext" {"http"}
 		][0]
 		_oidc_service_url:   "\(_edge_protocol)://\(defaults.edge.oidc.edge_domain):\(defaults.ports.edge_ingress)"

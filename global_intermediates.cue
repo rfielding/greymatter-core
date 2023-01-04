@@ -8,13 +8,13 @@ package greymatter
 //     tls edge + spire internal
 #SecuritySpecv1:{
     edge:{
-        type: "plaintext" | "tls"
+        type: "plaintext" | "tls" | "mtls"
         secret_name: string
     }
 
     internal:{
         type: [
-            if (edge.type == "tls"){ "plaintext" | "spire" | "manual-certs"}
+            if (edge.type == "tls" || edge.type == "mtls") { "plaintext" | "spire" | "manual-certs"}
             if (edge.type =="plaintext") { "plaintext" | "spire"}
         ][0]
         spire:{
@@ -36,7 +36,8 @@ package greymatter
 _security_spec: #SecuritySpecv1 &{
     edge:{
         type: [
-            if defaults.edge.enable_tls == true {"tls"}
+            if (defaults.edge.enable_tls == true && defaults.edge.require_client_certs == false){"tls"}
+            if (defaults.edge.enable_tls == true && defaults.edge.require_client_certs == true){"mtls"}
             if defaults.edge.enable_tls == false {"plaintext"}
         ][0]
         secret_name: defaults.edge.secret_name

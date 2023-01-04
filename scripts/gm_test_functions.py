@@ -101,13 +101,43 @@ def build_mesh_from_cue(my_cue_json):
 def pretty_print(x):
     print(json.dumps(x, indent=2))
 
-# TEST 1
+
+def test_ssl_plaintext_edge_but_edge_require_client_certs_true():
+    # this should not enable require_client_certs (falls back to no tls)
+    test_tag_dict={
+        "edge_enable_tls": "false",
+        "edge_require_client_certs": "false",
+        "internal_enable_tls": "false",
+        "spire": "false",
+    }
+
+    # evaluate cue and extract mesh configs
+    r = cue_eval(test_tag_dict)
+    m1=build_mesh_from_cue(r)
+    m1.total_objects
+    
+    # assertions
+    # ALL DOMAINS SHOULD NOT HAVE SSL CONFIG
+    test_schema= copy.deepcopy(constant.DOMAIN_SCHEMA)
+    test_schema.update({"required": ["ssl_config"]})
+    for i in m1.domain_dict:
+            assert is_x(m1.domain_dict.get(i),test_schema) == False
+    
+    # ALL CLUSTERS SHOULD HAVE NO SSL ENABLED 
+    test_schema2=copy.deepcopy(constant.CLUSTER_SCHEMA)
+    test_schema2.update({"required": ["ssl_config"]})
+    for i in m1.cluster_dict:
+        LOGGER.info(i)
+        assert is_x(m1.cluster_dict.get(i),test_schema) == False
+
+
 def test_ssl_spire_only_true():
     # define tag dictionary
     test_tag_dict={
-        "spire": "true",
+        "edge_enable_tls": "false",
+        "edge_require_client_certs": "false",
         "internal_enable_tls": "false",
-        "edge_enable_tls": "false"
+        "spire": "true",
     }
 
     # evaluate cue and extract mesh configs
@@ -124,16 +154,15 @@ def test_ssl_spire_only_true():
         has_instance=False
         if len(m1.cluster_dict.get(i)["instances"]) > 0:
             has_instance=is_x(m1.cluster_dict.get(i)["instances"][0], constant.HOST_PORT_SCHEMA)
-
+        
+        LOGGER.info(m1.cluster_dict.get(i))
         if has_instance:
             # local
             # assert all non edge clusters (with instances) do not have spire secrets
-            LOGGER.info(m1.cluster_dict.get(i))
             LOGGER.info(is_x(m1.cluster_dict.get(i),test_schema))
             assert is_x(m1.cluster_dict.get(i),test_schema) == False
         else:
             # inter sidecar
-            LOGGER.info(m1.cluster_dict.get(i))
             LOGGER.info(is_x(m1.cluster_dict.get(i),test_schema))
             assert is_x(m1.cluster_dict.get(i),test_schema) == True
 
@@ -151,13 +180,13 @@ def test_ssl_spire_only_true():
         assert is_x(m1.domain_dict.get(i),test_schema3) == False
 
 
-# TEST 2
 def test_ssl_internal_tls_only():
     # should fail to evaluate
     test_tag_dict={
-        "spire": "false",
+        "edge_enable_tls": "false",
+        "edge_require_client_certs": "false",
         "internal_enable_tls": "true",
-        "edge_enable_tls": "false"
+        "spire": "false",
     }
     # TODO: WELL THIS IS A HACK LOL.  exception should be from sub proccess (really cue eval of _security_spec schema will not allow this)
     foundException=False
@@ -170,12 +199,13 @@ def test_ssl_internal_tls_only():
     # assertions
     assert foundException == True
 
-# TEST 3
+
 def test_ssl_edge_tls_only():
     test_tag_dict={
-        "spire": "false",
+        "edge_enable_tls": "true",
+        "edge_require_client_certs": "false",
         "internal_enable_tls": "false",
-        "edge_enable_tls": "true"
+        "spire": "false",
     }
 
     # evaluate cue and extract mesh configs
@@ -184,12 +214,14 @@ def test_ssl_edge_tls_only():
 
     # assertions
     # only edge domain should have ssl block
+    # edge should not require_client_certs
     test_schema= copy.deepcopy(constant.DOMAIN_SCHEMA)
     test_schema.update({"required": ["ssl_config"]})
     for i in m1.domain_dict:
         if i == "edge":
             # edge domain should have an ssl_config
             assert is_x(m1.domain_dict.get(i),test_schema) == True
+            assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == False
         else:
             # all non edge should be false
             assert is_x(m1.domain_dict.get(i),test_schema) == False
@@ -209,12 +241,53 @@ def test_ssl_edge_tls_only():
         assert is_x(m1.cluster_dict.get(i),test_schema3) == False
 
 
-# TEST 4
+def test_ssl_edge_mtls_only():
+    test_tag_dict={
+        "edge_enable_tls": "true",
+        "edge_require_client_certs": "true",
+        "internal_enable_tls": "false",
+        "spire": "false",
+    }
+
+    # evaluate cue and extract mesh configs
+    r = cue_eval(test_tag_dict)
+    m1=build_mesh_from_cue(r)
+
+    # assertions
+    # only edge domain should have ssl block
+    # edge should not require_client_certs
+    test_schema= copy.deepcopy(constant.DOMAIN_SCHEMA)
+    test_schema.update({"required": ["ssl_config"]})
+    for i in m1.domain_dict:
+        if i == "edge":
+            # edge domain should have an ssl_config
+            assert is_x(m1.domain_dict.get(i),test_schema) == True
+            assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == True
+        else:
+            # all non edge should be false
+            assert is_x(m1.domain_dict.get(i),test_schema) == False
+
+    # no clusters should have ssl_config block
+    test_schema2= copy.deepcopy(constant.CLUSTER_SCHEMA)
+    test_schema2.update({"required": ["ssl_config"]})
+    for i in m1.cluster_dict:
+        LOGGER.info(m1.cluster_dict.get(i))
+        assert is_x(m1.cluster_dict.get(i),test_schema2) == False
+    
+    # no clusters should have secret block
+    test_schema3= copy.deepcopy(constant.CLUSTER_SCHEMA)
+    test_schema3.update({"required": ["secret"]})
+    for i in m1.cluster_dict:
+        LOGGER.info(m1.cluster_dict.get(i))
+        assert is_x(m1.cluster_dict.get(i),test_schema3) == False
+
+
 def test_ssl_edge_and_internal_tls_true():
     test_tag_dict={
-        "spire": "false",
+        "edge_enable_tls": "true",
+        "edge_require_client_certs": "false",
         "internal_enable_tls": "true",
-        "edge_enable_tls": "true"
+        "spire": "false",
     }
 
     # evaluate cue and extract mesh configs
@@ -235,24 +308,52 @@ def test_ssl_edge_and_internal_tls_true():
     for i in (i for i in m1.cluster_dict if i != "edge"):
         LOGGER.info(i)
     for i in (i for i in m1.cluster_dict if i != "edge"):
+        LOGGER.info(m1.cluster_dict.get(i))
         if len(m1.cluster_dict.get(i)["instances"]) == 0:
-            LOGGER.info("%s should have ssl configs" % i)
-            LOGGER.info(m1.cluster_dict.get(i))
             assert is_x(m1.cluster_dict.get(i),test_schema2) == True
         # observables_egress_to_elasticsearch is hardcoded to retuire_tls in gm/outputs/observables.cue
         elif m1.cluster_dict.get(i)["cluster_key"] == "observables_egress_to_elasticsearch":
             assert is_x(m1.cluster_dict.get(i),test_schema2) == True
         else:
-            LOGGER.info("%s should not have ssl configs" % i)
-            LOGGER.info(m1.cluster_dict.get(i))
             assert is_x(m1.cluster_dict.get(i),test_schema2) == False
 
-# TEST 5
+
+def test_ssl_plaintext_edge_but_edge_require_client_certs_true():
+    # this should not enable require_client_certs (falls back to no tls)
+    test_tag_dict={
+        "edge_enable_tls": "false",
+        "edge_require_client_certs": "true",
+        "internal_enable_tls": "false",
+        "spire": "false",
+    }
+
+    # evaluate cue and extract mesh configs
+    r = cue_eval(test_tag_dict)
+    m1=build_mesh_from_cue(r)
+    m1.total_objects
+    
+    # assertions
+    # ALL DOMAINS SHOULD NOT HAVE SSL CONFIG
+    test_schema= copy.deepcopy(constant.DOMAIN_SCHEMA)
+    test_schema.update({"required": ["ssl_config"]})
+    for i in m1.domain_dict:
+            LOGGER.info(m1.domain_dict.get(i))
+            assert is_x(m1.domain_dict.get(i),test_schema) == False
+    
+    # ALL CLUSTERS SHOULD HAVE NO SSL ENABLED 
+    test_schema2=copy.deepcopy(constant.CLUSTER_SCHEMA)
+    test_schema2.update({"required": ["ssl_config"]})
+    for i in m1.cluster_dict:
+        LOGGER.info(m1.cluster_dict.get(i))
+        assert is_x(m1.cluster_dict.get(i),test_schema) == False
+
+
 def test_ssl_edge_and_spire_tls_true():
     test_tag_dict={
-        "spire": "true",
+        "edge_enable_tls": "true",
+        "edge_require_client_certs": "false",
         "internal_enable_tls": "false",
-        "edge_enable_tls": "true"
+        "spire": "true",
     }
 
     # evaluate cue and extract mesh configs
@@ -270,17 +371,13 @@ def test_ssl_edge_and_spire_tls_true():
         has_instance=False
         if len(m1.cluster_dict.get(i)["instances"]) > 0:
             has_instance=is_x(m1.cluster_dict.get(i)["instances"][0], constant.HOST_PORT_SCHEMA)
-
+        LOGGER.info(m1.cluster_dict.get(i))
         if has_instance:
             # local
             # assert all non edge clusters (with instances) do not have spire secrets
-            LOGGER.info(m1.cluster_dict.get(i))
-            LOGGER.info(is_x(m1.cluster_dict.get(i),test_schema))
             assert is_x(m1.cluster_dict.get(i),test_schema) == False
         else:
             # inter sidecar
-            LOGGER.info(m1.cluster_dict.get(i))
-            LOGGER.info(is_x(m1.cluster_dict.get(i),test_schema))
             assert is_x(m1.cluster_dict.get(i),test_schema) == True
 
     # no clusters should have ssl config block
@@ -299,13 +396,14 @@ def test_ssl_edge_and_spire_tls_true():
         else:
             assert is_x(m1.domain_dict.get(i),test_schema3) == False
 
-# TEST 6
-def test_ssl_spire_takes_presidence_over_internal_tls():
+
+def test_ssl_spire_takes_precedence_over_internal_tls():
     # define tag dictionary
     test_tag_dict={
-        "spire": "true",
+        "edge_enable_tls": "false",
+        "edge_require_client_certs": "false",
         "internal_enable_tls": "true",
-        "edge_enable_tls": "false"
+        "spire": "true",
     }
 
     # evaluate cue and extract mesh configs
@@ -323,16 +421,13 @@ def test_ssl_spire_takes_presidence_over_internal_tls():
         if len(m1.cluster_dict.get(i)["instances"]) > 0:
             has_instance=is_x(m1.cluster_dict.get(i)["instances"][0], constant.HOST_PORT_SCHEMA)
 
+        LOGGER.info(m1.cluster_dict.get(i))
         if has_instance:
             # local
             # assert all non edge clusters (with instances) do not have spire secrets
-            LOGGER.info(m1.cluster_dict.get(i))
-            LOGGER.info(is_x(m1.cluster_dict.get(i),test_schema))
             assert is_x(m1.cluster_dict.get(i),test_schema) == False
         else:
             # inter sidecar
-            LOGGER.info(m1.cluster_dict.get(i))
-            LOGGER.info(is_x(m1.cluster_dict.get(i),test_schema))
             assert is_x(m1.cluster_dict.get(i),test_schema) == True
 
     # no cluster should have a tls block
@@ -346,6 +441,7 @@ def test_ssl_spire_takes_presidence_over_internal_tls():
     test_schema3= copy.deepcopy(constant.DOMAIN_SCHEMA)
     test_schema3.update({"required": ["ssl_config"]})
     for i in m1.domain_dict:
+        LOGGER.info(m1.domain_dict.get(i))
         assert is_x(m1.domain_dict.get(i),test_schema3) == False
 
 def print_dict_keys(a_dict):

@@ -55,7 +55,7 @@ import (
 			mountPath: defaults.spire.socket_mount_path
 		}]
 	}
-	if _security_spec.edge.type == "tls" && !(_security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket) {
+	if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") && !(_security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket) {
 		[{
 			name: "internal-tls-certs"
 			mountPath: "/etc/proxy/tls/sidecar/"
@@ -72,7 +72,7 @@ import (
 			hostPath: {path: defaults.spire.socket_mount_path, type: "DirectoryOrCreate"}
 		}]
 	}
-	if _security_spec.edge.type == "tls" && !(_security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket) {
+	if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") && !(_security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket) {
 		[{
 			name: "internal-tls-certs"
 			secret: {defaultMode: 420, secretName: defaults.edge.secret_name}

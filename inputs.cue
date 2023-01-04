@@ -166,6 +166,7 @@ defaults: {
 		// then you will need to add those certs to another secret and specity that
 		// below at defaults.core_internal_tls_certs.cert_secret.
 		enable_tls:  bool | *false @tag(edge_enable_tls,type=bool)
+		require_client_certs: bool | *false @tag(edge_require_client_certs, type=bool)
 		secret_name: "gm-edge-ingress-certs"
 		oidc: {
 			// upstream_host is the FQDN of your OIDC service.
