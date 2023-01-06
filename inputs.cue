@@ -160,12 +160,13 @@ defaults: {
 		// rely on this value, such as the audit app's queries to Elasticsearch. 
 		// The value should not need to be changed.
 		key: "edge"
-		// edge.enable_tls toggles internal mtls connections between greymatter core components
-		// by default the internal and external secrets are the same however if you want to
-		// have different certs for the ingress and internal connections (this is the case for prod)
-		// then you will need to add those certs to another secret and specity that
-		// below at defaults.core_internal_tls_certs.cert_secret.
+		// To enable TLS on the edge set edge.enable_tls to true.
+		// This config also toggles enables internal TLS across sidecars.  That behavior can be changed 
+		// by setting the toggle defaults.internal.core_internal_tls_certs.enable to true.
 		enable_tls:  bool | *false @tag(edge_enable_tls,type=bool)
+		// To enable mTLS on the edge, edge.require_client_certs should be set to true in addition to edge.enable_tls.
+		// This config also toggles enables internal TLS across sidecars.  That behavior can be changed
+		// by setting the toggle defaults.internal.core_internal_tls_certs.require_client_certs to true.
 		require_client_certs: bool | *false @tag(edge_require_client_certs, type=bool)
 		secret_name: "gm-edge-ingress-certs"
 		oidc: {
@@ -234,9 +235,14 @@ defaults: {
 	}
 
 	core_internal_tls_certs: {
+		// Enables internal TLS (requires defaults.edge.enable_tls == true)
 		enable: bool | *defaults.edge.enable_tls @tag(internal_enable_tls,type=bool)
-		// use npe cert for internal mtls
+		// Enables internal mTLS (requires: defaults.edge.enable_tls == true && defaults.core_internal_tls_certs.enable == true )
+		require_client_certs: bool | *defaults.edge.require_client_certs @tag(internal_require_client_certs, type=bool)
 		// Name of kubernetes secret to be mounted
+		// By default the same secret for external TLS/mTLS will be used for internal TLS/mTLS.
+		// Different certs can be used by specifying a different
+		// secret name in defaults.core_internal_tls_certs.cert_secret.
 		cert_secret: string | *defaults.edge.secret_name
 	}
 

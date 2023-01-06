@@ -17,17 +17,9 @@ edge_config: [
 	// This domain is special because it uses edge certs instead of sidecar certs.  This secures outside -> in traffic
 	#domain & {
 		domain_key:        defaults.edge.key
-		_force_https:[
-			if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") {true}
-			if _security_spec.edge.type == "plaintext" {false}
-		][0]
 		_trust_file:       "/etc/proxy/tls/edge/ca.crt"
 		_certificate_path: "/etc/proxy/tls/edge/server.crt"
 		_key_path:         "/etc/proxy/tls/edge/server.key"
-		_require_client_certs: [
-			if _security_spec.edge.type == "mtls" {true}
-			if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "plaintext") {false}
-		][0]
 	},
 	#listener & {
 		listener_key:                defaults.edge.key

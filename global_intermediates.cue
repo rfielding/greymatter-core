@@ -14,7 +14,7 @@ package greymatter
 
     internal:{
         type: [
-            if (edge.type == "tls" || edge.type == "mtls") { "plaintext" | "spire" | "manual-certs"}
+            if (edge.type == "tls" || edge.type == "mtls") { "plaintext" | "spire" | "manual-tls" | "manual-mtls"}
             if (edge.type =="plaintext") { "plaintext" | "spire"}
         ][0]
         spire:{
@@ -36,21 +36,22 @@ package greymatter
 _security_spec: #SecuritySpecv1 &{
     edge:{
         type: [
+            if defaults.edge.enable_tls == false {"plaintext"}
             if (defaults.edge.enable_tls == true && defaults.edge.require_client_certs == false){"tls"}
             if (defaults.edge.enable_tls == true && defaults.edge.require_client_certs == true){"mtls"}
-            if defaults.edge.enable_tls == false {"plaintext"}
         ][0]
         secret_name: defaults.edge.secret_name
     }
     internal:{
         type: [
             if config.spire == true {"spire"}
-            if defaults.core_internal_tls_certs.enable == true {"manual-certs"}
+            if (defaults.core_internal_tls_certs.enable == true && defaults.core_internal_tls_certs.require_client_certs == false) {"manual-tls"}
+            if (defaults.core_internal_tls_certs.enable == true && defaults.core_internal_tls_certs.require_client_certs == true) {"manual-mtls"}
             "plaintext"
         ][0]
         spire: defaults.spire
         manual:{
             secret_name: defaults.core_internal_tls_certs.cert_secret
-        } 
+        }
     }
 }
