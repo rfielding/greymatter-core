@@ -114,7 +114,7 @@ defaults: {
 		query_index: "gm-audits*"
 		// elasticsearch_host can be an IP address or DNS hostname to your Elasticsearch instance.
 		// It's set to a non-empty value so that the audit-pipeline starts successfully.
-		elasticsearch_host: "localhost"
+		elasticsearch_host: "127.0.0.1"
 		// elasticsearch_port is the port of your Elasticsearch instance.
 		elasticsearch_port: 443
 		// elasticsearch_endpoint is the full endpoint containing protocol, host, and port
@@ -163,12 +163,12 @@ defaults: {
 		// To enable TLS on the edge set edge.enable_tls to true.
 		// This config also toggles enables internal TLS across sidecars.  That behavior can be changed 
 		// by setting the toggle defaults.internal.core_internal_tls_certs.enable to true.
-		enable_tls:  bool | *false @tag(edge_enable_tls,type=bool)
+		enable_tls: bool | *false @tag(edge_enable_tls,type=bool)
 		// To enable mTLS on the edge, edge.require_client_certs should be set to true in addition to edge.enable_tls.
 		// This config also toggles enables internal TLS across sidecars.  That behavior can be changed
 		// by setting the toggle defaults.internal.core_internal_tls_certs.require_client_certs to true.
 		require_client_certs: bool | *false @tag(edge_require_client_certs, type=bool)
-		secret_name: "gm-edge-ingress-certs"
+		secret_name:          "gm-edge-ingress-certs"
 		oidc: {
 			// upstream_host is the FQDN of your OIDC service.
 			upstream_host: "foobar.oidc.com"
