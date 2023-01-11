@@ -42,16 +42,22 @@ operator_sts: [
 						fsGroup: 1000
 					}
 					containers: [{
-						env: [{
-							name: "BUGSNAG_API_TOKEN"
-							valueFrom: {
-								secretKeyRef: {
-									name:     "bugsnag-api-token"
-									key:      "token"
-									optional: true
+						env: [
+							if config.debug {
+								name: "BUGSNAG_API_TOKEN"
+								valueFrom: {
+									secretKeyRef: {
+										name:     "bugsnag-api-token"
+										key:      "token"
+										optional: true
+									}
 								}
 							}
-						}]
+							{
+								name: "SSH_KNOWN_HOSTS"
+								value: "/app/.ssh/known_hosts"
+							}
+						]
 						if !config.debug {
 							// command: ["sleep"] // DEBUG
 							// args: ["30000"]

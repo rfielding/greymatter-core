@@ -1,5 +1,12 @@
 # Changelog
 
+## vNext
+
+### Changed
+
+- Include SSH_KNOWN_HOSTS environment variable in Operator's StatefulSet
+
+
 ## v0.14.0 (December 2nd, 2022)
 
 ### Changed
