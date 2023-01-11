@@ -17,14 +17,16 @@ parse_and_promote(){
     version=$(echo ${image_tag} | awk -F- '{print $1}')
     addl=$(echo ${image_tag} | sed "s|${version}||g")
 
-    if [[ -n ${component} || -n ${version} ]]; then
-        promote_oci ${component} ${version} ${addl}
-        promote_generic ${component} ${version}
-    else
-        echo "Count not promote the image or binary.  promote() was unable to parse a component or version"
-        exit 2
+    if [[ $component != "greymatter-operator" ]]; then
+    
+        if [[ -n ${component} || -n ${version} ]]; then
+            promote_oci ${component} ${version} ${addl}
+            promote_generic ${component} ${version}
+        else
+            echo "Count not promote the image or binary.  promote() was unable to parse a component or version"
+            exit 2
+        fi
     fi
-
 
     if [[ ${dry_run_arg} -eq "" ]]; then
         echo "${component}:${version}" >> release-versions.yaml
