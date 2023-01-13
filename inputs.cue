@@ -40,11 +40,11 @@ mesh: meshv1.#Mesh & {
 		install_namespace: string | *"greymatter"
 		watch_namespaces:  [...string] | *["default", "examples"]
 		images: {
-			proxy:       string | *"greymatter.jfrog.io/release-oci/greymatter-proxy:1.8.1"
-			catalog:     string | *"greymatter.jfrog.io/release-oci/greymatter-catalog:3.0.10"
-			dashboard:   string | *"greymatter.jfrog.io/release-oci/greymatter-dashboard:6.0.6"
-			control:     string | *"greymatter.jfrog.io/release-oci/greymatter-control:1.8.3"
-			control_api: string | *"greymatter.jfrog.io/release-oci/greymatter-control-api:1.8.3"
+			proxy:       string | *"greymatter.jfrog.io/dev-oci/greymatter-proxy:1.8.3"
+			catalog:     string | *"greymatter.jfrog.io/dev-oci/greymatter-catalog:3.0.11"
+			dashboard:   string | *"greymatter.jfrog.io/dev-oci/greymatter-dashboard:6.0.8"
+			control:     string | *"greymatter.jfrog.io/dev-oci/greymatter-control:1.8.7"
+			control_api: string | *"greymatter.jfrog.io/dev-oci/greymatter-control-api:1.8.7"
 			redis:       string | *"index.docker.io/library/redis:6.2.7"
 			prometheus:  string | *"index.docker.io/prom/prometheus:v2.40.1"
 		}
@@ -76,10 +76,10 @@ defaults: {
 	}
 
 	images: {
-		cli:               string | *"greymatter.jfrog.io/release-oci/greymatter-cli:4.5.7"
-		operator:          string | *"greymatter.jfrog.io/release-oci/greymatter-operator:0.14.0" @tag(operator_image)
+		cli:               string | *"greymatter.jfrog.io/dev-oci/greymatter-cli:4.7.1"
+		operator:          string | *"greymatter.jfrog.io/dev-oci/greymatter-operator:0.15.0" @tag(operator_image)
 		vector:            string | *"timberio/vector:0.22.0-debian"
-		observables:       string | *"greymatter.jfrog.io/release-oci/greymatter-audits:1.1.5"
+		observables:       string | *"greymatter.jfrog.io/dev-oci/greymatter-audits:1.1.6"
 		keycloak:          string | *"quay.io/keycloak/keycloak:19.0.3"
 		keycloak_postgres: string | *"postgres:15.0"
 	}
