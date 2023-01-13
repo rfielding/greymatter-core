@@ -2,7 +2,7 @@ agents:
   container_image: ubuntu-2004-ci
 steps:
   # this is in place of automated smoke test
-  - block: "I have run a smoke test on generated inputs-staging.cue"
+  - block: "I have run a smoke test using the inputs-output.cue artifact from merge to main build (under promote artifacts to staging)"
 
   - input: "Information please"
     fields:
