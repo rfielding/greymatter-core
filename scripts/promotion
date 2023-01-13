@@ -76,7 +76,7 @@ promote_oci(){
     # remove fips from add
     addl=$(echo ${addl} | sed 's|-fips||g' )
 
-    src_path=${SRC_OCI}/${component}/${version}${addl}
+    local src_path=${SRC_OCI}/${component}/${version}${addl}
 
     echo "Validating the source image [${src_path}] exist"
     (jf rt search "${src_path}/" --fail-no-op=true)
@@ -96,7 +96,9 @@ promote_generic(){
     component=${1}
     version=${2}
 
-    bins=$(jf rt search "${SRC_GENERIC}/${component}/${component}_${version}*" | jq -r '.[].path')
+    local src_path="${SRC_GENERIC}/${component}/${component}_${version}*"
+
+    bins=$(jf rt search "${src_path}*" | jq -r '.[].path')
     arr=($bins)
     echo "Validating the source generic artifacts in [${src_path}] exist"
     if [[ ${#arr[@]} -gt 0  ]]; then

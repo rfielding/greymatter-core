@@ -97,7 +97,7 @@ steps:
     env:
       SRC_GENERIC_CI: "dev-generic"
       DEST_GENERIC_CI: "ci-staging-generic"
-      SRC_OCI_CI: "release-oci"
+      SRC_OCI_CI: "dev-oci"
       DEST_OCI_CI: "ci-staging-oci"
     # promotion defaults to dry run
     command: ./scripts/promotion 
