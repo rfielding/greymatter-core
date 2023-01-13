@@ -1,7 +1,5 @@
 # Changelog
 
-### Changed
-
 ## v0.15.0 (January 13, 2023)
 
 ### Added
