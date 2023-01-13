@@ -1,11 +1,23 @@
 # Changelog
 
-## vNext
+## v0.15.0 (January 13, 2023)
+
+### Added
+
+- Added more toggles for audit app configs
+- Auto-generation of operator manifests
+- Added tests for TLS and mTLS scenarios
 
 ### Changed
 
+- Improved security toggles for TLS and mTLS scenarios throughout the mesh
 - Include SSH_KNOWN_HOSTS environment variable in Operator's StatefulSet
 
+### Fixed
+
+- Added transport_api_version to grpc_service configs
+- Switched from `localhost` to `127.0.0.1` for the default elasticsearch host
+  to prevent Control from going into a nack loop
 
 ## v0.14.0 (December 2nd, 2022)
 
