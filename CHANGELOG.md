@@ -12,6 +12,7 @@
 
 - Improved security toggles for TLS and mTLS scenarios throughout the mesh
 - Include SSH_KNOWN_HOSTS environment variable in Operator's StatefulSet
+- Bump dockerfile base image to ironbank ubi 8.7
 
 ### Fixed
 
