@@ -106,7 +106,7 @@ promote_generic(){
             # hack to remove fips from name if present (this should be moved to component release)
             outputName=$(echo ${i} | sed 's|-fips||g' | sed "s|${SRC_GENERIC}|${DEST_GENERIC}|g")
             echo "Moving [${i}] to ${outputName}"
-            jf rt cp ${i} ${outputName} ${dry_run_arg}
+            jf rt cp ${i} ${outputName} ${dry_run_arg} --flat=true
         done
     else
         echo "Validation failed: Did not find any artifacts in [${src_path}]"
