@@ -84,14 +84,14 @@ defaults: {
 		keycloak_postgres: string | *"postgres:15.0"
 	}
 
-	// The external_host field instructs greymatter to install Prometheus or
-	// uses an external one. If enable_historical_metrics is true and external_host
-	// is empty, then greymatter will install Prometheus into the greymatter
-	// namespace. If enable_historical_metrics is true and external_host has a
-	// value, greymatter will not install Prometheus into the greymatter namespace
-	// and will connect to the external Prometheus via a sidecar
-	// (e.g. external_host: prometheus.metrics.svc).
 	prometheus: {
+		// external_host instructs greymatter to install Prometheus or use an
+		// externally hosted one. If enable_historical_metrics is true and external_host
+		// is empty, then greymatter will install Prometheus into the greymatter
+		// namespace. If enable_historical_metrics is true and external_host has a
+		// value, greymatter will not install Prometheus into the greymatter namespace
+		// and will connect to the external Prometheus via a sidecar
+		// (e.g. external_host: prometheus.metrics.svc).
 		external_host: ""
 		port:          9090
 		tls: {
@@ -121,9 +121,10 @@ defaults: {
 		// of your Elasticsearch instance. This is used by to sync audit data
 		// with Elasticsearch.
 		elasticsearch_endpoint: "https://\(elasticsearch_host):\(elasticsearch_port)"
-		// Default Elasticsearch basic authentication user name.
+		// elasticsearch_username is the default Elasticsearch basic authentication user name.
 		elasticsearch_username: "elastic"
-		// Kubernetes secret name containing default Elasticsearch basic authentication password.
+		// elasticsearch_password_secret is the Kubernetes secret name containing
+		// default Elasticsearch basic authentication password.
 		elasticsearch_password_secret: "elasticsearch-password"
 		// elasticsearch_tls_verify_certificate determines if the audit agent verifies
 		// Elasticsearch's TLS certificate during the TLS handshake. If your Elasticsearch is
@@ -136,22 +137,22 @@ defaults: {
 	// inside the mesh, not an externally hosted Keycloak instance. These
 	// configurations will be used when enable_keycloak is true.
 	keycloak: {
-		// database_name: name of Postgres database
+		// database_name is the name of the Postgres database.
 		database_name: "keycloak"
-		// database_user: user for Postgres database
+		// database_user is the user for the Postgres database.
 		database_user: "keycloak"
-		// database_ingress_port: port for sidecar ingress to Postgres
+		// database_ingress_port is the port for sidecar ingress to Postgres.
 		database_ingress_port: 10809
 		// database_egress_cluster is the name of the cluster used by the
 		// Keycloak sidecar to send requests out to the Keycloak database's
 		// sidecar.
 		database_egress_cluster: "keycloak-postgres_egress"
-		// keycloak_postgres_cluster_name: upstream cluster name for sidecar
-		// egress from Keycloak to Postgres
+		// keycloak_postgres_cluster_name is the upstream cluster name for sidecar
+		// egress from Keycloak to Postgres.
 		keycloak_postgres_cluster_name: "keycloak-postgres"
-		// Default Keycloak admin password secret name
+		// keycloak_admin_secretis the default Keycloak admin password secret name.
 		keycloak_admin_secret: "keycloak-admin-password"
-		// Default Keycloak Postgres password secret name
+		// keycloak_postgres_secretis the default Keycloak Postgres password secret name.
 		keycloak_postgres_secret: "keycloak-postgres-password"
 	}
 
@@ -160,13 +161,14 @@ defaults: {
 		// rely on this value, such as the audit app's queries to Elasticsearch. 
 		// The value should not need to be changed.
 		key: "edge"
-		// To enable TLS on the edge set edge.enable_tls to true.
-		// This config also toggles enables internal TLS across sidecars.  That behavior can be changed 
-		// by setting the toggle defaults.internal.core_internal_tls_certs.enable to true.
+		// enable_tls enables TLS on the edge proxy. This config also enables
+		// internal TLS across sidecars. That behavior can be changed by
+		// setting defaults.internal.core_internal_tls_certs.enable to false.
 		enable_tls: bool | *false @tag(edge_enable_tls,type=bool)
-		// To enable mTLS on the edge, edge.require_client_certs should be set to true in addition to edge.enable_tls.
-		// This config also toggles enables internal TLS across sidecars.  That behavior can be changed
-		// by setting the toggle defaults.internal.core_internal_tls_certs.require_client_certs to true.
+		// require_client_certs enables mTLS on the edge proxy. This requires
+		// that edge.enable_tls is also true. This config also enables internal
+		// mTLS across sidecars. That behavior can be changed by setting the
+		// defaults.internal.core_internal_tls_certs.require_client_certs to true.
 		require_client_certs: bool | *false @tag(edge_require_client_certs, type=bool)
 		secret_name:          "gm-edge-ingress-certs"
 		oidc: {
@@ -222,27 +224,27 @@ defaults: {
 	} // edge
 
 	spire: {
-		// Namespace of the Spire server
+		// namespace is where SPIRE server and agents are deployed to.
 		namespace: "spire"
-		// Trust domain must match what's configured at the server
+		// trust_domain is the trust domain that must match what's configured at the server.
 		trust_domain: "greymatter.io"
-		// The mount path of the spire socket for communication with the agent
+		// socket_mount_path is the mount path of the SPIRE socket for communication with an agent.
 		socket_mount_path: "/run/spire/socket"
-		// When config.deploy_spire=true, we inject a secret. This sets the name of that secret
+		// ca_secret_name is the name of the secret that is injected when config.deploy_spire is true.
 		ca_secret_name: "server-ca"
-		// should we request a host mount for the socket, or normal volume mount? If true, also requests hostPID permission
+		// host_mount_socket controls whether a host mount is used for the socket.
+		// Requires hostPID permission.
 		host_mount_socket: true
 	}
 
 	core_internal_tls_certs: {
-		// Enables internal TLS (requires defaults.edge.enable_tls == true)
+		// enable enables internal sideacr TLS (requires defaults.edge.enable_tls=true)
 		enable: bool | *defaults.edge.enable_tls @tag(internal_enable_tls,type=bool)
-		// Enables internal mTLS (requires: defaults.edge.enable_tls == true && defaults.core_internal_tls_certs.enable == true )
+		// require_client_certs enables internal mTLS (requires: defaults.edge.enable_tls=true and defaults.core_internal_tls_certs.enable=true)
 		require_client_certs: bool | *defaults.edge.require_client_certs @tag(internal_require_client_certs, type=bool)
-		// Name of kubernetes secret to be mounted
+		// cert_secret is the name of the Kubernetes secret to be mounted.
 		// By default the same secret for external TLS/mTLS will be used for internal TLS/mTLS.
-		// Different certs can be used by specifying a different
-		// secret name in defaults.core_internal_tls_certs.cert_secret.
+		// Different certs can be used by specifying a different secret name.
 		cert_secret: string | *defaults.edge.secret_name
 	}
 
