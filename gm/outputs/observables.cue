@@ -54,6 +54,7 @@ observables_config: [
 		domain_key: EgressToElasticSearchName
 		// don't change this, the app expects this port
 		port: 9200
+		_force_no_ssl: true
 	},
 	#cluster & {
 		cluster_key:    EgressToElasticSearchName

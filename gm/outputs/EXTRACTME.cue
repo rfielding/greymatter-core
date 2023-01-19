@@ -42,6 +42,7 @@ observables_configs:       observables_config
 jwtsecurity_configs:       jwtsecurity_config
 keycloak_configs:          keycloak_config
 keycloak_postgres_configs: keycloak_postgres_config
+observables_configs:       observables_config
 
 // for CLI convenience,
 // e.g. `cue eval -c ./gm/outputs --out text -e mesh_configs_yaml`
