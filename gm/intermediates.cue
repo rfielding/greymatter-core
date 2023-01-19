@@ -534,7 +534,7 @@ import (
 	_spire_other:             string // can specify an allowable upstream identity - defaults to "edge"
 	_enable_circuit_breakers: bool | *false
 	// We can expand options here for load balancers that superseed the lb_policy field
-	_load_balancer:    "round_robin" | "least_request" | "maglev" | "ring_hash" | "random"
+	_load_balancer:    *"round_robin" | "least_request" | "maglev" | "ring_hash" | "random"
 	_trust_file:       string | *"/etc/proxy/tls/sidecar/ca.crt"
 	_certificate_path: string | *"/etc/proxy/tls/sidecar/server.crt"
 	_key_path:         string | *"/etc/proxy/tls/sidecar/server.key"
