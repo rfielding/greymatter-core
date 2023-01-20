@@ -37,3 +37,15 @@ steps:
       - release-versions.yaml
       - greymatter-download*.sh
       - inputs-output.cue
+
+  # promote commit to tag
+  - label: "Promote Binaries to Artifactory (control latest)"
+    key: promote-control-generic-latest
+    depends_on:
+      - package-tarball
+    if: build.branch == 'main'
+    env:
+      JF_SRC_REGISTRY: dev-generic
+      JF_DEST_REGISTRY: generic
+    commands:
+      - jf rt cp $$JF_SRC_REGISTRY/greymatter-control/greymatter-control_${BUILDKITE_COMMIT}_linux_amd64.tar.gz $$JF_DEST_REGISTRY/greymatter-control/greymatter-control_${BUILDKITE_TAG:1}_linux_amd64.tar.gz --fail-no-op=true --flat=true
