@@ -293,14 +293,17 @@ def test_ssl_edge_tls_and_internal_tls():
     m1.total_objects
     
     # ASSERTIONS
-    # all domains should have ssl config
+    # all domains should have ssl config except observables_egress_to_elasticsearch
     LOGGER.info("Checking Domains")
     test_schema= copy.deepcopy(constant.DOMAIN_SCHEMA)
     test_schema.update({"required": ["ssl_config"]})
     for i in m1.domain_dict:
         LOGGER.info(m1.domain_dict.get(i))
-        assert is_x(m1.domain_dict.get(i),test_schema) == True
-        assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == False
+        if (i != "observables_egress_to_elasticsearch"):
+            assert is_x(m1.domain_dict.get(i),test_schema) == True
+            assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == False
+        else:
+            assert is_x(m1.domain_dict.get(i), test_schema) == False
     
     LOGGER.info("Checking Clusters")
     # all clusters that use service discovery (no instances defined) should have tls enabled (except edge)
@@ -330,16 +333,22 @@ def test_ssl_edge_tls_and_internal_mtls():
     
     # ASSERTIONS
     # all domains should have ssl config
+    #   - except observables_egress_to_elasticsearch
+    # edge will not require client certs
+    # all others will require client certs
     LOGGER.info("Checking Domains")
     test_schema= copy.deepcopy(constant.DOMAIN_SCHEMA)
     test_schema.update({"required": ["ssl_config"]})
     for i in m1.domain_dict:
         LOGGER.info(m1.domain_dict.get(i))
-        assert is_x(m1.domain_dict.get(i),test_schema) == True
-        if i == "edge":
-            assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == False
+        if i != "observables_egress_to_elasticsearch":
+            assert is_x(m1.domain_dict.get(i),test_schema) == True
+            if i == "edge":
+                assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == False
+            else:
+                assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == True
         else:
-            assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == True
+            assert is_x(m1.domain_dict.get(i),test_schema) == False
     
     LOGGER.info("Checking Clusters")
     # all clusters that use service discovery (no instances defined) should have tls enabled (except edge)
@@ -475,6 +484,9 @@ def test_ssl_edge_mtls_and_internal_tls():
         if i == "edge":
             assert is_x(m1.domain_dict.get(i), test_schema) == True
             assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == True
+        # observables_egress_to_elasticsearch does not have ssl_config
+        if i == "observables_egress_to_elasticsearch":
+            assert is_x(m1.domain_dict.get(i), test_schema) == False
     
     LOGGER.info("Checking Clusters")
     # all clusters that use service discovery (no instances defined) should have tls enabled (except edge)
@@ -503,13 +515,19 @@ def test_ssl_edge_mtls_and_internal_mtls():
     m1=build_mesh_from_cue(r)
 
     # ASSERTIONS
+    # all domains should have ssl config 
+    #   - except observables_egress_to_elasticsearch
+    # domains with ssl_config should require_client_certs
     LOGGER.info("Checking Domains")
     test_schema= copy.deepcopy(constant.DOMAIN_SCHEMA)
     test_schema.update({"required": ["ssl_config"]})
     for i in m1.domain_dict:
         LOGGER.info(m1.domain_dict.get(i))
-        assert is_x(m1.domain_dict.get(i), test_schema) == True
-        assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == True
+        if i != "observables_egress_to_elasticsearch":
+            assert is_x(m1.domain_dict.get(i), test_schema) == True
+            assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == True
+        else:
+            assert is_x(m1.domain_dict.get(i), test_schema) == False
     
     LOGGER.info("Checking Clusters")
     # all clusters that use service discovery (no instances defined) should have tls enabled (except edge)
