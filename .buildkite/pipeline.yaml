@@ -83,15 +83,34 @@ steps:
       - rm -r transform-manifest/
       - buildkite-agent artifact upload "generated-manifests/*"
 
-  - label: "Create Tarball and push to staging"
-    key: "push-to-staging"
+  - label: "Package Tarball"
+    key: "package-tarball"
     depends_on:
       - test
       - generate-manifests
     commands:
       - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
-      - ./scripts/cibuild release
+      - sleep 10
+      - rm -rf /tmp/greymatter-core
+      - mkdir /tmp/greymatter-core
+      - tar --exclude-vcs --exclude=".buildkite" --exclude="CHANGELOG.md" --exclude="scripts/cibuild" --exclude="scripts/bootstrap" --exclude="scripts/update" --exclude="scripts/promotion" --exclude="greymatter-download-template.sh" -czf /tmp/greymatter-core/greymatter-core.tar.gz .
+      - cp /tmp/greymatter-core/greymatter-core.tar.gz .
+      - rm -r /tmp/greymatter-core
+    artifact_paths:
+      - greymatter-core.tar.gz
 
+  - label: "Promote Tarball to Artifactory (greymatter-core dev)"
+    key: promote-generic-dev
+    depends_on:
+      - package-tarball
+    env:
+      JF_DEST_REGISTRY: dev-generic
+    commands:
+      - buildkite-agent artifact download greymatter-core.tar.gz . --step package-tarball
+      - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_COMMIT}_none_none.tar.gz
+      - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_BRANCH}_none_none.tar.gz
+
+  # PROMOTE COMPONENTS
   - label: "test-promote artifacts to staging"
     key: "promote-test"
     env:
@@ -102,3 +121,31 @@ steps:
     # promotion defaults to dry run
     command: ./scripts/promotion 
 
+  # promote latest on main 
+  - label: "Promote Binaries to Artifactory (latest)"
+    key: promote-generic-latest
+    depends_on:
+      - package-tarball
+    if: build.branch == 'main'
+    env:
+      JF_DEST_REGISTRY: dev-generic
+    commands:
+      - buildkite-agent artifact download greymatter-core.tar.gz . --step package-tarball
+      - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_latest_none_none.tar.gz
+
+  - label: "promote artifacts to staging"
+    key: "promote"
+    depends_on:
+      - promote-test
+    env:
+      SRC_GENERIC_CI: "dev-generic"
+      DEST_GENERIC_CI: "ci-staging-generic"
+      SRC_OCI_CI: "dev-oci"
+      DEST_OCI_CI: "ci-staging-oci"
+    if: build.branch == "main"
+    # --yes flag for promotion results in actual promotion
+    command: ./scripts/promotion --yes
+    artifact_paths:
+      - release-versions.yaml
+      - greymatter-download*.sh
+      - inputs-output.cue

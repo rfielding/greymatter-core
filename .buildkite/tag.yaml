@@ -5,12 +5,15 @@ steps:
   - block: "I have run a smoke test using the inputs-output.cue artifact from merge to main build (under promote artifacts to staging)"
 
   - input: "Information please"
+    key: info-request
     fields:
       - text: "What is this Release Called"
         key: "release"
 
   - label: "test-promote artifacts to oci/ generic"
     key: "promote-test-tag"
+    depends_on:
+      - info-request
     env:
       SRC_GENERIC_CI: "ci-staging-generic"
       DEST_GENERIC_CI: "generic"
@@ -25,6 +28,7 @@ steps:
     key: "promote-tag"
     depends_on: 
       - promote-test-tag
+      - info-request
     env:
       SRC_GENERIC_CI: "ci-staging-generic"
       DEST_GENERIC_CI: "generic"
@@ -37,3 +41,16 @@ steps:
       - release-versions.yaml
       - greymatter-download*.sh
       - inputs-output.cue
+
+  # promote commit to tag
+  - label: "Promote Binaries to Artifactory (control latest)"
+    key: promote-control-generic-latest
+    depends_on:
+      - promote-test-tag
+      - info-request
+    if: build.branch == 'main'
+    env:
+      JF_SRC_REGISTRY: dev-generic
+      JF_DEST_REGISTRY: generic
+    commands:
+      - jf rt cp $$JF_SRC_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_COMMIT}_none_none.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz --fail-no-op=true --flat=true
