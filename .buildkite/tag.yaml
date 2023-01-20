@@ -43,12 +43,11 @@ steps:
       - inputs-output.cue
 
   # promote commit to tag
-  - label: "Promote Binaries to Artifactory (control latest)"
-    key: promote-control-generic-latest
+  - label: "Promote Tarball to staging (tag)"
+    key: promote-generic-latest
     depends_on:
       - promote-test-tag
       - info-request
-    if: build.branch == 'main'
     env:
       JF_SRC_REGISTRY: dev-generic
       JF_DEST_REGISTRY: generic
