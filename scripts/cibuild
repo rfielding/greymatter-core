@@ -2,47 +2,6 @@
 
 set -e
 
-# Tar and push bundle to Artifactory; we expect built artifacts on disk
-release_bundle() {
-  if [[ "$BUILDKITE_BRANCH" == "main" ]]; then
-    bundle_and_push "latest"
-  fi
-}
-
-# Convenience function to push tarball to Artifactory
-bundle_and_push() {
-  local tag=$1
-  local workspace="/tmp/greymatter-core"
-  local tarball="greymatter-core_${tag}_none_none.tar.gz"
-
-  mkdir -p $workspace
-
-  # Create the tarball and exclude unnecessary files for the release bundle.
-  tar \
-    --exclude-vcs
-    --exclude=".buildkite"
-    --exclude="CHANGELOG.md"
-    --exclude="scripts/cibuild"
-    --exclude="scripts/bootstrap"
-    --exclude="scripts/update"
-    --exclude="scripts/promotion"
-    --exclude="greymatter-download-template.sh"
-    -cvzf "$workspace/$tarball" .
-
-  cd $workspace
-
-  # Nexus upload. We are not using the nexus-upload-archive script because this
-  # tarball does not need to meet OS architecture constraints. It is simply a
-  # tarball of directory contents.
-  curl -u "$NEXUS_USER:$NEXUS_PASS" --upload-file "./$tarball" "https://nexus.greymatter.io/repository/raw/development/greymatter-core/$tarball"
-
-  # Artifactory upload
-  buildkite-agent artifact upload "$tarball" "rt://dev-generic/greymatter-core"
-
-  # Cleanup the tarball
-  rm $tarball
-}
-
 #### Commands
 
 # Parse CHANGELOG into structured data suitable for powering templates
@@ -70,21 +29,6 @@ cmd_test() {
   ./scripts/test eval_all
 }
 
-# Pushes the greymatter-core tarball to Artifactory if merging into main or if a tag
-# was detected.
-cmd_release() {
-  if [[ "$BUILDKITE_BRANCH" != "main" && -z $BUILDKITE_TAG ]]; then
-    echo "Skipping release: Release conditions not detected."
-    return 0
-  fi
-
-  # Most commands will call bootstrap since each step may run on a different
-  # machine, one which may not have the dependancies installed.
-  ./scripts/bootstrap
-
-  release_bundle
-}
-
 if [ $# -eq 0 ]; then
   echo "missing argument"
   exit 1
@@ -93,7 +37,7 @@ fi
 CMD=$1
 shift
 case $CMD in
-  build|changelog|release|test)
+  build|changelog|test)
     cmd_$CMD "$@"
     ;;
   *)
