@@ -16,11 +16,6 @@ cmd_changelog() {
 # greymatter-cue submodule on disk.
 cmd_build() {
   ./scripts/bootstrap
-
-  # always push latest tarball when merging to main
-  if [[ "$BUILDKITE_BRANCH" == "main" ]]; then
-    release_bundle
-  fi
 }
 
 # Install the greymatter-cue and run 'cue eval' tests.
