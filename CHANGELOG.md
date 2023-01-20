@@ -1,5 +1,13 @@
 # Changelog
 
+## v 0.16.0 (January 20, 2023)
+
+## Changed
+- Updated operator, cli, dashboard, proxy, and control/control-api default images
+
+## Fixed
+- TLS and mTLS cue logic between audits app and external elastic search
+
 ## v0.15.0 (January 13, 2023)
 
 ### Added
