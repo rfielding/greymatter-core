@@ -1,6 +1,15 @@
 # Changelog
 
-## v 0.16.0 (January 20, 2023)
+## vNEXT
+
+- 
+
+## v0.16.1 (January 23, 2023)
+
+## Fixed
+- Pipeline release generated assets
+
+## v0.16.0 (January 20, 2023)
 
 ## Changed
 - Updated operator, cli, dashboard, proxy, and control/control-api default images
