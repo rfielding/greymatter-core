@@ -56,6 +56,10 @@ steps:
       - pwd && ls -al ./tmp-workspace
       - tar -xf greymatter-core_${BUILDKITE_COMMIT}_none_none.tar.gz -C ./tmp-workspace
       - pwd && ls -al ./tmp-workspace
+      - sed -i 's|greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.1|greymatter.jfrog.io/oci/greymatter-operator:0.16.1|g' tmp-workspace/generated-manifests-cue-output/operator.yaml
+      - sed -i 's|greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.1|greymatter.jfrog.io/oci/greymatter-operator:0.16.1|g' tmp-workspace/generated-manifests-cue-output/operator-spire.yaml
+      - sed -i 's|greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.1|greymatter.jfrog.io/oci/greymatter-operator:0.16.1|g' tmp-workspace/generated-manifests-cue-output/operator-openshift.yaml
+      - sed -i 's|greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.1|greymatter.jfrog.io/oci/greymatter-operator:0.16.1|g' tmp-workspace/generated-manifests-cue-output/operator-openshift-spire.yaml
       - buildkite-agent artifact download inputs-output.cue . --step promote-tag
       - mv inputs-output.cue ./tmp-workspace/inputs.cue
       - tar -cf greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz ./tmp-workspace
