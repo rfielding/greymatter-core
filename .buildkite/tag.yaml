@@ -36,14 +36,13 @@ steps:
       DEST_OCI_CI: "oci"
     # --yes flag for promotion results in actual promotion
     command: ./scripts/promotion --yes
-    # eventually we will want to automatically push greymatter-download*.sh to artifactory
     artifact_paths:
       - release-versions.yaml
       - greymatter-download*.sh
       - inputs-output.cue
 
   # promote commit to tag
-  - label: "Promote Tarball to staging (tag)"
+  - label: "Promote Tarball (tag)"
     key: promote-generic-latest
     depends_on:
       - promote-test-tag
@@ -52,4 +51,12 @@ steps:
       JF_SRC_REGISTRY: dev-generic
       JF_DEST_REGISTRY: generic
     commands:
-      - jf rt cp $$JF_SRC_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_COMMIT}_none_none.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz --fail-no-op=true --flat=true
+      - mkdir -p ./tmp-workspace
+      - jf rt download $$JF_SRC_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_COMMIT}_none_none.tar.gz --flat=true .
+      - pwd && ls -al ./tmp-workspace
+      - tar -xf greymatter-core_${BUILDKITE_COMMIT}_none_none.tar.gz -C ./tmp-workspace
+      - pwd && ls -al ./tmp-workspace
+      - buildkite-agent artifact download inputs-output.cue . --step promote-tag
+      - mv inputs-output.cue ./tmp-workspace/inputs.cue
+      - tar -cf greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz ./tmp-workspace
+      - jf rt upload greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz $$JF_SRC_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz
