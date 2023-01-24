@@ -6,7 +6,7 @@ artifacts=(
         "https://greymatter.jfrog.io/artifactory/generic/greymatter-control/greymatter-control_<VERSION>_linux_amd64.tar.gz"
         "https://greymatter.jfrog.io/artifactory/generic/greymatter-control-api/greymatter-control-api_<VERSION>_linux_amd64.tar.gz"
         "https://greymatter.jfrog.io/artifactory/generic/greymatter-dashboard/greymatter-dashboard_<VERSION>_linux_amd64.tar.gz"
-        "https://greymatter.jfrog.io/artifactory/generic/greymatter-proxy/greymatter-proxy_<VERSION>-ubuntu_linux_amd64.tar.gz"
+        "https://greymatter.jfrog.io/artifactory/generic/greymatter-proxy/greymatter-proxy_<VERSION>-el8_linux_amd64.tar.gz"
         "https://greymatter.jfrog.io/artifactory/generic/greymatter-core/greymatter-core_<VERSION>_none_none.tar.gz"
         "https://greymatter.jfrog.io/artifactory/generic/greymatter-audits/greymatter-audits_<VERSION>_linux_amd64.tar.gz"
 )
