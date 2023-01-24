@@ -39,6 +39,17 @@ steps:
       - ./scripts/validate-download-script
       - set +x
 
+  - label: validate generated inputs-cue
+    key: validate-generated-inputs-cue
+    depends_on:
+      - promote-tag
+    env:
+      - DEST_OCI_CI: "oci"
+    commands:
+      - buildkite-agent artifact download inputs-output.cue . --step promote-tag
+      - mv inputs-output.cue inputs.cue
+      - ./scripts/validate-generated-inputs-cue
+
   - label: "Update generated manifests"
     key: update-generated-manifests
     depends_on:
