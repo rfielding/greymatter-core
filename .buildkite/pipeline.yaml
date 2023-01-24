@@ -110,7 +110,7 @@ steps:
       - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_COMMIT}_none_none.tar.gz
       - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_BRANCH}_none_none.tar.gz
 
-  # PROMOTE COMPONENTS
+  # PROMOTE COMPONENTS To staging
   - label: "test-promote artifacts to staging"
     key: "promote-test"
     env:

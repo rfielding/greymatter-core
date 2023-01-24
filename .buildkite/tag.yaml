@@ -10,24 +10,12 @@ steps:
       - text: "What is this Release Called"
         key: "release"
 
-  - label: "test-promote artifacts to oci/ generic"
-    key: "promote-test-tag"
-    depends_on:
-      - info-request
-    env:
-      SRC_GENERIC_CI: "ci-staging-generic"
-      DEST_GENERIC_CI: "generic"
-      SRC_OCI_CI: "ci-staging-oci"
-      DEST_OCI_CI: "oci"
-    # promotion defaults to dry run
-    command: ./scripts/promotion 
-
   # promotes artifacts to their release repos
   # TODO: validates updates greymatter-download-<version><-rc>.sh file
   - label: "promote artifacts to oci/ generic"
     key: "promote-tag"
     depends_on: 
-      - promote-test-tag
+      - promote-generic-dev
       - info-request
     env:
       SRC_GENERIC_CI: "ci-staging-generic"
@@ -41,26 +29,58 @@ steps:
       - greymatter-download*.sh
       - inputs-output.cue
 
-  # promote commit to tag
-  - label: "Promote Tarball (tag)"
-    key: promote-generic-latest
+  # - label: "validate greymatter download script"
+  #   key: validate-download-script
+  #   depends_on:
+  #     - promote-tag
+  #   commands:
+  #     - set -x
+  #     - buildkite-agent artifact download greymatter-download*.sh . --step promote-tag
+  #     - rm -f test-download-script && mkdir test-download-script
+  #     - cp greymatter-download*.sh test-download-script
+  #     - chmod +x test-download-script/greymatter-download.sh
+  #     - ./test-download-script/greymatter-download.sh $BUILDKITE_ARTIFACTORY_USER $BUILDKITE_ARTIFACTORY_PASSWORD
+  #     - ls -al
+  #     - ls . | grep ".tar.gz"
+  #     - for i in $(ls . | grep ".tar.gz"); do echo ${i}; done
+  #     - set +x
+
+  - label: "Update generated manifests"
+    key: update-generated-manifests
     depends_on:
-      - promote-test-tag
-      - info-request
+      - generate-manifests
+    commands: 
+      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
+      - find ./generated-manifests -type f -name 'operator*.yaml' -exec sed -i 's|greymatter.jfrog.io/dev-oci/|greymatter.jfrog.io/oci/|g' {} \;
+    artifact_paths:
+      - generated-manifests/*
+
+  - label: "Package Tarball tag"
+    key: "package-tarball-tag"
+    depends_on:
+      - test
+      - update-generated-manifests
+      - promote-tag
+    commands:
+      - buildkite-agent artifact download inputs-output.cue . --step promote-tag
+      - mv inputs-output.cue inputs.cue
+      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step update-generated-manifests
+      - sleep 10
+      - rm -rf /tmp/greymatter-core
+      - mkdir /tmp/greymatter-core
+      - tar --exclude-vcs --exclude=".buildkite" --exclude="CHANGELOG.md" --exclude="scripts/cibuild" --exclude="scripts/bootstrap" --exclude="scripts/update" --exclude="scripts/promotion" --exclude="greymatter-download-template.sh" -czf /tmp/greymatter-core/greymatter-core.tar.gz .
+      - cp /tmp/greymatter-core/greymatter-core.tar.gz .
+      - rm -r /tmp/greymatter-core
+    artifact_paths:
+      - greymatter-core.tar.gz
+
+  - label: "Promote Tarball to Artifactory (greymatter-core generic)"
+    key: promote-generic-tag
+    depends_on:
+      - package-tarball-tag
     env:
-      JF_SRC_REGISTRY: dev-generic
       JF_DEST_REGISTRY: generic
     commands:
-      - mkdir -p ./tmp-workspace
-      - jf rt download $$JF_SRC_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_COMMIT}_none_none.tar.gz --flat=true .
-      - pwd && ls -al ./tmp-workspace
-      - tar -xf greymatter-core_${BUILDKITE_COMMIT}_none_none.tar.gz -C ./tmp-workspace
-      - pwd && ls -al ./tmp-workspace
-      - sed -i 's|greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.1|greymatter.jfrog.io/oci/greymatter-operator:0.16.1|g' tmp-workspace/generated-manifests-cue-output/operator.yaml
-      - sed -i 's|greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.1|greymatter.jfrog.io/oci/greymatter-operator:0.16.1|g' tmp-workspace/generated-manifests-cue-output/operator-spire.yaml
-      - sed -i 's|greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.1|greymatter.jfrog.io/oci/greymatter-operator:0.16.1|g' tmp-workspace/generated-manifests-cue-output/operator-openshift.yaml
-      - sed -i 's|greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.1|greymatter.jfrog.io/oci/greymatter-operator:0.16.1|g' tmp-workspace/generated-manifests-cue-output/operator-openshift-spire.yaml
-      - buildkite-agent artifact download inputs-output.cue . --step promote-tag
-      - mv inputs-output.cue ./tmp-workspace/inputs.cue
-      - tar -cf greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz ./tmp-workspace
-      - jf rt upload greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz $$JF_SRC_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz
+      - buildkite-agent artifact download greymatter-core.tar.gz . --step package-tarball-tag
+      - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz
+
