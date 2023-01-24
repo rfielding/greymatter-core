@@ -50,6 +50,16 @@ steps:
       - mv inputs-output.cue inputs.cue
       - ./scripts/validate-generated-inputs-cue
 
+  - label: validate generated manifests use correct operator image
+    key:
+    depends_on:
+      - validate-generated-inputs-cue
+    env:
+      - DEST_OCI_CI: "oci"
+    commands:
+      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
+      - ./scripts/validate-generated-manifests
+
   - label: "Update generated manifests"
     key: update-generated-manifests
     depends_on:

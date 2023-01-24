@@ -22,5 +22,5 @@ else
 fi
 
 # cleanup
-rm -f ${test_workspace}
+rm -rf ${test_workspace}
 set +x
