@@ -29,21 +29,15 @@ steps:
       - greymatter-download*.sh
       - inputs-output.cue
 
-  # - label: "validate greymatter download script"
-  #   key: validate-download-script
-  #   depends_on:
-  #     - promote-tag
-  #   commands:
-  #     - set -x
-  #     - buildkite-agent artifact download greymatter-download*.sh . --step promote-tag
-  #     - rm -f test-download-script && mkdir test-download-script
-  #     - cp greymatter-download*.sh test-download-script
-  #     - chmod +x test-download-script/greymatter-download.sh
-  #     - ./test-download-script/greymatter-download.sh $BUILDKITE_ARTIFACTORY_USER $BUILDKITE_ARTIFACTORY_PASSWORD
-  #     - ls -al
-  #     - ls . | grep ".tar.gz"
-  #     - for i in $(ls . | grep ".tar.gz"); do echo ${i}; done
-  #     - set +x
+  - label: "validate greymatter download script"
+    key: validate-download-script
+    depends_on:
+      - promote-tag
+    commands:
+      - set -x
+      - buildkite-agent artifact download greymatter-download*.sh . --step promote-tag
+      - ./scripts/validate-download-script
+      - set +x
 
   - label: "Update generated manifests"
     key: update-generated-manifests
