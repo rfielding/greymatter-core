@@ -46,42 +46,9 @@ steps:
       - build
       - test
     commands:
-      - mkdir generated-manifests-cue-output/
-      - mkdir transform-manifest/
-      - mkdir generated-manifests/
-
-      - cue eval -c ./k8s/outputs -e operator_manifests_yaml --out=text > generated-manifests-cue-output/operator.yaml
-      - sed -i 's/git@github.com:greymatter-io\/greymatter-core.git/git@github.com:<your-org>\/greymatter-core.git/g' generated-manifests-cue-output/operator.yaml
-      - mv generated-manifests-cue-output/operator.yaml transform-manifest/manifest.yaml
-      - ./scripts/reorder-manifest.py
-      - if [[ $(cat transform-manifest/manifest-reorder.yaml | tail -1) == "---" ]]; then echo "Not All k8s resources were added to manifest during reorder" && exit 2; fi
-      - mv transform-manifest/manifest-reorder.yaml generated-manifests/operator.yaml
-      
-      - cue eval -c ./k8s/outputs -e operator_manifests_yaml --out=text -t spire=true > generated-manifests-cue-output/operator-spire.yaml
-      - sed -i 's/git@github.com:greymatter-io\/greymatter-core.git/git@github.com:<your-org>\/greymatter-core.git/g' generated-manifests-cue-output/operator-spire.yaml
-      - mv generated-manifests-cue-output/operator-spire.yaml transform-manifest/manifest.yaml
-      - ./scripts/reorder-manifest.py
-      - if [[ $(cat transform-manifest/manifest-reorder.yaml | tail -1) == "---" ]]; then echo "Not All k8s resources were added to manifest during reorder" && exit 2; fi
-      - mv transform-manifest/manifest-reorder.yaml generated-manifests/operator-spire.yaml
-
-      - cue eval -c ./k8s/outputs -e operator_manifests_yaml --out=text -t openshift=true > generated-manifests-cue-output/operator-openshift.yaml
-      - sed -i 's/git@github.com:greymatter-io\/greymatter-core.git/git@github.com:<your-org>\/greymatter-core.git/g' generated-manifests-cue-output/operator-openshift.yaml
-      - mv generated-manifests-cue-output/operator-openshift.yaml transform-manifest/manifest.yaml
-      - ./scripts/reorder-manifest.py
-      - if [[ $(cat transform-manifest/manifest-reorder.yaml | tail -1) == "---" ]]; then echo "Not All k8s resources were added to manifest during reorder" && exit 2; fi
-      - mv transform-manifest/manifest-reorder.yaml generated-manifests/operator-openshift.yaml
-
-
-      - cue eval -c ./k8s/outputs -e operator_manifests_yaml --out=text -t openshift=true -t spire=true > generated-manifests-cue-output/operator-openshift-spire.yaml
-      - sed -i 's/git@github.com:greymatter-io\/greymatter-core.git/git@github.com:<your-org>\/greymatter-core.git/g' generated-manifests-cue-output/operator-openshift-spire.yaml
-      - mv generated-manifests-cue-output/operator-openshift-spire.yaml transform-manifest/manifest.yaml
-      - ./scripts/reorder-manifest.py
-      - if [[ $(cat transform-manifest/manifest-reorder.yaml | tail -1) == "---" ]]; then echo "Not All k8s resources were added to manifest during reorder" && exit 2; fi
-      - mv transform-manifest/manifest-reorder.yaml generated-manifests/operator-openshift-spire.yaml
-
-      - rm -r generated-manifests-cue-output/
-      - rm -r transform-manifest/
+      - ./scripts/generate-manifests
       - buildkite-agent artifact upload "generated-manifests/*"
+      - rm -rf generated-manifests
 
   - label: "Package Tarball"
     key: "package-tarball"

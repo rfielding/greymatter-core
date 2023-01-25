@@ -8,6 +8,8 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 )
 
+_git_remote: string | *"git@github.com:greymatter-io/greymatter-core.git" @tag(git_remote,type=string)
+
 operator_namespace: [
 	corev1.#Namespace & {
 		apiVersion: "v1"
@@ -66,7 +68,7 @@ operator_sts: [
 							]
 							if !config.test {
 								args: [
-									"-repo", "git@github.com:greymatter-io/greymatter-core.git",
+									"-repo", _git_remote,
 									"-sshPrivateKeyPath", "/app/.ssh/ssh-private-key",
 									"-branch", "main",
 								]
@@ -96,7 +98,7 @@ operator_sts: [
 								"--continue",
 								"/app/operator",
 								"--",
-								"-repo", "git@github.com:greymatter-io/greymatter-core.git",
+								"-repo", _git_remote,
 								"-sshPrivateKeyPath", "/app/.ssh/ssh-private-key",
 								"-branch", "main",
 							]
