@@ -11,46 +11,65 @@ steps:
       - text: "What is this Release Called"
         key: "release"
 
-  # promotes artifacts to their release repos
-  - label: "promote artifacts to oci/ generic"
-    key: "promote-tag"
-    depends_on: 
-      - promote-generic-dev
-      - info-request
-    env:
-      SRC_GENERIC_CI: "ci-staging-generic"
-      DEST_GENERIC_CI: "generic"
-      SRC_OCI_CI: "ci-staging-oci"
-      DEST_OCI_CI: "oci"
-    # --yes flag for promotion results in actual promotion
-    command: ./scripts/promotion --yes
+  ##############################################
+  # Create and validate release greymatter download script
+  ##############################################
+  - label: "Generate download script"
+    key: "generate-download-script-tag"
+    commands:
+      - ./scripts/promotion.py generate download-script --git-tag=$${BUILDKITE_TAG:1}
     artifact_paths:
-      - release-versions.yaml
-      - greymatter-download*.sh
-      - inputs-output.cue
+      - greymatter-download.sh
+    agents:
+      container_image: ubuntu-2204-ci
+      queue: default
 
-  - label: "validate greymatter download script"
+  - label: "validate and publish greymatter download script"
     key: validate-download-script
     depends_on:
-      - promote-tag
+      - generate-download-script-tag
+    env:
+      JF_DEST_REGISTRY: generic
     commands:
       - set -x
-      - buildkite-agent artifact download greymatter-download*.sh . --step promote-tag
+      - buildkite-agent artifact download greymatter-download.sh . --step generate-download-script-tag
       - ./scripts/validate-download-script
+      - jf rt upload ./greymatter-download.sh $$JF_DEST_REGISTRY/greymatter-download_$(buildkite-agent meta-data get release).sh
       - set +x
     soft_fail: true
 
-  - label: "validate generated inputs-cue"
+  ##############################################
+  # Create and validate release inputs.cue 
+  ##############################################
+  
+  - label: "Update inputs.cue on tag"
+    key: "update-inputs-cue-tag"
+    env:
+      GENERIC_DEST: "generic"
+      OCI_DEST: "oci"
+    command: ./scripts/promotion.py generate inputs
+    agents:
+      container_image: ubuntu-2204-ci
+      queue: default
+    artifact_paths: 
+      generated_inputs.cue
+
+  - label: validate generated inputs-cue
     key: validate-generated-inputs-cue
     depends_on:
-      - promote-tag
+      - update-inputs-cue-tag
     env:
       - DEST_OCI_CI: "oci"
     commands:
-      - buildkite-agent artifact download inputs-output.cue . --step promote-tag
-      - mv inputs-output.cue inputs.cue
+      - buildkite-agent artifact download generated_inputs.cue . --step update-inputs-cue-tag
+      - mv generated_inputs.cue inputs.cue
       - ./scripts/validate-generated-inputs-cue
     soft_fail: true
+
+
+  ##############################################
+  # Validate generated manifests
+  ##############################################
 
   - label: "Update generated manifests"
     key: update-generated-manifests
@@ -63,7 +82,7 @@ steps:
       - generated-manifests/*
 
   - label: validate generated manifests use correct operator image
-    key: validate-updated-manifests
+    key:
     depends_on:
       - update-generated-manifests
     env:
@@ -73,6 +92,34 @@ steps:
       - ./scripts/validate-generated-manifests
     soft_fail: true
 
+
+  ##############################################
+  # Promote Component artifacts from staging to release repos
+  ##############################################
+  - label: "Promote Component Artifacts To Release"
+    key: "promote-component-artifacts-to-release"
+    depends_on:
+      - promote-artifacts-to-staging
+    env:
+      GENERIC_SRC: "ci-staging-generic"
+      GENERIC_DEST: "generic"
+      OCI_SRC: "ci-staging-oci"
+      OCI_DEST: "oci"
+    commands:
+      - ./scripts/promotion.py promote proxy --dry-run=false
+      - ./scripts/promotion.py promote catalog --dry-run=false
+      - ./scripts/promotion.py promote dashboard --dry-run=false
+      - ./scripts/promotion.py promote control --dry-run=false
+      - ./scripts/promotion.py promote control-api --dry-run=false
+      - ./scripts/promotion.py promote cli --dry-run=false
+      - ./scripts/promotion.py promote audits --dry-run=false
+    agents:
+      container_image: ubuntu-2204-ci
+      queue: default
+
+  ##############################################
+  # Package and push core tarball to release
+  ##############################################
   - label: "Package Tarball tag"
     key: "package-tarball-tag"
     depends_on:
@@ -81,27 +128,18 @@ steps:
       - validate-generated-inputs-cue
       - validate-download-script
       - update-generated-manifests
-      - promote-tag
-    commands:
-      - buildkite-agent artifact download inputs-output.cue . --step promote-tag
-      - mv inputs-output.cue inputs.cue
-      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step update-generated-manifests
-      - sleep 10
-      - rm -rf /tmp/greymatter-core
-      - mkdir /tmp/greymatter-core
-      - tar --exclude-vcs --exclude=".buildkite" --exclude="CHANGELOG.md" --exclude="scripts/cibuild" --exclude="scripts/bootstrap" --exclude="scripts/update" --exclude="scripts/promotion" --exclude="greymatter-download-template.sh" -czf /tmp/greymatter-core/greymatter-core.tar.gz .
-      - cp /tmp/greymatter-core/greymatter-core.tar.gz .
-      - rm -r /tmp/greymatter-core
-    artifact_paths:
-      - greymatter-core.tar.gz
-
-  - label: "Promote Tarball to Artifactory (greymatter-core generic)"
-    key: promote-generic-tag
-    depends_on:
-      - package-tarball-tag
+      - update-inputs-cue-tag
+      - generate-download-script-tag
     env:
       JF_DEST_REGISTRY: generic
     commands:
-      - buildkite-agent artifact download greymatter-core.tar.gz . --step package-tarball-tag
+      - buildkite-agent artifact download generated_inputs.cue . --step update-inputs-cue-tag
+      - mv generated_inputs.cue inputs.cue
+      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step update-generated-manifests
+      - sleep 10
+      - rm -rf /tmp/greymatter-core && mkdir /tmp/greymatter-core
+      - tar --exclude-vcs --exclude=".buildkite" --exclude="CHANGELOG.md" --exclude="scripts/cibuild" --exclude="scripts/bootstrap" --exclude="scripts/update" --exclude="scripts/promotion" --exclude="scripts/promotion.py" --exclude="scripts/templates/greymatter-download-template" --exclude="greymatter-download-template.sh" -czf /tmp/greymatter-core/greymatter-core.tar.gz .
+      - cp /tmp/greymatter-core/greymatter-core.tar.gz . && rm -r /tmp/greymatter-core
       - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_TAG:1}_none_none.tar.gz
-
+    artifact_paths:
+      - greymatter-core.tar.gz
