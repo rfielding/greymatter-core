@@ -150,11 +150,6 @@ vector: [
 						image:           defaults.images.vector
 						imagePullPolicy: defaults.image_pull_policy
 						name:            "vector"
-						ports: [{
-							containerPort: 9090
-							name:          "metrics"
-							protocol:      "TCP"
-						}]
 						volumeMounts: [{
 							mountPath: "/var/log/"
 							name:      "var-log"
