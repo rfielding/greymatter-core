@@ -60,7 +60,10 @@ steps:
       - sleep 10
       - rm -rf /tmp/greymatter-core
       - mkdir /tmp/greymatter-core
-      - tar --exclude-vcs --exclude=".buildkite" --exclude="CHANGELOG.md" --exclude="scripts" --exclude="pyproject.toml" -czf /tmp/greymatter-core/greymatter-core.tar.gz .
+      - >
+        tar --exclude-vcs --exclude=".buildkite" --exclude="CHANGELOG.md" --exclude="scripts" --exclude="pyproject.toml" 
+        --exclude="cue.mod/pkg/_gen" --exclude="cue.mod/pkg/scripts" 
+        -czf /tmp/greymatter-core/greymatter-core.tar.gz .
       - cp /tmp/greymatter-core/greymatter-core.tar.gz .
       - rm -r /tmp/greymatter-core
     artifact_paths:
