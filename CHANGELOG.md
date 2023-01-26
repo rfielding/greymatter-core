@@ -2,6 +2,12 @@
 
 ## vNEXT
 
+## 0.16.2 (January 26, 2023)
+
+### Updated
+
+- Updated cli version to 4.7.4
+
 ### Removed
 
 - Removed unused port 9090 from Vector DaemonSet
