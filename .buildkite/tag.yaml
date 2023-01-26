@@ -1,5 +1,6 @@
 agents:
   container_image: ubuntu-2004-ci
+
 steps:
   # this is in place of automated smoke test
   - block: "I have run a smoke test using the inputs-output.cue artifact from merge to main build (under promote artifacts to staging)"
@@ -11,7 +12,6 @@ steps:
         key: "release"
 
   # promotes artifacts to their release repos
-  # TODO: validates updates greymatter-download-<version><-rc>.sh file
   - label: "promote artifacts to oci/ generic"
     key: "promote-tag"
     depends_on: 
@@ -39,7 +39,7 @@ steps:
       - ./scripts/validate-download-script
       - set +x
 
-  - label: validate generated inputs-cue
+  - label: "validate generated inputs-cue"
     key: validate-generated-inputs-cue
     depends_on:
       - promote-tag
@@ -49,16 +49,6 @@ steps:
       - buildkite-agent artifact download inputs-output.cue . --step promote-tag
       - mv inputs-output.cue inputs.cue
       - ./scripts/validate-generated-inputs-cue
-
-  - label: validate generated manifests use correct operator image
-    key:
-    depends_on:
-      - validate-generated-inputs-cue
-    env:
-      - DEST_OCI_CI: "oci"
-    commands:
-      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
-      - ./scripts/validate-generated-manifests
 
   - label: "Update generated manifests"
     key: update-generated-manifests
@@ -70,10 +60,23 @@ steps:
     artifact_paths:
       - generated-manifests/*
 
+  - label: validate generated manifests use correct operator image
+    key: validate-updated-manifests
+    depends_on:
+      - update-generated-manifests
+    env:
+      - DEST_OCI_CI: "oci"
+    commands:
+      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step update-generated-manifests
+      - ./scripts/validate-generated-manifests
+
   - label: "Package Tarball tag"
     key: "package-tarball-tag"
     depends_on:
       - test
+      - validate-updated-manifests
+      - validate-generated-inputs-cue
+      - validate-download-script
       - update-generated-manifests
       - promote-tag
     commands:
