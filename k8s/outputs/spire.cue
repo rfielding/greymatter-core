@@ -59,7 +59,7 @@ spire_server: [
 				spec: {
 					containers: [{
 						name:            "server"
-						image:           "gcr.io/spiffe-io/spire-server:1.2.0"
+						image:           "gcr.io/spiffe-io/spire-server:1.5.4"
 						imagePullPolicy: "IfNotPresent"
 						args: [
 							"-config",
@@ -102,7 +102,7 @@ spire_server: [
 						}
 					}, {
 						name:            "registrar"
-						image:           "gcr.io/spiffe-io/k8s-workload-registrar:1.2.0"
+						image:           "gcr.io/spiffe-io/k8s-workload-registrar:1.5.4"
 						imagePullPolicy: "IfNotPresent"
 						args: [
 							"-config",
@@ -361,7 +361,7 @@ spire_agent: [
 					}]
 					containers: [{
 						name:            "agent"
-						image:           "gcr.io/spiffe-io/spire-agent:1.2.0"
+						image:           "gcr.io/spiffe-io/spire-agent:1.5.4"
 						imagePullPolicy: "IfNotPresent"
 						args: [
 							"-config",
