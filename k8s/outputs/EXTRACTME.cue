@@ -35,6 +35,8 @@ operator_manifests: list.Concat([
 			[ for x in openshift_privileged_scc if config.openshift {x}],
 			[ for x in openshift_vector_scc if config.openshift && config.enable_audits {x}],
 			[ for x in openshift_spire_scc if config.openshift && config.spire {x}],
+			[ for x in openshift_redis_scc if config.openshift {x}],
+			[ for x in openshift_prometheus_scc if config.openshift {x}],
 			[ for x in spire_manifests if config.deploy_spire {x}],
 			[ for x in vector_permissions if config.enable_audits {x}],
 ])
@@ -100,3 +102,9 @@ sidecar_container: {
 	container: #sidecar_container_block & {_Name: name}
 	volumes:   #sidecar_volumes
 }
+
+redis_configs: redis
+vector: vector
+redis_openshift: openshift_redis_scc
+
+

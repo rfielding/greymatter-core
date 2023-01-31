@@ -84,6 +84,14 @@ defaults: {
 		keycloak_postgres: string | *"postgres:15.0"
 	}
 
+	redis: {
+		// The official Redis container runs as root, but many hardened containers will run as
+		// a different user. Setting this to the gid of the Redis user sets the pod fsGroup security 
+		// context to the gid so the Redis user can access its persistent volume.
+		
+		// gid: 1001
+	}
+
 	prometheus: {
 		// external_host instructs greymatter to install Prometheus or use an
 		// externally hosted one. If enable_historical_metrics is true and external_host

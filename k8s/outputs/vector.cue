@@ -187,6 +187,8 @@ vector: [
 					}]
 					serviceAccountName:            Name
 					terminationGracePeriodSeconds: 60
+
+					imagePullSecrets: [{name: defaults.image_pull_secret_name}]
 					tolerations: [{
 						effect: "NoSchedule"
 						key:    "node-role.kubernetes.io/master"
