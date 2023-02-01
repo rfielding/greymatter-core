@@ -1,5 +1,4 @@
 // k8s manifests for Vector
-
 package greymatter
 
 import (
@@ -10,7 +9,6 @@ import (
 )
 
 let Name = "greymatter-audit-agent"
-let VectorConfig = "vector-config"
 let logs_namespaces = [mesh.spec.install_namespace] + mesh.spec.watch_namespaces
 let logs = strings.Join([ for namespace in logs_namespaces {"'/var/log/pods/\(namespace)*/sidecar/*.log'"}], ",")
 
@@ -130,15 +128,6 @@ vector: [
 								}
 							}
 						}, {
-							name:  "PROCFS_ROOT"
-							value: "/host/proc"
-						}, {
-							name:  "SYSFS_ROOT"
-							value: "/host/sys"
-						}, {
-							name:  "LOG"
-							value: "info"
-						}, {
 							name: "ELASTICSEARCH_PASSWORD"
 							valueFrom: {
 								secretKeyRef: {
@@ -151,27 +140,12 @@ vector: [
 						imagePullPolicy: defaults.image_pull_policy
 						name:            "vector"
 						volumeMounts: [{
+							mountPath: "/etc/vector"
+							name: "config-dir"
+							readOnly: true 
+						},{
 							mountPath: "/var/log/"
 							name:      "var-log"
-							readOnly:  true
-						}, {
-							mountPath: "/var/lib"
-							name:      "var-lib"
-							readOnly:  true
-						}, {
-							mountPath: "/vector-data-dir"
-							name:      "data-dir"
-						}, {
-							mountPath: "/etc/vector"
-							name:      "config-dir"
-							readOnly:  true
-						}, {
-							mountPath: "/host/proc"
-							name:      "procfs"
-							readOnly:  true
-						}, {
-							mountPath: "/host/sys"
-							name:      "sysfs"
 							readOnly:  true
 						}]
 						resources: {
@@ -185,6 +159,9 @@ vector: [
 							}
 						}
 					}]
+					if config.openshift == true {
+						hostPID: true 
+					}
 					serviceAccountName:            Name
 					terminationGracePeriodSeconds: 60
 
@@ -198,27 +175,12 @@ vector: [
 							path: "/var/log/"
 						}
 						name: "var-log"
-					}, {
-						hostPath: {
-							path: "/var/lib/"
-						}
-						name: "var-lib"
-					}, {
-						hostPath: {
-							path: "/var/lib/vector/"
-						}
-						name: "data-dir"
-					}, {
+					},{
 						name: "config-dir"
 						projected: {
 							sources: [{
 								configMap: {
-									name: "\(VectorConfig)"
-								}
-							}, {
-								configMap: {
-									name:     "\(Name)-config"
-									optional: true
+									name: "\(Name)-config"
 								}
 							}, {
 								secret: {
@@ -227,16 +189,6 @@ vector: [
 								}
 							}]
 						}
-					}, {
-						hostPath: {
-							path: "/proc"
-						}
-						name: "procfs"
-					}, {
-						hostPath: {
-							path: "/sys"
-						}
-						name: "sysfs"
 					}]
 				}
 			}
@@ -258,6 +210,11 @@ vector: [
 		}
 		data: {
 			"vector.toml": """
+			[api]
+			enabled = false
+			address = \"0.0.0.0:8686\"
+			playground = true
+
 			# Configure the source of logs.
 			[sources.file]
 			type = \"file\"
@@ -267,7 +224,6 @@ vector: [
 			# Does not work with Kubernetes logs but will work with greymatter sidecar
 			# logs if writing to a file instead of standard out.
 			# remove_after_secs = 3600
-
 			# Parse the log for the eventId string, indicating that it is a
 			# greymatter observable log.
 			[transforms.observables_only]
@@ -277,7 +233,6 @@ vector: [
 			. |= parse_regex!(.message, r'(?P<obsMatch>eventId)')
 			. = .obsMatch != null
 			'''
-
 			# Parse observable JSON out of the Kubernetes log, and coerce the timestamp
 			# value from ms to an actual timestamp.
 			[transforms.modify]
@@ -288,7 +243,6 @@ vector: [
 			. = parse_json!(.event)
 			.timestamp, err = to_timestamp(.timestamp)
 			'''
-
 			# Configure Elasticsearch sink.
 			[sinks.es]
 			type = \"elasticsearch\"
@@ -303,59 +257,7 @@ vector: [
 			suppress_type_name = true
 			tls.verify_certificate = \(defaults.audits.elasticsearch_tls_verify_certificate)
 			"""
-		}
-	},
 
-	corev1.#ConfigMap & {
-		apiVersion: "v1"
-		kind:       "ConfigMap"
-		metadata: {
-			name:      "\(VectorConfig)"
-			namespace: mesh.spec.install_namespace
-		}
-		data: {
-			"managed.toml": """
-				# Configuration for vector.
-				# Docs: https://vector.dev/docs/
-
-				data_dir = \"/vector-data-dir\"
-
-				[api]
-				enabled = false
-				address = \"0.0.0.0:8686\"
-				playground = true
-
-				[log_schema]
-				host_key = \"host\"
-				message_key = \"message\"
-				source_type_key = \"source_type\"
-				timestamp_key = \"timestamp\"
-
-				# Ingest logs from Kubernetes.
-				[sources.kubernetes_logs]
-				type = \"kubernetes_logs\"
-
-				# Capture the metrics from the host.
-				[sources.host_metrics]
-				type = \"host_metrics\"
-				[sources.host_metrics.filesystem]
-				[sources.host_metrics.filesystem.devices]
-				excludes = [\"binfmt_misc\"]
-				[sources.host_metrics.filesystem.filesystems]
-				excludes = [\"binfmt_misc\"]
-				[sources.host_metrics.filesystem.mountpoints]
-				excludes = [\"*/proc/sys/fs/binfmt_misc\"]
-
-				# Emit internal Vector metrics.
-				[sources.internal_metrics]
-				type = \"internal_metrics\"
-
-				# Expose metrics for scraping in the Prometheus format.
-				#[sinks.prometheus_sink]
-				#address = \"0.0.0.0:9090\"
-				#inputs = [\"internal_metrics\", \"host_metrics\"]
-				#type = \"prometheus\"
-				"""
 		}
 	},
 

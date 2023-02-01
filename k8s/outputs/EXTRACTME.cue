@@ -103,8 +103,8 @@ sidecar_container: {
 	volumes:   #sidecar_volumes
 }
 
+
 redis_configs: redis
 vector: vector
 redis_openshift: openshift_redis_scc
-
 

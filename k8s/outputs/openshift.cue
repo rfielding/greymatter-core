@@ -167,7 +167,7 @@ openshift_vector_scc: [
 		fsGroup: type: "RunAsAny"
 		groups: []
 		priority:               null
-		readOnlyRootFilesystem: false
+		readOnlyRootFilesystem: true 
 		requiredDropCapabilities: [ "KILL", "MKNOD", "SETUID", "SETGID"]
 		runAsUser: type:          "RunAsAny"
 		seLinuxContext: type:     "MustRunAs"
