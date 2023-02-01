@@ -218,6 +218,7 @@ vector: [
 			# Configure the source of logs.
 			[sources.file]
 			type = \"file\"
+			data_dir = \"/tmp/\"
 			include = [\(logs)]
 			ignore_older = 1200
 			# You can enable log file deletion if you have full control of the file.
