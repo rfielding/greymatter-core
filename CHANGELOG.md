@@ -11,7 +11,7 @@
 ### Fixed
 
 - Fixed redis running as root user
-- Fixed vector supoprt for openshift
+- Fixed vector support for openshift
 
 ## 0.16.2 (January 26, 2023)
 
