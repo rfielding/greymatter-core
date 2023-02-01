@@ -1,10 +1,21 @@
 # Changelog
 
-## vNEXT
+## 0.16.3 (February 1, 2023)
+
+### Changed
+
+- Bumped CLI version to 4.7.5
+- Bumped proxy version to 1.8.6
+- Bumped operator version to 0.16.3
+
+### Fixed
+
+- Fixed redis running as root user
+- Fixed vector supoprt for openshift
 
 ## 0.16.2 (January 26, 2023)
 
-### Updated
+### Changed
 
 - Updated cli version to 4.7.4
 

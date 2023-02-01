@@ -40,7 +40,7 @@ mesh: meshv1.#Mesh & {
 		install_namespace: string | *"greymatter"
 		watch_namespaces:  [...string] | *["default", "examples"]
 		images: {
-			proxy:       string | *"greymatter.jfrog.io/dev-oci/greymatter-proxy:1.8.5"
+			proxy:       string | *"greymatter.jfrog.io/dev-oci/greymatter-proxy:1.8.6"
 			catalog:     string | *"greymatter.jfrog.io/dev-oci/greymatter-catalog:3.0.12"
 			dashboard:   string | *"greymatter.jfrog.io/dev-oci/greymatter-dashboard:6.0.10"
 			control:     string | *"greymatter.jfrog.io/dev-oci/greymatter-control:1.8.9"
@@ -76,8 +76,8 @@ defaults: {
 	}
 
 	images: {
-		cli:               string | *"greymatter.jfrog.io/dev-oci/greymatter-cli:4.7.4"
-		operator:          string | *"greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.2" @tag(operator_image)
+		cli:               string | *"greymatter.jfrog.io/dev-oci/greymatter-cli:4.7.5"
+		operator:          string | *"greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.3" @tag(operator_image)
 		vector:            string | *"timberio/vector:0.22.0-debian"
 		observables:       string | *"greymatter.jfrog.io/dev-oci/greymatter-audits:1.1.7"
 		keycloak:          string | *"quay.io/keycloak/keycloak:19.0.3"
