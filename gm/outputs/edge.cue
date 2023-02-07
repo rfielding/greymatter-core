@@ -50,6 +50,9 @@ edge_config: [
 	#domain & {
 		domain_key: egress_to_redis
 		port:       defaults.ports.redis_ingress
+		// Set to true to force no ssl_config
+		// on the plaintext egress listener
+		_is_egress: true
 	},
 	#cluster & {
 		cluster_key:  egress_to_redis

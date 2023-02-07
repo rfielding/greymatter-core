@@ -293,13 +293,14 @@ def test_ssl_edge_tls_and_internal_tls():
     m1.total_objects
     
     # ASSERTIONS
-    # all domains should have ssl config except observables_egress_to_elasticsearch
+    # all domains should have ssl config
+    #   - except egress domains
     LOGGER.info("Checking Domains")
     test_schema= copy.deepcopy(constant.DOMAIN_SCHEMA)
     test_schema.update({"required": ["ssl_config"]})
     for i in m1.domain_dict:
         LOGGER.info(m1.domain_dict.get(i))
-        if (i != "observables_egress_to_elasticsearch"):
+        if not i.__contains__("egress"):
             assert is_x(m1.domain_dict.get(i),test_schema) == True
             assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == False
         else:
@@ -333,7 +334,7 @@ def test_ssl_edge_tls_and_internal_mtls():
     
     # ASSERTIONS
     # all domains should have ssl config
-    #   - except observables_egress_to_elasticsearch
+    #   - except egress domains
     # edge will not require client certs
     # all others will require client certs
     LOGGER.info("Checking Domains")
@@ -341,7 +342,7 @@ def test_ssl_edge_tls_and_internal_mtls():
     test_schema.update({"required": ["ssl_config"]})
     for i in m1.domain_dict:
         LOGGER.info(m1.domain_dict.get(i))
-        if i != "observables_egress_to_elasticsearch":
+        if not i.__contains__("egress"):
             assert is_x(m1.domain_dict.get(i),test_schema) == True
             if i == "edge":
                 assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == False
@@ -516,14 +517,14 @@ def test_ssl_edge_mtls_and_internal_mtls():
 
     # ASSERTIONS
     # all domains should have ssl config 
-    #   - except observables_egress_to_elasticsearch
+    #   - except egress domains
     # domains with ssl_config should require_client_certs
     LOGGER.info("Checking Domains")
     test_schema= copy.deepcopy(constant.DOMAIN_SCHEMA)
     test_schema.update({"required": ["ssl_config"]})
     for i in m1.domain_dict:
         LOGGER.info(m1.domain_dict.get(i))
-        if i != "observables_egress_to_elasticsearch":
+        if not i.__contains__("egress"):
             assert is_x(m1.domain_dict.get(i), test_schema) == True
             assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == True
         else:

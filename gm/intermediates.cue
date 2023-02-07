@@ -46,6 +46,7 @@ import (
 	_key_path:         string | *"/etc/proxy/tls/sidecar/server.key"
 
 	_force_no_ssl: bool | *false
+	_is_egress: bool | * false
 
 	_enable_ssl_block:[
 		if (domain_key != defaults.edge.key && (_security_spec.internal.type == "manual-tls" || _security_spec.internal.type == "manual-mtls")) {true}
@@ -54,7 +55,7 @@ import (
 		if _security_spec.internal.type == "spire" {false}
 	][0]
 
-	if  _enable_ssl_block && (! _force_no_ssl){
+	if  _enable_ssl_block && (! _force_no_ssl) && (! _is_egress) {
 		if domain_key != defaults.edge.key {
 			_require_client_certs:[
 				if _security_spec.internal.type == "manual-tls" {false}

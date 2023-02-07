@@ -30,6 +30,9 @@ observables_config: [
 	#domain & {
 		domain_key: EgressToRedisName
 		port: defaults.ports.redis_ingress
+		// Set to true to force no ssl_config
+		// on the plaintext egress listener
+		_is_egress: true
 	},
 	#cluster & {
 		cluster_key:  EgressToRedisName
@@ -54,7 +57,9 @@ observables_config: [
 		domain_key: EgressToElasticSearchName
 		// don't change this, the app expects this port
 		port: 9200
-		_force_no_ssl: true
+		// Set to true to force no ssl_config
+		// on the plaintext egress listener
+		_is_egress: true
 	},
 	#cluster & {
 		cluster_key:    EgressToElasticSearchName
