@@ -75,12 +75,12 @@ observables: [
 							}]
 							resources: {
 								limits: {
-									cpu:    "1"
+									cpu:    "20m"
 									memory: "2Gi"
 								}
 								requests: {
-									cpu:    "500m"
-									memory: "1Gi"
+									cpu:    "10m"
+									memory: "19Mi"
 								}
 							}
 						},

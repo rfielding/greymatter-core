@@ -68,8 +68,8 @@ dashboard: [
 								{name: "KEYCLOAK_AUTH_URL", value:            "\(defaults.edge.oidc.endpoint)\(_authRealms)\(defaults.edge.oidc.realm)/protocol/openid-connect/token"},
 							]
 							resources: {
-								limits: {cpu: "200m", memory: "1Gi"}
-								requests: {cpu: "100m", memory: "500Mi"}
+								limits: {cpu: "50m", memory: "1Gi"}
+								requests: {cpu: "10m", memory: "15Mi"}
 							}
 							volumeMounts: [
 								{

@@ -149,13 +149,13 @@ vector: [
 							readOnly:  true
 						}]
 						resources: {
-							requests: {
-								memory: "64Mi"
-								cpu:    "500m"
-							}
 							limits: {
-								memory: "1024Mi"
-								cpu:    "6000m"
+								memory: "1.2Gi"
+								cpu:    "1250m"
+							}
+							requests: {
+								memory: "700Mi"
+								cpu:    "750m"
 							}
 						}
 					}]

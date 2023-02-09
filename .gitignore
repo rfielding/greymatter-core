@@ -1,3 +1,4 @@
 /greymatter-download*.sh
 release-versions.yaml
 scripts/__pycache__
+generated-manifests/

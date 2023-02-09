@@ -38,6 +38,15 @@ controlensemble: [
 					}
 				}
 				spec: #spire_permission_requests & {
+					nodeSelector: {
+						"greymatter.io/control-node" : "true"
+					}
+					tolerations: [{
+						key: "controlensemble"
+  						operator: "Equal"
+  						value: "allowed"
+  						effect: "NoSchedule"
+					}]
 					containers: [
 
 						#sidecar_container_block & {_Name: Name},
@@ -64,8 +73,8 @@ controlensemble: [
 								{name: "GM_CONTROL_DIFF_IGNORE_CREATE", value:       "true"},
 							]
 							resources: {
-								limits: {cpu: "200m", memory: "1Gi"}
-								requests: {cpu: "125m", memory: "256Mi"}
+								limits: {cpu: "2500m", memory: "4.5Gi"}
+								requests: {cpu: "2000m", memory: "4Gi"}
 							}
 							imagePullPolicy: defaults.image_pull_policy
 						}, // control
@@ -92,8 +101,8 @@ controlensemble: [
 								{name: "GM_CONTROL_API_REDIS_DB", value:   "0"},
 							]
 							resources: {
-								limits: {cpu: "400m", memory: "512Mi"}
-								requests: {cpu: "250m", memory: "256Mi"}
+								limits: {cpu: "150m", memory: "620Mi"}
+								requests: {cpu: "75m", memory: "120Mi"}
 							}
 							imagePullPolicy: defaults.image_pull_policy
 						}, // control_api

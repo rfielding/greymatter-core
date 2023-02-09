@@ -35,12 +35,12 @@ import (
 	]
 	resources: {
 		limits: {
-			cpu:    *"200m" | string
-			memory: *"512Mi" | string
+			cpu:    *"330m" | string
+			memory: *"615Mi" | string
 		}
 		requests: {
-			cpu:    *"50m" | string
-			memory: *"128Mi" | string
+			cpu:    *"250m" | string
+			memory: *"115Mi" | string
 		}
 
 	}

@@ -121,12 +121,12 @@ operator_sts: [
 						}
 						resources: {
 							limits: {
-								cpu:    "200m"
-								memory: "300Mi"
+								cpu:    "400m"
+								memory: "1.1Gi"
 							}
 							requests: {
-								cpu:    "100m"
-								memory: "150Mi"
+								cpu:    "150m"
+								memory: "600Mi"
 							}
 						}
 						securityContext: {

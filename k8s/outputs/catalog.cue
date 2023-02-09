@@ -58,9 +58,8 @@ catalog: [
 								{name: "REDIS_DB", value:   "0"},
 							]
 							resources: {
-								limits: {cpu: "200m", memory: "1Gi"}
-								requests: {cpu: "50m", memory: "128Mi"}
-
+								limits: {cpu: "600m", memory: "735Mi"}
+								requests: {cpu: "500m", memory: "235Mi"}
 							}
 							imagePullPolicy: defaults.image_pull_policy
 							volumeMounts: [
