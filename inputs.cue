@@ -2,7 +2,7 @@ package greymatter
 
 import (
 	corev1 "k8s.io/api/core/v1"
-	"github.com/greymatter-io/common/api/meshv1"
+	"github.com/greymatter-io/operator/api/meshv1"
 )
 
 config: {
@@ -48,6 +48,7 @@ mesh: meshv1.#Mesh & {
 			redis:       string | *"index.docker.io/library/redis:6.2.7"
 			prometheus:  string | *"index.docker.io/prom/prometheus:v2.40.1"
 		}
+		display_name: string | *"greymatter Mesh"
 	}
 }
 
@@ -88,7 +89,7 @@ defaults: {
 		// The official Redis container runs as root, but many hardened containers will run as
 		// a different user. Setting this to the gid of the Redis user sets the pod fsGroup security 
 		// context to the gid so the Redis user can access its persistent volume.
-		
+
 		// gid: 1001
 	}
 
