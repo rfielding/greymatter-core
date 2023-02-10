@@ -80,17 +80,6 @@ steps:
       - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_COMMIT}_none_none.tar.gz
       - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_BRANCH}_none_none.tar.gz
 
-  # PROMOTE COMPONENTS To staging
-  - label: "test-promote artifacts to staging"
-    key: "promote-test"
-    env:
-      SRC_GENERIC_CI: "dev-generic"
-      DEST_GENERIC_CI: "ci-staging-generic"
-      SRC_OCI_CI: "dev-oci"
-      DEST_OCI_CI: "ci-staging-oci"
-    # promotion defaults to dry run
-    command: ./scripts/promotion 
-
   # promote latest on main 
   - label: "Promote Binaries to Artifactory (latest)"
     key: promote-generic-latest
@@ -102,20 +91,3 @@ steps:
     commands:
       - buildkite-agent artifact download greymatter-core.tar.gz . --step package-tarball
       - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_latest_none_none.tar.gz
-
-  - label: "promote artifacts to staging"
-    key: "promote"
-    depends_on:
-      - promote-test
-    env:
-      SRC_GENERIC_CI: "dev-generic"
-      DEST_GENERIC_CI: "ci-staging-generic"
-      SRC_OCI_CI: "dev-oci"
-      DEST_OCI_CI: "ci-staging-oci"
-    if: build.branch == "main"
-    # --yes flag for promotion results in actual promotion
-    command: ./scripts/promotion --yes
-    artifact_paths:
-      - release-versions.yaml
-      - greymatter-download*.sh
-      - inputs-output.cue
