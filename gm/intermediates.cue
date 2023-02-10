@@ -654,6 +654,7 @@ import (
 	domain_keys:   [...string] | *[proxy_key]
 	listener_keys: [...string] | *[proxy_key]
 	zone_key:      mesh.spec.zone
+	filters: {}
 }
 
 #spire_secret: {
