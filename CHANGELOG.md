@@ -1,5 +1,15 @@
 # Changelog
 
+## vNext
+
+### Added
+
+- Added `mesh.spec.display_name` for Catalog mesh name
+
+### Changed
+
+- Changed operator package from `v1alpha1` to `meshv1`
+
 ## 0.16.3 (February 1, 2023)
 
 ### Changed

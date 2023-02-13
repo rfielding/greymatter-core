@@ -23,7 +23,7 @@ catalog: [
 			template: {
 				metadata: {
 					labels: {
-						"greymatter.io/cluster": Name
+						"greymatter.io/cluster":  Name
 						"greymatter.io/workload": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 					}
 				}
@@ -51,9 +51,9 @@ catalog: [
 								{name: "REDIS_DB", value:   "0"},
 							]
 							resources: {
-								limits: { cpu: "200m", memory: "1Gi" }
-								requests: { cpu: "50m", memory: "128Mi"}
-								
+								limits: {cpu: "200m", memory: "1Gi"}
+								requests: {cpu: "50m", memory: "128Mi"}
+
 							}
 							imagePullPolicy: defaults.image_pull_policy
 							volumeMounts: [
@@ -87,6 +87,7 @@ catalog: [
 			"seed.yaml": """
         \(mesh.metadata.name):
           mesh_type: greymatter
+          name: Greymatter Mesh
           sessions:
             default:
               url: \(defaults.xds_host):50000

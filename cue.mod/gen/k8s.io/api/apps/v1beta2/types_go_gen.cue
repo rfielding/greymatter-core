@@ -65,8 +65,9 @@ import (
 // more information.
 // StatefulSet represents a set of pods with consistent identities.
 // Identities are defined as:
-//  - Network: A single stable DNS and hostname.
-//  - Storage: As many VolumeClaims as requested.
+//   - Network: A single stable DNS and hostname.
+//   - Storage: As many VolumeClaims as requested.
+//
 // The StatefulSet guarantees that a given network identity will always
 // map to the same storage identity.
 #StatefulSet: {
@@ -260,7 +261,6 @@ import (
 	// Minimum number of seconds for which a newly created pod should be ready
 	// without any of its container crashing for it to be considered available.
 	// Defaults to 0 (pod will be considered available as soon as it is ready)
-	// This is an alpha field and requires enabling StatefulSetMinReadySeconds feature gate.
 	// +optional
 	minReadySeconds?: int32 @go(MinReadySeconds) @protobuf(9,varint,opt)
 
@@ -313,7 +313,6 @@ import (
 	conditions?: [...#StatefulSetCondition] @go(Conditions,[]StatefulSetCondition) @protobuf(10,bytes,rep)
 
 	// Total number of available pods (ready for at least minReadySeconds) targeted by this StatefulSet.
-	// This is a beta field and enabled/disabled by StatefulSetMinReadySeconds feature gate.
 	// +optional
 	availableReplicas: int32 @go(AvailableReplicas) @protobuf(11,varint,opt)
 }
@@ -633,7 +632,6 @@ import (
 	// daemonset on any given node can double if the readiness check fails, and
 	// so resource intensive daemonsets should take into account that they may
 	// cause evictions during disruption.
-	// This is beta field and enabled/disabled by DaemonSetUpdateSurge feature gate.
 	// +optional
 	maxSurge?: null | intstr.#IntOrString @go(MaxSurge,*intstr.IntOrString) @protobuf(2,bytes,opt)
 }
