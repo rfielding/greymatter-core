@@ -5,6 +5,7 @@ package greymatter
 import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"strings"
 )
 
 let Name = defaults.redis_cluster_name
@@ -26,6 +27,12 @@ redis: [
 					labels: {
 						"greymatter.io/cluster": Name
 						"greymatter.io/workload": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
+						for i in defaults.additional_labels.all_pods {
+							"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])",
+						}
+						if len(defaults.additional_labels.external_spire_label) > 0{
+							"\(defaults.additional_labels.external_spire_label)": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
+						}
 					}
 				}
 				spec: #spire_permission_requests & {

@@ -257,4 +257,15 @@ defaults: {
 		cert_secret: string | *defaults.edge.secret_name
 	}
 
+	additional_labels: {
+		// Labels to add to all greymatter core pods
+		all_pods: [...string] | *[]
+		// If integrating with an external spire that uses pod_labels for registration
+		// Add the label it is looking for and this label will be added to all greymatter
+		// core components
+		external_spire_label: string | *""
+		// Labels to add to the edge service
+		edge_service: [...string] | *[]
+	}
+
 } // defaults

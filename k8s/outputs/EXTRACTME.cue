@@ -107,4 +107,9 @@ sidecar_container: {
 redis_configs: redis
 vector: vector
 redis_openshift: openshift_redis_scc
-
+control_configs: controlensemble
+dashboard_configs: dashboard
+edge_configs: edge
+catalog_configs: catalog
+jwt_configs: jwt_security
+observables_configs: observables
