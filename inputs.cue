@@ -180,6 +180,10 @@ defaults: {
 		// defaults.internal.core_internal_tls_certs.require_client_certs to true.
 		require_client_certs: bool | *false @tag(edge_require_client_certs, type=bool)
 		secret_name:          "gm-edge-ingress-certs"
+		annotations:{
+			// Additional annotations for the core edge service. ex: ["annotation_key_1:value1", "annotation_key_2:value2"]
+			service: [...string] | *[]
+		}
 		oidc: {
 			// upstream_host is the FQDN of your OIDC service.
 			upstream_host: "foobar.oidc.com"
