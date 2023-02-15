@@ -79,6 +79,13 @@ edge: [
 					}
 				}
 			}
+			if len(defaults.edge.annotations.service) > 0 {
+				annotations:{
+					for i in defaults.edge.annotations.service {
+						"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])",
+					}
+				}
+			}
 		}
 		spec: {
 			selector: "greymatter.io/cluster": defaults.edge.key
