@@ -4,10 +4,20 @@ import yaml
 import argparse
 import os
 
-# resource_order to apply
-# most from helm's implementation
-# SecurityContextConstraints best guess location
-resource_order=("Namespace", "NetworkPolicy", "ResourceQuota", "LimitRange", "PodSecurityPolicy", "PodDisruptionBudget", "ServiceAccount", "Secret", "SecretList", "ConfigMap", "StorageClass", "PersistentVolume", "PersistentVolumeClaim", "CustomResourceDefinition","SecurityContextConstraints", "ClusterRole", "ClusterRoleList", "ClusterRoleBinding", "ClusterRoleBindingList", "Role", "RoleList", "RoleBinding", "RoleBindingList", "Service", "DaemonSet", "Pod", "ReplicationController", "ReplicaSet", "Deployment", "HorizontalPodAutoscaler", "StatefulSet", "Job", "CronJob", "IngressClass", "Ingress", "APIService")
+
+# When adding resources to order non namespace scoped resources
+# Should be added first, cluster scoped objects should follow,
+# namespace scoped resources should be last.
+# If a resource is referenced in other resources then the resource being referenced should come first.
+# 
+# Resources not in helm's ordering implementation are using above guidelines for placement:
+# SecurityContextConstraints, PriorityClass 
+resource_order=("PriorityClass", "Namespace", "NetworkPolicy", "ResourceQuota", "LimitRange", "PodSecurityPolicy", 
+    "PodDisruptionBudget", "ServiceAccount", "Secret", "SecretList", "ConfigMap", "StorageClass", 
+    "PersistentVolume", "PersistentVolumeClaim", "CustomResourceDefinition","SecurityContextConstraints", 
+    "ClusterRole", "ClusterRoleList", "ClusterRoleBinding", "ClusterRoleBindingList", "Role", "RoleList", 
+    "RoleBinding", "RoleBindingList", "Service", "DaemonSet", "Pod", "ReplicationController", "ReplicaSet", 
+    "Deployment", "HorizontalPodAutoscaler", "StatefulSet", "Job", "CronJob", "IngressClass", "Ingress", "APIService")
 
 # list of dicts
 objects=[]

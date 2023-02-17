@@ -150,7 +150,7 @@ vector: [
 						}]
 						resources: {
 							limits: {
-								memory: "1.2Gi"
+								memory: "1200Mi"
 								cpu:    "1250m"
 							}
 							requests: {

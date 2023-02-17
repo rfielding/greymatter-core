@@ -83,7 +83,7 @@ prometheus: [
 							]
 							resources: {
 								limits: {cpu: "1250m", memory: "3Gi"}
-								requests: {cpu: "500m", memory: "2.5Gi"}
+								requests: {cpu: "500m", memory: "2500Mi"}
 							}
 						},
 					]

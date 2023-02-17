@@ -6,6 +6,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
+	schedulingv1 "k8s.io/api/scheduling/v1"
 	"strings"
 	// "list"
 )
@@ -38,19 +39,9 @@ controlensemble: [
 					}
 				}
 				spec: #spire_permission_requests & {
-					nodeSelector: {
-						"greymatter.io/control-node" : "true"
-					}
-					tolerations: [{
-						key: "controlensemble"
-  						operator: "Equal"
-  						value: "allowed"
-  						effect: "NoSchedule"
-					}]
+					priorityClassName: Name
 					containers: [
-
 						#sidecar_container_block & {_Name: Name},
-
 						{
 							name:  "control"
 							image: mesh.spec.images.control
@@ -71,6 +62,7 @@ controlensemble: [
 								{name: "GM_CONTROL_API_KEY", value:                  "xxx"}, // no longer used, but must be set
 								{name: "GM_CONTROL_API_ZONE_NAME", value:            mesh.spec.zone},
 								{name: "GM_CONTROL_DIFF_IGNORE_CREATE", value:       "true"},
+								{name: "GM_CONTROL_CONSOLE_LEVEL", value: "error"},							
 							]
 							resources: {
 								limits: {cpu: "2500m", memory: "4.5Gi"}
@@ -99,6 +91,7 @@ controlensemble: [
 								{name: "GM_CONTROL_API_REDIS_HOST", value: defaults.redis_host},
 								{name: "GM_CONTROL_API_REDIS_PORT", value: "6379"}, // local redis in this pod
 								{name: "GM_CONTROL_API_REDIS_DB", value:   "0"},
+								{name: "GM_CONTROL_API_LOG_LEVEL", value: "error" },
 							]
 							resources: {
 								limits: {cpu: "150m", memory: "620Mi"}
@@ -189,4 +182,14 @@ controlensemble: [
 			]
 		}
 	},
+
+	schedulingv1.#PriorityClass & {
+		apiVersion: "scheduling.k8s.io/v1"
+		description: "Used for prioritizing greymatter control pods"
+		kind: "PriorityClass"
+		metadata:
+			name: Name
+		preemptionPolicy: "PreemptLowerPriority"
+		value: 999999999
+	}
 ]
