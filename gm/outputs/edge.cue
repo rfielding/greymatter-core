@@ -36,7 +36,6 @@ edge_config: [
 		][0]
 		_oidc_service_url:   "\(_edge_protocol)://\(defaults.edge.oidc.edge_domain):\(defaults.ports.edge_ingress)"
 		_oidc_client_id:     defaults.edge.oidc.client_id
-		_oidc_client_secret: defaults.edge.oidc.client_secret
 		_oidc_cookie_domain: defaults.edge.oidc.edge_domain
 		_oidc_realm: defaults.edge.oidc.realm
 	},

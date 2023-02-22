@@ -147,7 +147,6 @@ import (
 	_oidc_endpoint:      string
 	_oidc_service_url:   string
 	_oidc_client_id:     string
-	_oidc_client_secret: string
 	_oidc_cookie_domain: string
 	_oidc_realm:         string
 
@@ -172,6 +171,14 @@ import (
 	// domain, or if you use a different string for your domain
 	// and listener keys.
 	domain_keys: [...string] | *[listener_key]
+
+	// External filters secrets are utilized by Control to 
+	// map secretive information read from the environment
+	// into a filters configuration.
+	_external_filter_secrets: {
+		...
+	}
+
 
 	// _http_filter_weight establishes a baseline for greymatter
 	// filter priority. The ordering here does not matter as 
@@ -267,12 +274,12 @@ import (
 		// NB: Even if configuration exists in network_filters for a filter,
 		// only filters which are listed as active will be applied and used.
 		active_network_filters: list.Sort(
-					// the inputted array is the combined user defined filters and our
-					// known list of toggleable filters.
-					_active_network_filter_toggles+_active_network_filters,
-					// the sort algorithm used is stable.
-					{x: string, y: string, less: _network_filter_weight[x] < _network_filter_weight[y]},
-					)
+			// the inputted array is the combined user defined filters and our
+			// known list of toggleable filters.
+			_active_network_filter_toggles+_active_network_filters,
+			// the sort algorithm used is stable.
+			{x: string, y: string, less: _network_filter_weight[x] < _network_filter_weight[y]},
+		)
 
 		network_filters: {
 			// Configures rate limiting for TCP listeners.
@@ -372,12 +379,22 @@ import (
 		// We use a special sort weight to correctly prioritize what filter order 
 		// these get applied in.
 		active_http_filters: list.Sort(
-					// the inputted array is the combined user defined filters and our
-					// known list of toggleable filters.
-					_active_http_filter_toggles+_active_http_filters,
-					// the sort algorithm used is stable.
-					{x: string, y: string, less: _http_filter_weight[x] < _http_filter_weight[y]},
-					)
+			// the inputted array is the combined user defined filters and our
+			// known list of toggleable filters.
+			_active_http_filter_toggles+_active_http_filters,
+			// the sort algorithm used is stable.
+			{x: string, y: string, less: _http_filter_weight[x] < _http_filter_weight[y]},
+		)
+
+		// Set a default external_secret for DEV mode redis connections.
+		// NOTE: we have to do another IF statement for the OIDC check
+		// due to CUE scoping. If we use the check inside of the `http_filters` object
+		// CUE loses scope and evaluation fails.
+		_external_filter_secrets: metrics_receiver_secret: defaults.metrics_receiver
+		if _enable_oidc_authentication {
+			_external_filter_secrets: oidc_authn_secret: defaults.edge.oidc.client_secret
+		}
+
 
 		// http_filters contains the configuration for HTTP filters (not TCP)
 		// potentially applied to the listener. Note again that the active_http_filters
@@ -396,10 +413,12 @@ import (
 				metrics_key_function:                       "depth"
 				metrics_key_depth:                          string | *"1"
 				metrics_receiver: {
-					redis_connection_string: string | *"redis://127.0.0.1:\(defaults.ports.redis_ingress)"
+					// The connection string gets set by the external secret mechnanism in secrets/
+					redis_connection_string?: string
 					push_interval_seconds:   10
 				}
 			}
+
 			// gm_observables configures the proxy to emit information about each request made to 
 			// the service for audits.
 			gm_observables: {
@@ -421,7 +440,6 @@ import (
 					serviceUrl:   _oidc_service_url
 					provider:     _oidc_provider
 					clientId:     _oidc_client_id
-					clientSecret: _oidc_client_secret
 					accessToken: {
 						cookieOptions: {
 							domain: _oidc_cookie_domain
@@ -521,6 +539,9 @@ import (
 			forward_client_cert_details: "APPEND_FORWARD"
 		}
 	}
+
+	// calculate all external secrets
+	external_secrets: [for k, v in _external_filter_secrets { v }]
 
 	zone_key: mesh.spec.zone
 }

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -uo pipefail
+set -e
 
 cmd_eval_all () {
   cmd_eval_gm_basic
@@ -60,19 +61,14 @@ cmd_eval_spire () {
   fi
 }
 
-cmd_eval_gm(){
-  echo "Running cue eval on kubernetes configs with spire and edge tls enabled"
-  pip3 install pytest
-  which pytest
-  pytest scripts/gm_test_functions.py --no-header -v
-}
+set +e
 
 # test spire enabled and tls enabled
 # should see spire stuff in k8s and gm 
 # should have tls on edge but not any other sidecar
 cmd_eval_k8s_spire_enabled_and_edge_tls_enabled(){
   echo "Running cue eval on kubernetes configs with spire and edge tls enabled"
-  cue_eval=$(cue eval -t spire=true -t edge_enable_tls=true -c ./k8s/outputs ./global_intermediates.cue ./inputs.cue -e k8s_manifests --out=json)
+  cue_eval=$(cue eval -t spire=true -t edge_enable_tls=true -c ./k8s/outputs ./global_intermediates.cue ./secrets.cue ./inputs.cue -e k8s_manifests --out=json)
 
   ################################
   # FOR DEPLOY/STS WITH NOT EDGE
@@ -135,7 +131,7 @@ cmd_eval_k8s_spire_enabled_and_edge_tls_enabled(){
 # should see spire stuff in k8s but no tls stuff 
 cmd_eval_k8s_spire_enabled_and_edge_tls_disabled(){
   echo "Running cue eval on kubernetes configs with spire enabled and edge tls disabled"
-  cue_eval=$(cue eval -t spire=true -t edge_enable_tls=false -c ./k8s/outputs ./global_intermediates.cue ./inputs.cue -e k8s_manifests --out=json)
+  cue_eval=$(cue eval -t spire=true -t edge_enable_tls=false -c ./k8s/outputs ./global_intermediates.cue ./secrets.cue ./inputs.cue -e k8s_manifests --out=json)
 
   ################################
   # FOR DEPLOY/STS WITH NOT EDGE
@@ -198,7 +194,7 @@ cmd_eval_k8s_spire_enabled_and_edge_tls_disabled(){
 # should see spire stuff in k8s but no tls stuff 
 cmd_eval_k8s_spire_disabled_and_edge_tls_disabled(){
   echo "Running cue eval on kubernetes configs with spire and edge tls disabled"
-  cue_eval=$(cue eval -t spire=false -t edge_enable_tls=false -c ./k8s/outputs ./global_intermediates.cue ./inputs.cue -e k8s_manifests --out=json)
+  cue_eval=$(cue eval -t spire=false -t edge_enable_tls=false -c ./k8s/outputs ./global_intermediates.cue ./secrets.cue ./inputs.cue -e k8s_manifests --out=json)
 
   ################################
   # FOR DEPLOY/STS WITH NOT EDGE
@@ -318,6 +314,11 @@ cmd_eval_k8s_spire_disabled_and_edge_tls_enabled(){
   else
     echo -e "\nTest ${FUNCNAME[0]}............PASSED\n"
   fi
+}
+
+cmd_eval_gm(){
+  echo "Running cue eval on kubernetes configs with spire and edge tls enabled"
+  pytest scripts/gm_test_functions.py --no-header -v
 }
 
 source scripts/k8s_test_functions.sh

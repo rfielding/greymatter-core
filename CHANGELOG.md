@@ -5,6 +5,10 @@
 ### Added
 
 - Added `mesh.spec.display_name` for Catalog mesh name
+- Introduced support for defining filter/mesh secrets as 
+  `#KubernetesSecret` or `#PlaintextSecret`. This enables users to read secrets
+  from the environment given one of the supported formats. Note, plaintext secrets
+  should remain undocumented and used for internal development only.
 
 ### Changed
 

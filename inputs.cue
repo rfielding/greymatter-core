@@ -2,6 +2,7 @@ package greymatter
 
 import (
 	corev1 "k8s.io/api/core/v1"
+	greymatter "greymatter.io/api"
 	"github.com/greymatter-io/operator/api/meshv1"
 )
 
@@ -45,7 +46,7 @@ mesh: meshv1.#Mesh & {
 			dashboard:   string | *"greymatter.jfrog.io/dev-oci/greymatter-dashboard:6.0.10"
 			control:     string | *"greymatter.jfrog.io/dev-oci/greymatter-control:1.8.9"
 			control_api: string | *"greymatter.jfrog.io/dev-oci/greymatter-control-api:1.8.9"
-			redis:       string | *"index.docker.io/library/redis:6.2.7"
+			redis:       string | *"index.docker.io/library/redis:7.0.8"
 			prometheus:  string | *"index.docker.io/prom/prometheus:v2.40.1"
 		}
 		display_name: string | *"greymatter Mesh"
@@ -64,6 +65,14 @@ defaults: {
 	redis_db:               0
 	redis_username:         ""
 	redis_password:         ""
+	metrics_receiver:       #MetricsRedisSecret & {
+		greymatter.#PlaintextSecret
+
+		plaintext_secret: {
+			secret: "redis://127.0.0.1:\(defaults.ports.redis_ingress)"
+		}
+	}
+
 	// key names for applied-state backups to Redis - they only need to be unique.
 	gitops_state_key_gm:      "\(config.operator_namespace).gmHashes"
 	gitops_state_key_k8s:     "\(config.operator_namespace).k8sHashes"
@@ -202,8 +211,17 @@ defaults: {
 			// client_id is the ID of a client in a realm in your OIDC provider.
 			client_id: "greymatter"
 			// client_secret is the secret key of a client in a realm in your
-			// OIDC provider. 
-			client_secret: ""
+			// OIDC provider. It must be provided as a kubernetes secret in the 
+			// target namespace. Uncomment this block when using OIDC.
+			// client_secret: #OIDCSecret & {
+			// 	greymatter.#KubernetesSecret
+
+			// 	kubernetes_secret: {
+			// 		namespace: mesh.spec.install_namespace
+			// 		name:      "oidc-client-secret"
+			// 		key:       "client-secret"
+			// 	}
+			// }
 			// enable_remote_jwks is a toggle that automatically enables remote
 			// JSON Web Key Sets (JWKS) verification with your OIDC provider.
 			// Alternatively, you can disable this and use local_jwks below.

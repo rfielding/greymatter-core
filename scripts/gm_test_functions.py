@@ -42,7 +42,7 @@ def is_x(object, object_schema):
     return True
 
 def cue_eval(tag_dict):
-    eval_cmd="cue eval -c ./gm/outputs -e mesh_configs --out=json"
+    eval_cmd="cue eval -c ./gm/outputs --out=json -e mesh_configs"
     for i in tag_dict:
         print(i)
         eval_cmd="%s -t %s=%s" % (eval_cmd, i, tag_dict[i])

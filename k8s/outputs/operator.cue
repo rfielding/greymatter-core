@@ -54,11 +54,11 @@ operator_sts: [
 										optional: true
 									}
 								}
-							}
+							},
 							{
-								name: "SSH_KNOWN_HOSTS"
+								name:  "SSH_KNOWN_HOSTS"
 								value: "/app/.ssh/known_hosts"
-							}
+							},
 						]
 						if !config.debug {
 							// command: ["sleep"] // DEBUG
