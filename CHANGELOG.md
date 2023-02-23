@@ -5,6 +5,7 @@
 ### Added
 
 - Added `mesh.spec.display_name` for Catalog mesh name
+- PriorityClass for ControlEnsemble
 - Introduced support for defining filter/mesh secrets as 
   `#KubernetesSecret` or `#PlaintextSecret`. This enables users to read secrets
   from the environment given one of the supported formats. Note, plaintext secrets
@@ -13,6 +14,7 @@
 ### Changed
 
 - Changed operator package from `v1alpha1` to `meshv1`
+- Default resosurce requests and limits to match 300 services benchmarks
 
 ## 0.16.3 (February 1, 2023)
 

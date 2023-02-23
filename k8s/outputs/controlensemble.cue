@@ -65,8 +65,8 @@ controlensemble: [
 								{name: "GM_CONTROL_CONSOLE_LEVEL", value: "error"},							
 							]
 							resources: {
-								limits: {cpu: "2500m", memory: "4.5Gi"}
-								requests: {cpu: "2000m", memory: "4Gi"}
+								limits: {cpu: "250m", memory: "2000Mi"}
+								requests: {cpu: "200m", memory: "1500Mi"}
 							}
 							imagePullPolicy: defaults.image_pull_policy
 						}, // control
