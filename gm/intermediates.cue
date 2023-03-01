@@ -41,7 +41,7 @@ import (
 	zone_key: mesh.spec.zone
 	// Configures TLS settings for incoming requests, utilizing 
 	// mounted certificates to allow for HTTPS traffic
-	_trust_file:       string | *"/etc/proxy/tls/sidecar/ca.crt"
+	_trust_file:       string
 	_certificate_path: string | *"/etc/proxy/tls/sidecar/server.crt"
 	_key_path:         string | *"/etc/proxy/tls/sidecar/server.key"
 
@@ -70,7 +70,7 @@ import (
 		}
 
 		force_https: true
-		ssl_config:  greymatter.#SSLConfig & {
+		ssl_config: greymatter.#SSLConfig & {
 			// Specify a TLS Protocol to use when communicating
 			// Supported options are:
 			// TLS_AUTO TLSv1_0 TLSv1_1 TLSv1_2 TLSv1_3
@@ -80,7 +80,9 @@ import (
 			// That we specify in the k8s manifests for the service.
 			// If these files are mounted in a different location, change
 			// these paths.
-			trust_file: _trust_file
+			if _require_client_certs {
+				trust_file: _trust_file | *"/etc/proxy/tls/sidecar/ca.crt"
+			}
 			cert_key_pairs: [
 				greymatter.#CertKeyPathPair & {
 					certificate_path: _certificate_path
@@ -559,9 +561,14 @@ import (
 	_enable_circuit_breakers: bool | *false
 	// We can expand options here for load balancers that superseed the lb_policy field
 	_load_balancer:    *"round_robin" | "least_request" | "maglev" | "ring_hash" | "random"
-	_trust_file:       string | *"/etc/proxy/tls/sidecar/ca.crt"
+	_trust_file:       string
 	_certificate_path: string | *"/etc/proxy/tls/sidecar/server.crt"
 	_key_path:         string | *"/etc/proxy/tls/sidecar/server.key"
+	// Set _require_client_certs for TLS enabled sidecars to require
+	// x.509 client certificates during the TLS handshake. For web browsers,
+	// the user will need to load their certificate into their browser or
+	// computer's certificate storage.
+	_require_client_certs: bool | *false
 
 	cluster_key: string
 	name:        string | *cluster_key
@@ -581,6 +588,10 @@ import (
 		}
 	}
 
+	_require_client_certs:[
+		if _security_spec.internal.type == "manual-tls" {false}
+		if _security_spec.internal.type == "manual-mtls" {true}
+	][0]
 	_enable_ssl_block:[
 		if (_security_spec.internal.type == "manual-mtls") {true}
 		if (_security_spec.internal.type == "manual-tls") {true}
@@ -589,14 +600,16 @@ import (
 	][0]
 
 	// if len(instances) == 0 then it is using service discovery (so a cluster from a sidecar going to another sidecar)
-	if  (name != defaults.edge.key && _enable_ssl_block && len(instances) == 0) || _force_https {
+	if (name != defaults.edge.key && _enable_ssl_block && len(instances) == 0) || _force_https {
 		require_tls: true
 		ssl_config: {
 			cert_key_pairs: [{
 				certificate_path: _certificate_path
 				key_path:         _key_path
 			}]
-			trust_file: _trust_file
+		}
+		if _require_client_certs {
+			ssl_config: trust_file: _trust_file | *"/etc/proxy/tls/sidecar/ca.crt"
 		}
 	}
 

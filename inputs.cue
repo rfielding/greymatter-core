@@ -44,8 +44,8 @@ mesh: meshv1.#Mesh & {
 			proxy:       string | *"greymatter.jfrog.io/dev-oci/greymatter-proxy:1.8.6"
 			catalog:     string | *"greymatter.jfrog.io/dev-oci/greymatter-catalog:3.0.12"
 			dashboard:   string | *"greymatter.jfrog.io/dev-oci/greymatter-dashboard:6.0.10"
-			control:     string | *"greymatter.jfrog.io/dev-oci/greymatter-control:1.8.9"
-			control_api: string | *"greymatter.jfrog.io/dev-oci/greymatter-control-api:1.8.9"
+			control:     string | *"greymatter.jfrog.io/dev-oci/greymatter-control:1.8.10"
+			control_api: string | *"greymatter.jfrog.io/dev-oci/greymatter-control-api:1.8.10"
 			redis:       string | *"index.docker.io/library/redis:7.0.8"
 			prometheus:  string | *"index.docker.io/prom/prometheus:v2.40.1"
 		}
@@ -86,7 +86,7 @@ defaults: {
 	}
 
 	images: {
-		cli:               string | *"greymatter.jfrog.io/dev-oci/greymatter-cli:4.7.5"
+		cli:               string | *"greymatter.jfrog.io/dev-oci/greymatter-cli:4.7.6"
 		operator:          string | *"greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.3" @tag(operator_image)
 		vector:            string | *"timberio/vector:0.22.0-debian"
 		observables:       string | *"greymatter.jfrog.io/dev-oci/greymatter-audits:1.1.7"
