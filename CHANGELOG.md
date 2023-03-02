@@ -1,6 +1,10 @@
 # Changelog
 
-## vNext
+## 0.16.4 (March 1, 2023)
+
+### Fixed
+
+- Fixed one way TLS connections presenting a `trust_file` when they shouldn't.
 
 ### Added
 
@@ -14,7 +18,10 @@
 ### Changed
 
 - Changed operator package from `v1alpha1` to `meshv1`
-- Default resosurce requests and limits to match 300 services benchmarks
+- Default resource requests and limits to match 300 services benchmarks
+- Bumped CLI version to 4.7.6
+- Bumped Control and Control-Api version to 1.8.10
+- Bumped Greymatter Data Store Redis to 7.0.8
 
 ## 0.16.3 (February 1, 2023)
 
