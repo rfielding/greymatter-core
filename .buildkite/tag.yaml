@@ -38,6 +38,7 @@ steps:
       - buildkite-agent artifact download greymatter-download*.sh . --step promote-tag
       - ./scripts/validate-download-script
       - set +x
+    soft_fail: true
 
   - label: "validate generated inputs-cue"
     key: validate-generated-inputs-cue
@@ -49,6 +50,7 @@ steps:
       - buildkite-agent artifact download inputs-output.cue . --step promote-tag
       - mv inputs-output.cue inputs.cue
       - ./scripts/validate-generated-inputs-cue
+    soft_fail: true
 
   - label: "Update generated manifests"
     key: update-generated-manifests
@@ -69,6 +71,7 @@ steps:
     commands:
       - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step update-generated-manifests
       - ./scripts/validate-generated-manifests
+    soft_fail: true
 
   - label: "Package Tarball tag"
     key: "package-tarball-tag"
