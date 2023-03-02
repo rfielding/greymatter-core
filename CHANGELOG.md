@@ -1,5 +1,11 @@
 # Changelog
 
+## vNext
+
+### Changed 
+
+- Bumped CLI version to 4.7.7 in inputs.cue
+
 ## 0.16.4 (March 1, 2023)
 
 ### Fixed
