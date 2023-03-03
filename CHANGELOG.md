@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.6 (March 2, 2023)
+
+### Changed
+
+- Bumped operator version to 0.16.6
+
 ## 0.16.5 (March 2, 2023)
 
 ### Changed 
