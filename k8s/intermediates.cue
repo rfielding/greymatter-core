@@ -75,7 +75,13 @@ import (
 	if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") && !(_security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket) {
 		[{
 			name: "internal-tls-certs"
-			secret: {defaultMode: 420, secretName: defaults.edge.secret_name}
+			secret: {
+				defaultMode: 420,
+				secretName: [
+					if _security_spec.edge.secret_name != _security_spec.internal.manual.secret_name {_security_spec.internal.manual.secret_name}
+					if _security_spec.edge.secret_name == _security_spec.internal.manual.secret_name {_security_spec.edge.secret_name}
+				][0]
+			}
 		}]
 	}
 	[...]
