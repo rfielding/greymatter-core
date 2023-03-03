@@ -87,7 +87,7 @@ defaults: {
 
 	images: {
 		cli:               string | *"greymatter.jfrog.io/dev-oci/greymatter-cli:4.7.7"
-		operator:          string | *"greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.4" @tag(operator_image)
+		operator:          string | *"greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.6" @tag(operator_image)
 		vector:            string | *"timberio/vector:0.22.0-debian"
 		observables:       string | *"greymatter.jfrog.io/dev-oci/greymatter-audits:1.1.7"
 		keycloak:          string | *"quay.io/keycloak/keycloak:19.0.3"
