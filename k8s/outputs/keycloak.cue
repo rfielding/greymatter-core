@@ -70,11 +70,7 @@ keycloak: [
 										}
 									}
 								}]
-							resources: {
-								limits: {cpu: "500m", memory: "2Gi"}
-								requests: {cpu: "200m", memory: "1Gi"}
-
-							}
+							resources: keycloak_resources
 							imagePullPolicy: defaults.image_pull_policy
 							volumeMounts: [
 								{

@@ -55,10 +55,7 @@ redis: [
 								"--dir", "/data",
 								"--logLevel", "verbose",
 							]
-							resources: {
-								limits: { cpu: "20m", memory: "550Mi" }
-								requests: { cpu: "15m", memory: "50Mi" }
-							}
+							resources: redis_resources
 							ports: [{// HACK this port is exposed so the Service (below) can get to it for easy bootstrap
 								name:          "redis"
 								containerPort: 6379

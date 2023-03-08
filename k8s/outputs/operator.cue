@@ -119,16 +119,7 @@ operator_sts: [
 							initialDelaySeconds: 120
 							periodSeconds:       10
 						}
-						resources: {
-							limits: {
-								cpu:    "400m"
-								memory: "1100Mi"
-							}
-							requests: {
-								cpu:    "150m"
-								memory: "600Mi"
-							}
-						}
+						resources: operator_resources
 						securityContext: {
 							allowPrivilegeEscalation: false
 						}

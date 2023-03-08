@@ -63,11 +63,7 @@ keycloak_postgres: [
 								{name: "POSTGRES_DB", value: defaults.keycloak.database_name},
 								{name: "PGDATA", value:      "/var/lib/postgresql/data/pgdata"},
 							]
-							resources: {
-								limits: {cpu: "200m", memory: "1Gi"}
-								requests: {cpu: "50m", memory: "128Mi"}
-
-							}
+							resources: keycloak_postgres_resources
 							imagePullPolicy: defaults.image_pull_policy
 							volumeMounts: [
 								{

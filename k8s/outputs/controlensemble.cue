@@ -62,10 +62,7 @@ controlensemble: [
 								{name: "GM_CONTROL_DIFF_IGNORE_CREATE", value:       "true"},
 								{name: "GM_CONTROL_CONSOLE_LEVEL", value: "error"},							
 							]
-							resources: {
-								limits: {cpu: "250m", memory: "2000Mi"}
-								requests: {cpu: "200m", memory: "1500Mi"}
-							}
+							resources: control_resources
 							imagePullPolicy: defaults.image_pull_policy
 						}, // control
 
@@ -91,10 +88,7 @@ controlensemble: [
 								{name: "GM_CONTROL_API_REDIS_DB", value:   "0"},
 								{name: "GM_CONTROL_API_LOG_LEVEL", value: "error" },
 							]
-							resources: {
-								limits: {cpu: "150m", memory: "620Mi"}
-								requests: {cpu: "75m", memory: "120Mi"}
-							}
+							resources: control_api_resources
 							imagePullPolicy: defaults.image_pull_policy
 						}, // control_api
 

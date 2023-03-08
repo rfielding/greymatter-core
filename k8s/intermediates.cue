@@ -33,17 +33,7 @@ import (
 			{name: "SPIRE_PATH", value: "\(defaults.spire.socket_mount_path)/agent.sock"}
 		},
 	]
-	resources: {
-		limits: {
-			cpu:    *"330m" | string
-			memory: *"615Mi" | string
-		}
-		requests: {
-			cpu:    *"250m" | string
-			memory: *"115Mi" | string
-		}
-
-	}
+	resources: edge_and_sidecar_resources
 	volumeMounts:    #sidecar_volume_mounts + _volume_mounts
 	imagePullPolicy: defaults.image_pull_policy
 }

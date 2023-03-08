@@ -148,16 +148,7 @@ vector: [
 							name:      "var-log"
 							readOnly:  true
 						}]
-						resources: {
-							limits: {
-								memory: "1200Mi"
-								cpu:    "1250m"
-							}
-							requests: {
-								memory: "700Mi"
-								cpu:    "750m"
-							}
-						}
+						resources: vector_resources
 					}]
 					if config.openshift == true {
 						hostPID: true 
