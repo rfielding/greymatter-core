@@ -440,20 +440,7 @@ operator_k8s: [
 				"list",
 				"watch",
 			]
-		}, {
-			apiGroups: [
-				"scheduling.k8s.io"
-			]
-			resources: [
-				"priorityclasses"
-			]
-			verbs:[
-				"create",
-				"update",
-				"get",
-			]
-		}
-		]
+		}]
 	},
 
 	corev1.#Secret & {// the values here get filled in programmatically by the operator

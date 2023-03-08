@@ -1,5 +1,11 @@
 # Changelog
 
+## vNext
+
+### Removed
+
+- Removed PriorityClass from ControlEnsemble and the associated permissions required for the operator.
+
 ## 0.16.6 (March 2, 2023)
 
 ### Changed

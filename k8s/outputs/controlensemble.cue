@@ -6,7 +6,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	schedulingv1 "k8s.io/api/scheduling/v1"
 	"strings"
 	// "list"
 )
@@ -39,7 +38,6 @@ controlensemble: [
 					}
 				}
 				spec: #spire_permission_requests & {
-					priorityClassName: Name
 					containers: [
 						#sidecar_container_block & {_Name: Name},
 						{
@@ -182,14 +180,4 @@ controlensemble: [
 			]
 		}
 	},
-
-	schedulingv1.#PriorityClass & {
-		apiVersion: "scheduling.k8s.io/v1"
-		description: "Used for prioritizing greymatter control pods"
-		kind: "PriorityClass"
-		metadata:
-			name: Name
-		preemptionPolicy: "PreemptLowerPriority"
-		value: 999999999
-	}
 ]
