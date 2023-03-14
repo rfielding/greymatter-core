@@ -12,8 +12,6 @@ let Name = "greymatter-audit-agent"
 let logs_namespaces = [mesh.spec.install_namespace] + mesh.spec.watch_namespaces
 let logs = strings.Join([ for namespace in logs_namespaces {"'/var/log/pods/\(namespace)*/sidecar/*.log'"}], ",")
 
-// vector_permissions need to be applied by the user. They will be used by
-// operator_manifests in k8s/EXTRACTME.cue.
 vector_permissions: [
 	corev1.#Namespace & {
 		apiVersion: "v1"
@@ -141,17 +139,21 @@ vector: [
 						name:            "vector"
 						volumeMounts: [{
 							mountPath: "/etc/vector"
-							name: "config-dir"
-							readOnly: true 
-						},{
+							name:      "config-dir"
+							readOnly:  true
+						}, {
 							mountPath: "/var/log/"
 							name:      "var-log"
 							readOnly:  true
+						}, {
+							name: "data-dir"
+							mountPath: "/tmp/"
+							readOnly: false
 						}]
 						resources: vector_resources
 					}]
 					if config.openshift == true {
-						hostPID: true 
+						hostPID: true
 					}
 					serviceAccountName:            Name
 					terminationGracePeriodSeconds: 60
@@ -166,7 +168,7 @@ vector: [
 							path: "/var/log/"
 						}
 						name: "var-log"
-					},{
+					}, {
 						name: "config-dir"
 						projected: {
 							sources: [{
@@ -180,6 +182,10 @@ vector: [
 								}
 							}]
 						}
+					}, {
+						name: "data-dir"
+						emptyDir:
+							sizeLimit: 50Mi
 					}]
 				}
 			}
@@ -249,7 +255,6 @@ vector: [
 			suppress_type_name = true
 			tls.verify_certificate = \(defaults.audits.elasticsearch_tls_verify_certificate)
 			"""
-
 		}
 	},
 

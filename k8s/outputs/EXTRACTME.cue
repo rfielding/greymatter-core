@@ -33,7 +33,6 @@ operator_manifests: list.Concat([
 			operator_sts,
 			operator_k8s,
 			role_bindings,
-			[ for x in openshift_privileged_scc if config.openshift {x}],
 			[ for x in openshift_vector_scc if config.openshift && config.enable_audits {x}],
 			[ for x in openshift_spire_scc if config.openshift && config.spire {x}],
 			[ for x in openshift_redis_scc if config.openshift {x}],

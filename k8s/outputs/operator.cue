@@ -40,9 +40,6 @@ operator_sts: [
 			template: {
 				metadata: labels: name: "greymatter-operator"
 				spec: {
-					securityContext: {
-						fsGroup: 1000
-					}
 					containers: [{
 						env: [
 							if config.debug {
@@ -120,9 +117,6 @@ operator_sts: [
 							periodSeconds:       10
 						}
 						resources: operator_resources
-						securityContext: {
-							allowPrivilegeEscalation: false
-						}
 						volumeMounts: [
 							{
 								mountPath: "/tmp/k8s-webhook-server/serving-certs"
@@ -140,11 +134,16 @@ operator_sts: [
 								mountPath: "/app/.ssh"
 							},
 						]
+						securityContext: {
+							allowPrivilegeEscalation: false
+							capabilities: {drop: ["ALL"]}
+						}
 					}]
-					imagePullSecrets: []
 					securityContext: {
 						runAsNonRoot: true
+						seccompProfile: {type: "RuntimeDefault"}
 					}
+					imagePullSecrets: []
 					serviceAccountName:            "greymatter-operator"
 					terminationGracePeriodSeconds: 10
 					volumes: [
@@ -215,6 +214,7 @@ operator_k8s: [
 			namespace: config.operator_namespace
 		}
 	},
+
 	rbacv1.#Role & {
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "Role"
@@ -267,6 +267,7 @@ operator_k8s: [
 			]
 		}]
 	},
+
 	rbacv1.#ClusterRole & {
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "ClusterRole"
@@ -382,6 +383,7 @@ operator_k8s: [
 			verbs: [
 				"get",
 				"create",
+				"update",
 			]
 		}, {
 			apiGroups: [
@@ -431,6 +433,10 @@ operator_k8s: [
 				"list",
 				"watch",
 			]
+		}, {
+			apiGroups: ["security.openshift.io"]
+			resources: ["securitycontextconstraints"]
+			verbs: ["use"]
 		}]
 	},
 
@@ -483,5 +489,4 @@ operator_k8s: [
 			namespace: config.operator_namespace
 		}]
 	},
-
 ]

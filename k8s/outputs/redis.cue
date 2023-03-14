@@ -10,6 +10,15 @@ import (
 
 let Name = defaults.redis_cluster_name
 redis: [
+	corev1.#ServiceAccount & {
+		apiVersion: "v1"
+		kind: "ServiceAccount"
+		metadata: {
+			name: Name
+			namespace: mesh.spec.install_namespace
+		}
+	},
+
 	appsv1.#StatefulSet & {
 		apiVersion: "apps/v1"
 		kind:       "StatefulSet"
@@ -69,11 +78,9 @@ redis: [
 							]
 						}, // redis
 					] // containers
-
 					volumes: #sidecar_volumes
 					imagePullSecrets: [{name: defaults.image_pull_secret_name}]
 					serviceAccountName: Name
-				
 					if defaults.redis.gid != _|_ {
 						securityContext: {
 							fsGroup: defaults.redis.gid
@@ -93,15 +100,6 @@ redis: [
 					}
 				},
 			]
-		}
-	},
-
-	corev1.#ServiceAccount & {
-		apiVersion: "v1"
-		kind: "ServiceAccount"
-		metadata: {
-			name: Name
-			namespace: mesh.spec.install_namespace
 		}
 	},
 

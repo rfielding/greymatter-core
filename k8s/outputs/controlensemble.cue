@@ -65,6 +65,10 @@ controlensemble: [
 							]
 							resources: control_resources
 							imagePullPolicy: defaults.image_pull_policy
+							securityContext: {
+								allowPrivilegeEscalation: false
+								capabilities: {drop: ["ALL"]}
+							}
 						}, // control
 
 						{
@@ -91,10 +95,17 @@ controlensemble: [
 							]
 							resources: control_api_resources
 							imagePullPolicy: defaults.image_pull_policy
+							securityContext: {
+								allowPrivilegeEscalation: false
+								capabilities: {drop: ["ALL"]}
+							}
 						}, // control_api
 
 					] // containers
-
+					securityContext: {
+						runAsNonRoot: true
+						seccompProfile: {type: "RuntimeDefault"}
+					}
 					volumes: #sidecar_volumes + [
 							{
 							name: "catalog-seed"

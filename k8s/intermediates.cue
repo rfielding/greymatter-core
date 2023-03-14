@@ -36,6 +36,10 @@ import (
 	resources: edge_and_sidecar_resources
 	volumeMounts:    #sidecar_volume_mounts + _volume_mounts
 	imagePullPolicy: defaults.image_pull_policy
+	securityContext: {
+		allowPrivilegeEscalation: false
+		capabilities: {drop: ["ALL"]}
+	}
 }
 
 #sidecar_volume_mounts: {

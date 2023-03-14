@@ -65,8 +65,16 @@ catalog: [
 									mountPath: "/app/seed"
 								},
 							]
+							securityContext: {
+								allowPrivilegeEscalation: false
+								capabilities: {drop: ["ALL"]}
+							}
 						},
 					]
+					securityContext: {
+						runAsNonRoot: true
+						seccompProfile: {type: "RuntimeDefault"}
+					}
 					volumes: #sidecar_volumes + [
 							{
 							name: "catalog-seed"
