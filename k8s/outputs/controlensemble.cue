@@ -49,9 +49,10 @@ controlensemble: [
 							}]
 							env: [
 								{name: "GM_CONTROL_CMD", value:                      "kubernetes"},
-								{name: "GM_CONTROL_KUBERNETES_NAMESPACES", value:    strings.Join([mesh.spec.install_namespace]+mesh.spec.watch_namespaces, ",")},
-								{name: "GM_CONTROL_KUBERNETES_CLUSTER_LABEL", value: "greymatter.io/cluster"},
-								{name: "GM_CONTROL_KUBERNETES_PORT_NAME", value:     defaults.proxy_port_name},
+								{name: "KUBERNETES_NAMESPACES", value:    strings.Join([mesh.spec.install_namespace]+mesh.spec.watch_namespaces, ",")},
+								{name: "KUBERNETES_CLUSTER_LABEL", value: "greymatter.io/cluster"},
+								{name: "KUBERNETES_PORT_NAMES", value:     defaults.proxy_port_name},
+								{name: "GM_CONTROL_REDIS_ADDRESS", value: "\(defaults.redis_host):6379"},
 								{name: "GM_CONTROL_XDS_ADS_ENABLED", value:          "true"},
 								{name: "GM_CONTROL_XDS_RESOLVE_DNS", value:          "true"},
 								{name: "GM_CONTROL_API_HOST", value:                 "127.0.0.1:5555"},
@@ -60,7 +61,7 @@ controlensemble: [
 								{name: "GM_CONTROL_API_KEY", value:                  "xxx"}, // no longer used, but must be set
 								{name: "GM_CONTROL_API_ZONE_NAME", value:            mesh.spec.zone},
 								{name: "GM_CONTROL_DIFF_IGNORE_CREATE", value:       "true"},
-								{name: "GM_CONTROL_CONSOLE_LEVEL", value: "error"},							
+								{name: "GM_CONTROL_CONSOLE_LEVEL", value: "info"},							
 							]
 							resources: control_resources
 							imagePullPolicy: defaults.image_pull_policy
