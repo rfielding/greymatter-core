@@ -168,7 +168,7 @@ operator_sts: [
 						{
 							name: "greymatter-sync-secret"
 							secret: {
-								defaultMode: 256
+								defaultMode: 288
 								secretName:  "greymatter-sync-secret"
 							}
 						},
