@@ -44,8 +44,8 @@ mesh: meshv1.#Mesh & {
 			proxy:       string | *"greymatter.jfrog.io/dev-oci/greymatter-proxy:1.8.6"
 			catalog:     string | *"greymatter.jfrog.io/dev-oci/greymatter-catalog:3.0.12"
 			dashboard:   string | *"greymatter.jfrog.io/dev-oci/greymatter-dashboard:6.0.10"
-			control:     string | *"greymatter.jfrog.io/dev-oci/greymatter-control:1.8.10"
-			control_api: string | *"greymatter.jfrog.io/dev-oci/greymatter-control-api:1.8.10"
+			control:     string | *"greymatter.jfrog.io/dev-oci/greymatter-control:main"
+			control_api: string | *"greymatter.jfrog.io/dev-oci/greymatter-control-api:main"
 			redis:       string | *"index.docker.io/library/redis:7.0.8"
 			prometheus:  string | *"index.docker.io/prom/prometheus:v2.40.1"
 		}
@@ -263,9 +263,6 @@ defaults: {
 		socket_mount_path: "/run/spire/socket"
 		// ca_secret_name is the name of the secret that is injected when config.deploy_spire is true.
 		ca_secret_name: "server-ca"
-		// host_mount_socket controls whether a host mount is used for the socket.
-		// Requires hostPID permission.
-		host_mount_socket: true
 	}
 
 	core_internal_tls_certs: {

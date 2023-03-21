@@ -22,7 +22,6 @@ package greymatter
             trust_domain: string
             socket_mount_path: string
             ca_secret_name: string
-            host_mount_socket: bool
         }
         manual?: {
             secret_name: string

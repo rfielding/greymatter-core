@@ -81,6 +81,58 @@ openshift_spire_scc: [
 			namespace: defaults.spire.namespace
 		}]
 	},
+
+	{
+		allowHostDirVolumePlugin: true
+		allowHostIPC:             false
+		allowHostNetwork:         false
+		allowHostPID:             true
+		allowHostPorts:           false
+		allowPrivilegeEscalation: false
+		allowPrivilegedContainer: false
+		allowedCapabilities:      [ "NET_BIND_SERVICE" ]
+		apiVersion:               "security.openshift.io/v1"
+		defaultAddCapabilities:   null
+		fsGroup: type: "MustRunAs"
+		groups: []
+		kind: "SecurityContextConstraints"
+		metadata: {
+			annotations: {
+				"kubernetes.io/description": "allows hostpath mount for spire socket"
+			}
+			name: "greymatter-proxy-spire-scc"
+		}
+		priority:               null
+		readOnlyRootFilesystem: false
+		requiredDropCapabilities: [ "ALL" ]
+		runAsUser: type:          "MustRunAsRange"
+		seLinuxContext: type:     "MustRunAs"
+		seccompProfiles: [ "runtime/default" ]
+		supplementalGroups: type: "RunAsAny"
+		users: []
+		volumes: [
+			"hostPath",
+			"configMap",
+			"downwardAPI",
+			"emptyDir",
+			"persistentVolumeClaim",
+			"projected",
+			"secret",
+		]
+	},
+	rbacv1.#ClusterRole & {
+		apiVersion: "rbac.authorization.k8s.io/v1"
+		kind:       "ClusterRole"
+		metadata: {
+			name: "greymatter-proxy-spire-scc"
+		}
+		rules: [{
+			apiGroups: ["security.openshift.io"]
+			resourceNames: ["greymatter-proxy-spire-scc"]
+			resources: ["securitycontextconstraints"]
+			verbs: ["use"]
+		}]
+	},
 ]
 
 
@@ -90,13 +142,13 @@ openshift_spire: [
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "RoleBinding"
 		metadata: {
-			name:      "system:openshift:scc:spire:controlensemble"
+			name:      "greymatter-proxy-spire-scc:controlensemble"
 			namespace: mesh.spec.install_namespace
 		}
 		roleRef: {
 			apiGroup: "rbac.authorization.k8s.io"
 			kind:     "ClusterRole"
-			name:     "\(config.operator_namespace)-system:openshift:scc:spire"
+			name:     "greymatter-proxy-spire-scc"
 		}
 		subjects: [{
 			kind:      "ServiceAccount"
@@ -108,13 +160,13 @@ openshift_spire: [
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "RoleBinding"
 		metadata: {
-			name:      "system:openshift:scc:spire:prometheus"
+			name:      "greymatter-proxy-spire-scc:prometheus"
 			namespace: mesh.spec.install_namespace
 		}
 		roleRef: {
 			apiGroup: "rbac.authorization.k8s.io"
 			kind:     "ClusterRole"
-			name:     "\(config.operator_namespace)-system:openshift:scc:spire"
+			name:     "greymatter-proxy-spire-scc"
 		}
 		subjects: [{
 			kind:      "ServiceAccount"
@@ -126,13 +178,13 @@ openshift_spire: [
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "RoleBinding"
 		metadata: {
-			name:      "system:openshift:scc:spire:default"
+			name:      "greymatter-proxy-spire-scc:default"
 			namespace: mesh.spec.install_namespace
 		}
 		roleRef: {
 			apiGroup: "rbac.authorization.k8s.io"
 			kind:     "ClusterRole"
-			name:     "\(config.operator_namespace)-system:openshift:scc:spire"
+			name:     "greymatter-proxy-spire-scc"
 		}
 		subjects: [{
 			kind:      "ServiceAccount"

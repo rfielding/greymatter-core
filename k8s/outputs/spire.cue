@@ -126,12 +126,8 @@ spire_server: [
 							allowPrivilegeEscalation: false
 							capabilities: {drop: ["ALL"]}
 						}
-						resources: spire_server_resources
+						resources: spire_registrar_resources
 					}]
-					securityContext: {
-						runAsNonRoot: true
-						seccompProfile: {type: "RuntimeDefault"}
-					}
 					volumes: [{
 						name: "server-socket"
 						emptyDir: medium: "Memory"

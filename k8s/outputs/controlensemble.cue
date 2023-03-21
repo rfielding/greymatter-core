@@ -7,7 +7,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"strings"
-	// "list"
 )
 
 let Name = "controlensemble"
@@ -102,10 +101,6 @@ controlensemble: [
 						}, // control_api
 
 					] // containers
-					securityContext: {
-						runAsNonRoot: true
-						seccompProfile: {type: "RuntimeDefault"}
-					}
 					volumes: #sidecar_volumes + [
 							{
 							name: "catalog-seed"

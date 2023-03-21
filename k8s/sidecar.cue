@@ -43,13 +43,13 @@ import (
 }
 
 #sidecar_volume_mounts: {
-	if _security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket {
+	if _security_spec.internal.type == "spire" {
 		[{
 			name:      "spire-socket"
 			mountPath: defaults.spire.socket_mount_path
 		}]
 	}
-	if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") && !(_security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket) {
+	if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") && !(_security_spec.internal.type == "spire") {
 		[{
 			name: "internal-tls-certs"
 			mountPath: "/etc/proxy/tls/sidecar/"
@@ -60,13 +60,16 @@ import (
 }
 
 #sidecar_volumes: {
-	if _security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket {
+	if _security_spec.internal.type == "spire" {
 		[{
 			name: "spire-socket"
-			hostPath: {path: defaults.spire.socket_mount_path, type: "DirectoryOrCreate"}
+			hostPath: {
+				path: defaults.spire.socket_mount_path,
+				type: "DirectoryOrCreate"
+			}
 		}]
 	}
-	if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") && !(_security_spec.internal.type == "spire" && _security_spec.internal.spire.host_mount_socket) {
+	if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") && !(_security_spec.internal.type == "spire") {
 		[{
 			name: "internal-tls-certs"
 			secret: {
@@ -82,10 +85,8 @@ import (
 }
 
 #spire_permission_requests: {
-	if _security_spec.internal.type == "spire" && defaults.spire.host_mount_socket {
+	if _security_spec.internal.type == "spire" {
 		hostPID: true
-		// hostNetwork: true
-		// dnsPolicy: "ClusterFirstWithHostNet"
 	}
 	...
 }

@@ -45,10 +45,6 @@ edge: [
 							]
 						},
 					]
-					securityContext: {
-						runAsNonRoot: true
-						seccompProfile: {type: "RuntimeDefault"}
-					}
 					volumes: #sidecar_volumes + [
 							if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") {
 							{

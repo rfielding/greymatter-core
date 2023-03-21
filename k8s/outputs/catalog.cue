@@ -71,10 +71,6 @@ catalog: [
 							}
 						},
 					]
-					securityContext: {
-						runAsNonRoot: true
-						seccompProfile: {type: "RuntimeDefault"}
-					}
 					volumes: #sidecar_volumes + [
 							{
 							name: "catalog-seed"

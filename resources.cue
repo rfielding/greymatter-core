@@ -112,6 +112,11 @@ spire_server_resources: corev1.#ResourceRequirements & {
 	}
 }
 
+spire_registrar_resources: corev1.#ResourceRequirements & {
+	requests: {}
+	limits: {}
+}
+
 spire_agent_resources: corev1.#ResourceRequirements & {
 	requests: {
 		// cpu:    "100m"

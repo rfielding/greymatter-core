@@ -2,9 +2,17 @@
 
 ## vNext
 
+## Added
+- Add SCC for proxy granting permission to use the SPIRE agent socket.
+
+### Changed
+
+- Split SPIRE resources config from SPIRE server.
+
 ### Removed
 
 - Removed PriorityClass from ControlEnsemble and the associated permissions required for the operator.
+- Remove host_mount_socket toggle as it is always true.
 
 ## 0.16.6 (March 2, 2023)
 
