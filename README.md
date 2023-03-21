@@ -5,8 +5,9 @@ Enterprise-level CUE files for core greymatter.io mesh configurations.
 ## Prerequisites
 
 - [CUE CLI](https://cuelang.org/docs/install/)
+- pytest
 
-## Dependencies
+## CUE Libraries
 
 This project makes use of git submodules for dependency management. The
 <https://github.com/greymatter-io/greymatter-cue> submodule provides the
