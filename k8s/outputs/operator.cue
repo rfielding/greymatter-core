@@ -113,7 +113,7 @@ operator_sts: [
 								path: "/readyz"
 								port: 8081
 							}
-							initialDelaySeconds: 120
+							initialDelaySeconds: 30
 							periodSeconds:       10
 						}
 						resources: operator_resources
