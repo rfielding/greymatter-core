@@ -23,7 +23,7 @@ mesh_configs: list.Concat([
 		catalog_entries,
 		[ for x in prometheus_config if config.enable_historical_metrics {x}],
 		[ for x in jwtsecurity_config if _enable_jwtsecurity {x}],
-		[ for x in observables_config if config.enable_audits {x}],
+		[ for x in audits_config if config.enable_audits {x}],
 		[ for x in keycloak_config if config.enable_keycloak {x}],
 		[ for x in keycloak_postgres_config if config.enable_keycloak {x}],
 ])
@@ -38,11 +38,10 @@ catalog_configs:           catalog_config
 controlensemble_configs:   controlensemble_config
 prometheus_configs:        prometheus_config
 redis_configs:             redis_config
-observables_configs:       observables_config
 jwtsecurity_configs:       jwtsecurity_config
 keycloak_configs:          keycloak_config
 keycloak_postgres_configs: keycloak_postgres_config
-observables_configs:       observables_config
+audits_configs:            audits_config
 
 // for CLI convenience,
 // e.g. `cue eval -c ./gm/outputs --out text -e mesh_configs_yaml`

@@ -72,7 +72,7 @@ catalog_resources: corev1.#ResourceRequirements & {
 	}
 }
 
-observables_resources: corev1.#ResourceRequirements & {
+audits_resources: corev1.#ResourceRequirements & {
 	requests: {
 		// cpu:    "10m"
 		// memory: "2Gi"

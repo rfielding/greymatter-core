@@ -485,8 +485,8 @@ def test_ssl_edge_mtls_and_internal_tls():
         if i == "edge":
             assert is_x(m1.domain_dict.get(i), test_schema) == True
             assert m1.domain_dict.get(i)["ssl_config"]["require_client_certs"] == True
-        # observables_egress_to_elasticsearch does not have ssl_config
-        if i == "observables_egress_to_elasticsearch":
+        # audits_egress_to_elasticsearch does not have ssl_config
+        if i == "audits_egress_to_elasticsearch":
             assert is_x(m1.domain_dict.get(i), test_schema) == False
     
     LOGGER.info("Checking Clusters")

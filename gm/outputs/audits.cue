@@ -1,29 +1,33 @@
 package greymatter
 
+import (
+	"strings"
+)
+
 // Name needs to match the greymatter.io/cluster value in the Kubernetes deployment
-let Name = "observables"
-let ObservablesAppIngressName = "\(Name)_ingress"
+let Name = "audits"
+let AuditsAppIngressName = "\(Name)_ingress"
 let EgressToRedisName = "\(Name)_egress_to_redis"
 let EgressToElasticSearchName = "\(Name)_egress_to_elasticsearch"
 
-observables_config: [
+audits_config: [
 
 	// HTTP ingress
 	#domain & {
-		domain_key: ObservablesAppIngressName
+		domain_key: AuditsAppIngressName
 	},
 	#listener & {
-		listener_key:          ObservablesAppIngressName
+		listener_key:          AuditsAppIngressName
 		_spire_self:           Name
 		_gm_observables_topic: Name
 		_is_ingress:           true
 	},
 	#cluster & {
-		cluster_key: ObservablesAppIngressName
+		cluster_key: AuditsAppIngressName
 		_upstream_port: 5000
 	},
 	#route & {
-		route_key:     ObservablesAppIngressName
+		route_key:     AuditsAppIngressName
 	},
 
 	// egress -> redis
@@ -83,8 +87,8 @@ observables_config: [
 	// shared proxy object
 	#proxy & {
 		proxy_key: Name
-		domain_keys: [ObservablesAppIngressName, EgressToRedisName, EgressToElasticSearchName]
-		listener_keys: [ObservablesAppIngressName, EgressToRedisName, EgressToElasticSearchName]
+		domain_keys: [AuditsAppIngressName, EgressToRedisName, EgressToElasticSearchName]
+		listener_keys: [AuditsAppIngressName, EgressToRedisName, EgressToElasticSearchName]
 	},
 
 	// Config for greymatter.io edge ingress.
@@ -131,8 +135,8 @@ observables_config: [
 		name:                      "Audits"
 		owner:                     "greymatter.io"
 		mesh_id:                   mesh.metadata.name
-		service_id:                "observables"
-		version:                   "0.0.1"
+		service_id:                "\(Name)"
+		version:                   strings.Split(defaults.images.audits, ":")[1]
 		description:               "A standalone dashboard visualizing data collected from greymatter audits."
 		api_endpoint:              "/services/audits"
 		business_impact:           "critical"
