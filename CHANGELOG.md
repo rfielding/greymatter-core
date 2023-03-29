@@ -2,6 +2,9 @@
 
 ## vNext
 
+### Added
+- Add explicit securityContext for catalog, control, and redis for pod security admission.
+
 ## v0.17.0 (March 29, 2023)
 
 ### Added
