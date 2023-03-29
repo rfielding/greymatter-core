@@ -57,7 +57,7 @@ defaults: {
 	image_pull_secret_name: string | *"gm-docker-secret"
 	image_pull_policy:      corev1.#enumPullPolicy | *corev1.#PullAlways
 	xds_host:               "controlensemble.\(mesh.spec.install_namespace).svc.cluster.local"
-	sidecar_list:           [...string] | *["dashboard", "catalog", "controlensemble", "edge", "redis", "prometheus", "jwtsecurity", "observables"]
+	sidecar_list:           [...string] | *["dashboard", "catalog", "controlensemble", "edge", "redis", "prometheus", "jwtsecurity", "audits"]
 	proxy_port_name:        "proxy" // the name of the ingress port for sidecars - used by service discovery
 	redis_cluster_name:     "greymatter-datastore"
 	redis_host:             "\(redis_cluster_name).\(mesh.spec.install_namespace).svc.cluster.local"
@@ -89,7 +89,7 @@ defaults: {
 		cli:               string | *"greymatter.jfrog.io/dev-oci/greymatter-cli:4.7.7"
 		operator:          string | *"greymatter.jfrog.io/dev-oci/greymatter-operator:0.16.6" @tag(operator_image)
 		vector:            string | *"timberio/vector:0.22.0-debian"
-		observables:       string | *"greymatter.jfrog.io/dev-oci/greymatter-audits:1.1.7"
+		audits:            string | *"greymatter.jfrog.io/dev-oci/greymatter-audits:1.1.7"
 		keycloak:          string | *"quay.io/keycloak/keycloak:19.0.3"
 		keycloak_postgres: string | *"postgres:15.0"
 	}

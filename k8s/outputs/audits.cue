@@ -1,4 +1,4 @@
-// k8s manifests for Observables App
+// k8s manifests for Audits App
 
 package greymatter
 
@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-let Name = "observables"
+let Name = "audits"
 
-observables: [
+audits: [
 	appsv1.#Deployment & {
 		apiVersion: "apps/v1"
 		kind:       "Deployment"
@@ -39,7 +39,7 @@ observables: [
 						#sidecar_container_block & {_Name: Name},
 						{
 							name:            Name
-							image:           defaults.images.observables
+							image:           defaults.images.audits
 							imagePullPolicy: defaults.image_pull_policy
 							ports: [{
 								containerPort: 5000
@@ -73,7 +73,7 @@ observables: [
 								name:  "ES_HOST"
 								value: defaults.audits.elasticsearch_host
 							}]
-							resources: observables_resources
+							resources: audits_resources
 						},
 					]
 					volumes: #sidecar_volumes

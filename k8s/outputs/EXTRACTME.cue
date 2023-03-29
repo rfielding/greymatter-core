@@ -61,7 +61,7 @@ k8s_manifests: list.Concat([
 		[ for x in prometheus_proxy if config.enable_historical_metrics && len(defaults.prometheus.external_host) > 0 {x}],
 		[ for x in openshift_vector_scc_bindings if config.openshift && config.enable_audits {x}],
 		[ for x in openshift_spire if config.openshift && config.spire {x}],
-		[ for x in observables if config.enable_audits {x}],
+		[ for x in audits if config.enable_audits {x}],
 		[ for x in vector if config.enable_audits {x}],
 		[ for x in elasticsearch_password if config.enable_audits {x}],
 		[ for x in jwt_security_manifests if _enable_jwtsecurity {x}],
@@ -88,7 +88,7 @@ prometheus_manifests_yaml:        yaml.MarshalStream(prometheus_manifests)
 prometheus_scrape_rules_yaml:     yaml.Marshal(prometheus_scrape_rules)
 prometheus_rbac_yaml:             yaml.MarshalStream(prometheus_rbac)
 vector_manifests_yaml:            yaml.MarshalStream(vector)
-observables_manifests_yaml:       yaml.MarshalStream(observables)
+audits_manifests_yaml:            yaml.MarshalStream(audits)
 keycloak_manifests_yaml:          yaml.MarshalStream(keycloak_manifests)
 keycloak_postgres_manifests_yaml: yaml.MarshalStream(keycloak_postgres_manifests)
 
@@ -112,4 +112,4 @@ dashboard_configs: dashboard
 edge_configs: edge
 catalog_configs: catalog
 jwt_configs: jwt_security
-observables_configs: observables
+audits_configs: audits
