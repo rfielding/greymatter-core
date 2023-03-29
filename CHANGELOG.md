@@ -2,12 +2,23 @@
 
 ## vNext
 
-## Added
+## v0.17.0 (March 29, 2023)
+
+### Added
 - Add SCC for proxy granting permission to use the SPIRE agent socket.
 
 ### Changed
 
+- Updated versions of the cli, operator, proxy, control, control-api, proxy, and catalog.
 - Split SPIRE resources config from SPIRE server.
+- Rename observable references to audits in cue.
+- Update cue submodule.
+- Decrease operator readiness probe init delay.
+- Expose k8s resource requests and limits in cue.
+
+### Fixed
+
+- If internal secret is different than the edge secret use that for internal TLS.
 
 ### Removed
 
