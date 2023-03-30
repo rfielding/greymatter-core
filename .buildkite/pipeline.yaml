@@ -2,17 +2,8 @@ agents:
   container_image: ubuntu-2004-ci
 
 steps:
-  - label: ":shipit: Build"
-    key: build
-    commands:
-      - ./scripts/cibuild build
-    agents:
-      container_image: ubuntu-2204-ci
-      queue: default
-
   - label: "Run Tests"
     key: test
-    depends_on: build
     commands:
       - ./scripts/cibuild test
     agents:
@@ -37,51 +28,66 @@ steps:
         changelog_filename: "greymatter-core.toml"
     async: true
 
+
+  ##############################################
+  # Generate manifests
+  ##############################################
   - label: "Generate manifests"
     key: "generate-manifests"
     agents:
       container_image: ubuntu-2204-ci
       queue: default
     depends_on: 
-      - build
       - test
     commands:
       - ./scripts/generate-manifests
       - buildkite-agent artifact upload "generated-manifests/*"
       - rm -rf generated-manifests
 
+
+  ##############################################
+  # Generate inputs.cue that points to staging assets
+  ##############################################
+  - label: "Update inputs.cue"
+    key: "update-inputs-cue"
+    env:
+      GENERIC_SRC: "dev-generic"
+      GENERIC_DEST: "ci-staging-generic"
+      OCI_SRC: "dev-oci"
+      OCI_DEST: "ci-staging-oci"
+    command: ./scripts/promotion.py generate inputs
+    agents:
+      container_image: ubuntu-2204-ci
+      queue: default
+    artifact_paths: 
+      generated_inputs.cue
+
+  ##############################################
+  # Package and push core tarball to staging
+  ##############################################
   - label: "Package Tarball"
     key: "package-tarball"
     depends_on:
       - test
       - generate-manifests
-    commands:
-      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
-      - sleep 10
-      - rm -rf /tmp/greymatter-core
-      - mkdir /tmp/greymatter-core
-      - >
-        tar --exclude-vcs --exclude=".buildkite" --exclude="CHANGELOG.md" --exclude="scripts" --exclude="pyproject.toml" 
-        --exclude="cue.mod/pkg/_gen" --exclude="cue.mod/pkg/scripts" 
-        -czf /tmp/greymatter-core/greymatter-core.tar.gz .
-      - cp /tmp/greymatter-core/greymatter-core.tar.gz .
-      - rm -r /tmp/greymatter-core
-    artifact_paths:
-      - greymatter-core.tar.gz
-
-  - label: "Promote Tarball to Artifactory (greymatter-core dev)"
-    key: promote-generic-dev
-    depends_on:
-      - package-tarball
+      - update-inputs-cue
     env:
       JF_DEST_REGISTRY: dev-generic
     commands:
-      - buildkite-agent artifact download greymatter-core.tar.gz . --step package-tarball
+      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
+      - buildkite-agent artifact download generated_inputs.cue . --step update-inputs-cue
+      - mv generated_inputs.cue inputs.cue
+      - sleep 10
+      - rm -rf /tmp/greymatter-core && mkdir /tmp/greymatter-core
+      - tar --exclude-vcs --exclude=".buildkite" --exclude="CHANGELOG.md" --exclude="scripts/cibuild" --exclude="scripts/bootstrap" --exclude="scripts/update" --exclude="scripts/promotion" --exclude="greymatter-download-template.sh" -czf /tmp/greymatter-core/greymatter-core.tar.gz .
+      - cp /tmp/greymatter-core/greymatter-core.tar.gz . && rm -r /tmp/greymatter-core
       - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_COMMIT}_none_none.tar.gz
       - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_BRANCH}_none_none.tar.gz
+    artifact_paths:
+      - greymatter-core.tar.gz
 
-  # promote latest on main 
-  - label: "Promote Binaries to Artifactory (latest)"
+  # push greymatter-core latest to artifactory
+  - label: "Promote Tarball to Artifactory (latest)"
     key: promote-generic-latest
     depends_on:
       - package-tarball
@@ -91,3 +97,48 @@ steps:
     commands:
       - buildkite-agent artifact download greymatter-core.tar.gz . --step package-tarball
       - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_latest_none_none.tar.gz
+
+  ##############################################
+  # Promote components to staging
+  ##############################################
+  # Test promote artifacts to staging
+  - label: "test-promote artifacts to staging"
+    key: "test-promote-components-to-staging"
+    env:
+      GENERIC_SRC: "dev-generic"
+      GENERIC_DEST: "ci-staging-generic"
+      OCI_SRC: "dev-oci"
+      OCI_DEST: "ci-staging-oci"
+    commands:
+      - ./scripts/promotion.py promote proxy
+      - ./scripts/promotion.py promote catalog
+      - ./scripts/promotion.py promote dashboard
+      - ./scripts/promotion.py promote control
+      - ./scripts/promotion.py promote control-api
+      - ./scripts/promotion.py promote cli
+      - ./scripts/promotion.py promote audits 
+    agents:
+      container_image: ubuntu-2204-ci
+      queue: default
+
+  # PROMOTE COMPONENTS To staging
+  - label: "Promote Artifacts To Staging"
+    key: "promote-artifacts-to-staging"
+    depends_on:
+      - test-promote-components-to-staging
+    env:
+      GENERIC_SRC: "dev-generic"
+      GENERIC_DEST: "ci-staging-generic"
+      OCI_SRC: "dev-oci"
+      OCI_DEST: "ci-staging-oci"
+    commands:
+      - ./scripts/promotion.py promote --dry-run=false proxy
+      - ./scripts/promotion.py promote --dry-run=false catalog
+      - ./scripts/promotion.py promote --dry-run=false dashboard
+      - ./scripts/promotion.py promote --dry-run=false control
+      - ./scripts/promotion.py promote --dry-run=false control-api
+      - ./scripts/promotion.py promote --dry-run=false cli
+      - ./scripts/promotion.py promote --dry-run=false audits
+    agents:
+      container_image: ubuntu-2204-ci
+      queue: default

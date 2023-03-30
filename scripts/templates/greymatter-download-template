@@ -1,0 +1,45 @@
+#!/bin/bash
+
+artifacts=(
+        "https://greymatter.jfrog.io/artifactory/generic/greymatter-cli/greymatter-cli_<CLI_VERSION>_linux_amd64.tar.gz"
+        "https://greymatter.jfrog.io/artifactory/generic/greymatter-catalog/greymatter-catalog_<CATALOG_VERSION>_linux_amd64.tar.gz"
+        "https://greymatter.jfrog.io/artifactory/generic/greymatter-control/greymatter-control_<CONTROL_VERSION>_linux_amd64.tar.gz"
+        "https://greymatter.jfrog.io/artifactory/generic/greymatter-control-api/greymatter-control-api_<CONTROL_API_VERSION>_linux_amd64.tar.gz"
+        "https://greymatter.jfrog.io/artifactory/generic/greymatter-dashboard/greymatter-dashboard_<DASHBOARD_VERSION>_linux_amd64.tar.gz"
+        "https://greymatter.jfrog.io/artifactory/generic/greymatter-proxy/greymatter-proxy_<PROXY_VERSION>-el8_linux_amd64.tar.gz"
+        "https://greymatter.jfrog.io/artifactory/generic/greymatter-core/greymatter-core_<CORE_VERSION>_none_none.tar.gz"
+        "https://greymatter.jfrog.io/artifactory/generic/greymatter-audits/greymatter-audits_<OBSERVABLES_VERSION>_linux_amd64.tar.gz"
+)
+
+case $# in
+    1)
+        API_KEY=$1
+        for artifact in "${artifacts[@]}"; do
+            echo "Downloading $artifact"
+            curl -s -L -H "X-JFrog-Art-Api:$API_KEY" \
+                $artifact \
+                -o $( echo $artifact | cut -d/ -f7 )
+        done
+        ;;
+    2)
+        USERNAME=$1
+        API_KEY=$2
+        for artifact in "${artifacts[@]}"; do
+            echo "Downloading $artifact"
+            curl -s -L -u $USERNAME:$API_KEY \
+                $artifact \
+                -o $( echo $artifact | cut -d/ -f7 )
+        done
+        ;;
+    *)
+        echo "${BASH_SOURCE[0]} can be used with the following patterns:"
+        echo "${BASH_SOURCE[0]} <api_key>"
+        echo "${BASH_SOURCE[0]} <username> <api_key>"
+        echo "${BASH_SOURCE[0]} <username> <password>"
+        echo ""
+        echo "To get an api key navigate to the following and generate your own key:"
+        echo "https://www.jfrog.com/confluence/display/JFROG/User+Profile"
+        echo "You will need a greymatter.io account."
+        exit 1
+        ;;
+esac
