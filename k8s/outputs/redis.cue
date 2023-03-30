@@ -76,16 +76,22 @@ redis: [
 									mountPath: "/data"
 								},
 							]
+							securityContext: {
+								allowPrivilegeEscalation: false
+								capabilities: {drop: ["ALL"]}
+							}
 						}, // redis
 					] // containers
+					securityContext: {
+						runAsUser: 1001
+						fsGroup: 1001
+						fsGroupChangePolicy: "OnRootMismatch"
+						runAsNonRoot: true
+						seccompProfile: {type: "RuntimeDefault"}
+					}
 					volumes: #sidecar_volumes
 					imagePullSecrets: [{name: defaults.image_pull_secret_name}]
 					serviceAccountName: Name
-					if defaults.redis.gid != _|_ {
-						securityContext: {
-							fsGroup: defaults.redis.gid
-						}
-					}
 				}
 			}
 			volumeClaimTemplates: [

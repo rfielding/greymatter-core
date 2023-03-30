@@ -39,6 +39,7 @@ openshift_redis_scc: [
 		requiredDropCapabilities: [ "KILL", "MKNOD", "SETUID", "SETGID"]
 		runAsUser: type:          "RunAsAny"
 		seLinuxContext: type:     "MustRunAs"
+		seccompProfiles: [ "runtime/default" ]
 		supplementalGroups: type: "RunAsAny"
 		users: []
 		volumes: [
