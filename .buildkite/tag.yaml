@@ -106,13 +106,13 @@ steps:
       OCI_SRC: "ci-staging-oci"
       OCI_DEST: "oci"
     commands:
-      - ./scripts/promotion.py promote proxy --dry-run=false
-      - ./scripts/promotion.py promote catalog --dry-run=false
-      - ./scripts/promotion.py promote dashboard --dry-run=false
-      - ./scripts/promotion.py promote control --dry-run=false
-      - ./scripts/promotion.py promote control-api --dry-run=false
-      - ./scripts/promotion.py promote cli --dry-run=false
-      - ./scripts/promotion.py promote audits --dry-run=false
+      - ./scripts/promotion.py promote --dry-run=false proxy
+      - ./scripts/promotion.py promote --dry-run=false catalog
+      - ./scripts/promotion.py promote --dry-run=false dashboard
+      - ./scripts/promotion.py promote --dry-run=false control
+      - ./scripts/promotion.py promote --dry-run=false control-api
+      - ./scripts/promotion.py promote --dry-run=false cli
+      - ./scripts/promotion.py promote --dry-run=false audits
     agents:
       container_image: ubuntu-2204-ci
       queue: default

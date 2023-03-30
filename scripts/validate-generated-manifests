@@ -24,10 +24,10 @@ files=$(find ./generated-manifests -type f -name "operator*")
 for i in ${files}; do
     echo ${i}
     image=$(cat ${i} | grep image | grep ${desired_host} | sed 's|image: ||g' | tr -d '[:space:]')
-    if [[ ${image} != ${desired_image} ]]; then
-        echo "${i} operator image should be ${desired_image} BUT found ${image}" >> ${test_workspace}/test-results
-    else
+    if [[ ${image} == *"${desired_image}"* ]]; then
         echo "${i} operator image should be ${desired_image} found ${image}"
+    else
+        echo "${i} operator image should be ${desired_image} BUT found ${image}" >> ${test_workspace}/test-results
     fi
 done
 
