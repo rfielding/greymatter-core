@@ -124,7 +124,6 @@ steps:
     key: "package-tarball-tag"
     depends_on:
       - test
-      - validate-updated-manifests
       - validate-generated-inputs-cue
       - validate-download-script
       - update-generated-manifests
