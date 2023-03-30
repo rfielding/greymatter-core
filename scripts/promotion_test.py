@@ -4,11 +4,7 @@ from promotion import *
 import logging 
 import re
 from pyartifactory.models.artifact import (
-    ArtifactFolderInfoResponse,
-    ArtifactFileInfoResponse,
     ArtifactListResponse,
-    ArtifactListFolderResponse,
-    ArtifactListFileResponse,
 )
 
 LOGGER = logging.getLogger()
