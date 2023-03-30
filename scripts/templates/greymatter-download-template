@@ -8,7 +8,7 @@ artifacts=(
         "https://greymatter.jfrog.io/artifactory/generic/greymatter-dashboard/greymatter-dashboard_<DASHBOARD_VERSION>_linux_amd64.tar.gz"
         "https://greymatter.jfrog.io/artifactory/generic/greymatter-proxy/greymatter-proxy_<PROXY_VERSION>-el8_linux_amd64.tar.gz"
         "https://greymatter.jfrog.io/artifactory/generic/greymatter-core/greymatter-core_<CORE_VERSION>_none_none.tar.gz"
-        "https://greymatter.jfrog.io/artifactory/generic/greymatter-audits/greymatter-audits_<OBSERVABLES_VERSION>_linux_amd64.tar.gz"
+        "https://greymatter.jfrog.io/artifactory/generic/greymatter-audits/greymatter-audits_<AUDITS_VERSION>_linux_amd64.tar.gz"
 )
 
 case $# in
