@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
 import yaml
-import argparse
-import os
-
 
 # When adding resources to order non namespace scoped resources
 # Should be added first, cluster scoped objects should follow,
@@ -12,15 +9,17 @@ import os
 # 
 # Resources not in helm's ordering implementation are using above guidelines for placement:
 # SecurityContextConstraints, PriorityClass 
-resource_order=("PriorityClass", "Namespace", "NetworkPolicy", "ResourceQuota", "LimitRange", "PodSecurityPolicy", 
-    "PodDisruptionBudget", "ServiceAccount", "Secret", "SecretList", "ConfigMap", "StorageClass", 
-    "PersistentVolume", "PersistentVolumeClaim", "CustomResourceDefinition","SecurityContextConstraints", 
-    "ClusterRole", "ClusterRoleList", "ClusterRoleBinding", "ClusterRoleBindingList", "Role", "RoleList", 
-    "RoleBinding", "RoleBindingList", "Service", "DaemonSet", "Pod", "ReplicationController", "ReplicaSet", 
-    "Deployment", "HorizontalPodAutoscaler", "StatefulSet", "Job", "CronJob", "IngressClass", "Ingress", "APIService")
+resource_order = ("PriorityClass", "Namespace", "NetworkPolicy", "ResourceQuota", "LimitRange", "PodSecurityPolicy",
+                  "PodDisruptionBudget", "ServiceAccount", "Secret", "SecretList", "ConfigMap", "StorageClass",
+                  "PersistentVolume", "PersistentVolumeClaim", "CustomResourceDefinition", "SecurityContextConstraints",
+                  "ClusterRole", "ClusterRoleList", "ClusterRoleBinding", "ClusterRoleBindingList", "Role", "RoleList",
+                  "RoleBinding", "RoleBindingList", "Service", "DaemonSet", "Pod", "ReplicationController",
+                  "ReplicaSet",
+                  "Deployment", "HorizontalPodAutoscaler", "StatefulSet", "Job", "CronJob", "IngressClass", "Ingress",
+                  "APIService")
 
 # list of dicts
-objects=[]
+objects = []
 with open("transform-manifest/manifest.yaml", "r") as file:
     try:
         print("---- Loading yaml ----")
@@ -35,27 +34,25 @@ with open("transform-manifest/manifest.yaml", "r") as file:
         print(exc)
     print("---- Done Load ----")
 
-
-processed_objects=0
+processed_objects = 0
 for r in resource_order:
     print(f'> Resource: {r}')
     # print("")
 
     for i in objects:
-        
-        kind=i['kind']
-        name=i['metadata']['name']
-        
+
+        kind = i['kind']
+        name = i['metadata']['name']
+
         # print(f'Looking at kind: [{kind}] , name: [{name}]')
         if kind == r:
             print("    " + name)
 
             with open("transform-manifest/manifest-reorder.yaml", 'a') as file:
-                yaml.safe_dump(i,file)
-                if processed_objects != len(objects)-1:
+                yaml.safe_dump(i, file)
+                if processed_objects != len(objects) - 1:
                     file.write("---\n")
-            
-                processed_objects = processed_objects + 1
-    
-print("")
 
+                processed_objects = processed_objects + 1
+
+print("")
