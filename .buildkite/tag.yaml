@@ -5,39 +5,6 @@ steps:
   # this is in place of automated smoke test
   - block: "I have run a smoke test using the inputs-output.cue artifact from merge to main build (under promote artifacts to staging)"
 
-  - input: "Information please"
-    key: info-request
-    fields:
-      - text: "What is this Release Called"
-        key: "release"
-
-  ##############################################
-  # Create and validate release greymatter download script
-  ##############################################
-  - label: "Generate download script"
-    key: "generate-download-script-tag"
-    commands:
-      - ./scripts/promotion.py generate download-script --git-tag=$${BUILDKITE_TAG:1}
-    artifact_paths:
-      - greymatter-download.sh
-    agents:
-      container_image: ubuntu-2204-ci
-      queue: default
-
-  - label: "validate and publish greymatter download script"
-    key: validate-download-script
-    depends_on:
-      - generate-download-script-tag
-    env:
-      JF_DEST_REGISTRY: generic
-    commands:
-      - set -x
-      - buildkite-agent artifact download greymatter-download.sh . --step generate-download-script-tag
-      - ./scripts/validate-download-script
-      - jf rt upload ./greymatter-download.sh $$JF_DEST_REGISTRY/greymatter-download_$(buildkite-agent meta-data get release).sh
-      - set +x
-    soft_fail: true
-
   ##############################################
   # Create and validate release inputs.cue 
   ##############################################
@@ -91,31 +58,6 @@ steps:
       - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step update-generated-manifests
       - ./scripts/validate-generated-manifests
     soft_fail: true
-
-
-  ##############################################
-  # Promote Component artifacts from staging to release repos
-  ##############################################
-  - label: "Promote Component Artifacts To Release"
-    key: "promote-component-artifacts-to-release"
-    depends_on:
-      - promote-artifacts-to-staging
-    env:
-      GENERIC_SRC: "ci-staging-generic"
-      GENERIC_DEST: "generic"
-      OCI_SRC: "ci-staging-oci"
-      OCI_DEST: "oci"
-    commands:
-      - ./scripts/promotion.py promote --dry-run=false proxy
-      - ./scripts/promotion.py promote --dry-run=false catalog
-      - ./scripts/promotion.py promote --dry-run=false dashboard
-      - ./scripts/promotion.py promote --dry-run=false control
-      - ./scripts/promotion.py promote --dry-run=false control-api
-      - ./scripts/promotion.py promote --dry-run=false cli
-      - ./scripts/promotion.py promote --dry-run=false audits
-    agents:
-      container_image: ubuntu-2204-ci
-      queue: default
 
   ##############################################
   # Package and push core tarball to release
