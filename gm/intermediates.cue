@@ -46,31 +46,31 @@ import (
 	_key_path:         string | *"/etc/proxy/tls/sidecar/server.key"
 
 	_force_no_ssl: bool | *false
-	_is_egress: bool | * false
+	_is_egress:    bool | *false
 
-	_enable_ssl_block:[
-		if (domain_key != defaults.edge.key && (_security_spec.internal.type == "manual-tls" || _security_spec.internal.type == "manual-mtls")) {true}
-		if (domain_key == defaults.edge.key && (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls" )) {true}
-		if _security_spec.internal.type == "plaintext" {false}
-		if _security_spec.internal.type == "spire" {false}
+	_enable_ssl_block: [
+				if (domain_key != defaults.edge.key && (_security_spec.internal.type == "manual-tls" || _security_spec.internal.type == "manual-mtls")) {true},
+				if (domain_key == defaults.edge.key && (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls" )) {true},
+				if _security_spec.internal.type == "plaintext" {false},
+				if _security_spec.internal.type == "spire" {false},
 	][0]
 
-	if  _enable_ssl_block && (! _force_no_ssl) && (! _is_egress) {
+	if _enable_ssl_block && (!_force_no_ssl) && (!_is_egress) {
 		if domain_key != defaults.edge.key {
-			_require_client_certs:[
-				if _security_spec.internal.type == "manual-tls" {false}
-				if _security_spec.internal.type == "manual-mtls" {true}
+			_require_client_certs: [
+						if _security_spec.internal.type == "manual-tls" {false},
+						if _security_spec.internal.type == "manual-mtls" {true},
 			][0]
 		}
 		if domain_key == defaults.edge.key {
-			_require_client_certs:[
-				if _security_spec.edge.type == "tls" {false}
-				if _security_spec.edge.type == "mtls" {true}
+			_require_client_certs: [
+						if _security_spec.edge.type == "tls" {false},
+						if _security_spec.edge.type == "mtls" {true},
 			][0]
 		}
 
 		force_https: true
-		ssl_config: greymatter.#SSLConfig & {
+		ssl_config:  greymatter.#SSLConfig & {
 			// Specify a TLS Protocol to use when communicating
 			// Supported options are:
 			// TLS_AUTO TLSv1_0 TLSv1_1 TLSv1_2 TLSv1_3
@@ -181,7 +181,6 @@ import (
 		...
 	}
 
-
 	// _http_filter_weight establishes a baseline for greymatter
 	// filter priority. The ordering here does not matter as 
 	// the sorting algorithm will sort given the order in the 
@@ -276,12 +275,12 @@ import (
 		// NB: Even if configuration exists in network_filters for a filter,
 		// only filters which are listed as active will be applied and used.
 		active_network_filters: list.Sort(
-			// the inputted array is the combined user defined filters and our
-			// known list of toggleable filters.
-			_active_network_filter_toggles+_active_network_filters,
-			// the sort algorithm used is stable.
-			{x: string, y: string, less: _network_filter_weight[x] < _network_filter_weight[y]},
-		)
+					// the inputted array is the combined user defined filters and our
+					// known list of toggleable filters.
+					_active_network_filter_toggles+_active_network_filters,
+					// the sort algorithm used is stable.
+					{x: string, y: string, less: _network_filter_weight[x] < _network_filter_weight[y]},
+					)
 
 		network_filters: {
 			// Configures rate limiting for TCP listeners.
@@ -381,12 +380,12 @@ import (
 		// We use a special sort weight to correctly prioritize what filter order 
 		// these get applied in.
 		active_http_filters: list.Sort(
-			// the inputted array is the combined user defined filters and our
-			// known list of toggleable filters.
-			_active_http_filter_toggles+_active_http_filters,
-			// the sort algorithm used is stable.
-			{x: string, y: string, less: _http_filter_weight[x] < _http_filter_weight[y]},
-		)
+					// the inputted array is the combined user defined filters and our
+					// known list of toggleable filters.
+					_active_http_filter_toggles+_active_http_filters,
+					// the sort algorithm used is stable.
+					{x: string, y: string, less: _http_filter_weight[x] < _http_filter_weight[y]},
+					)
 
 		// Set a default external_secret for DEV mode redis connections.
 		// NOTE: we have to do another IF statement for the OIDC check
@@ -396,7 +395,6 @@ import (
 		if _enable_oidc_authentication {
 			_external_filter_secrets: oidc_authn_secret: defaults.edge.oidc.client_secret
 		}
-
 
 		// http_filters contains the configuration for HTTP filters (not TCP)
 		// potentially applied to the listener. Note again that the active_http_filters
@@ -417,7 +415,7 @@ import (
 				metrics_receiver: {
 					// The connection string gets set by the external secret mechnanism in secrets/
 					redis_connection_string?: string
-					push_interval_seconds:   10
+					push_interval_seconds:    10
 				}
 			}
 
@@ -439,9 +437,9 @@ import (
 					authRealms:      _authRealms
 					authAdminRealms: _authAdminRealms
 					// These values are populated from inputs.cue
-					serviceUrl:   _oidc_service_url
-					provider:     _oidc_provider
-					clientId:     _oidc_client_id
+					serviceUrl: _oidc_service_url
+					provider:   _oidc_provider
+					clientId:   _oidc_client_id
 					accessToken: {
 						cookieOptions: {
 							domain: _oidc_cookie_domain
@@ -543,7 +541,7 @@ import (
 	}
 
 	// calculate all external secrets
-	external_secrets: [for k, v in _external_filter_secrets { v }]
+	external_secrets: [ for k, v in _external_filter_secrets {v}]
 
 	zone_key: mesh.spec.zone
 }
@@ -588,15 +586,16 @@ import (
 		}
 	}
 
-	_require_client_certs:[
-		if _security_spec.internal.type == "manual-tls" {false}
-		if _security_spec.internal.type == "manual-mtls" {true}
+	_require_client_certs: [
+				if _security_spec.internal.type == "manual-tls" {false},
+				if _security_spec.internal.type == "manual-mtls" {true},
+				false,
 	][0]
-	_enable_ssl_block:[
-		if (_security_spec.internal.type == "manual-mtls") {true}
-		if (_security_spec.internal.type == "manual-tls") {true}
-		if ( _security_spec.internal.type == "plaintext" ) {false}
-		if ( _security_spec.internal.type == "spire") {false}
+	_enable_ssl_block: [
+				if (_security_spec.internal.type == "manual-mtls") {true},
+				if (_security_spec.internal.type == "manual-tls") {true},
+				if ( _security_spec.internal.type == "plaintext" ) {false},
+				if ( _security_spec.internal.type == "spire") {false},
 	][0]
 
 	// if len(instances) == 0 then it is using service discovery (so a cluster from a sidecar going to another sidecar)
