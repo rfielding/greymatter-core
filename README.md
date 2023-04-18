@@ -7,8 +7,6 @@ Enterprise-level CUE files for core greymatter.io mesh configurations.
 - [CUE CLI](https://cuelang.org/docs/install/) v0.5.0
 - pytest
 
-**WARNING (2023-03-31):** the `latest` tip of CUE's master branch doesn't work for us.
-Please install `go install cuelang.org/go/cmd/cue@v0.5.0-beta.5`
 
 ## CUE Libraries
 
