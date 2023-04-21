@@ -7,9 +7,10 @@ import (
 )
 
 let egress_to_redis = "\(defaults.edge.key)_egress_to_redis"
+let external_mesh_connections_ingress = "edge_ingress_for_connections"
 
 let upstream_clusters = list.Concat([
-	[defaults.edge.key, egress_to_redis],
+	[defaults.edge.key, egress_to_redis, external_mesh_connections_ingress],
 	[ if defaults.edge.oidc.enable_remote_jwks {defaults.edge.oidc.remote_jwks_cluster}],
 ])
 

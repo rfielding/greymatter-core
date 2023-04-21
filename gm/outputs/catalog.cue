@@ -5,6 +5,7 @@ package greymatter
 let Name = "catalog"
 let CatalogIngressName = "\(Name)_ingress"
 let EgressToRedisName = "\(Name)_egress_to_redis"
+let external_mesh_connections_egress = "catalog_egress_for_connections"
 
 catalog_config: [
 
@@ -55,8 +56,8 @@ catalog_config: [
 	// shared proxy object
 	#proxy & {
 		proxy_key: Name
-		domain_keys: [CatalogIngressName, EgressToRedisName]
-		listener_keys: [CatalogIngressName, EgressToRedisName]
+		domain_keys: [CatalogIngressName, EgressToRedisName, external_mesh_connections_egress]
+		listener_keys: [CatalogIngressName, EgressToRedisName, external_mesh_connections_egress]
 	},
 
 	// Edge config for catalog ingress
