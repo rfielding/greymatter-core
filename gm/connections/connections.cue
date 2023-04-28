@@ -1,17 +1,17 @@
 package greymatter
 
 connect: #Connections & {
-    // Embed our default mesh configurations for outbound
-    // connections from our catalog.
-    #Connect
+	// Embed our default mesh configurations for outbound
+	// connections from our catalog.
+	#Connect
 
-    connections: {}
+	connections: {}
 }
-    
-accept: #Connections & {
-    // Embed our default mesh configurations for inbound
-    // connections to our catalog.
-    #Accept
 
-    connections: {}
+accept: #Connections & {
+	// Embed our default mesh configurations for inbound
+	// connections to our catalog.
+	#Accept
+
+	connections: {}
 }
