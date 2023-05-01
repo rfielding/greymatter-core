@@ -42,11 +42,15 @@ edge: [
 										mountPath: "/etc/proxy/tls/edge"
 									}
 								},
+								{
+									name: "greymatter-mesh-connections"
+									mountPath: "/etc/proxy/tls/edge/connections"
+								}
 							]
 						},
 					]
 					volumes: #sidecar_volumes + [
-							if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") {
+						if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") {
 							{
 								name: "tls-certs"
 								secret: {
@@ -55,6 +59,14 @@ edge: [
 								}
 							}
 						},
+						{
+							name: "greymatter-mesh-connections"
+							secret: {
+								defaultMode: 420
+								secretName: "grematter-mesh-connections"
+								optional: true
+							}
+						}
 					]
 					imagePullSecrets: [{name: defaults.image_pull_secret_name}]
 				}

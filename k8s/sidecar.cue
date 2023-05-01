@@ -55,7 +55,6 @@ import (
 			mountPath: "/etc/proxy/tls/sidecar/"
 		}]
 	}
-
 	[...]
 }
 

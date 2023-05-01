@@ -78,6 +78,12 @@ defaults: {
 	gitops_state_key_k8s:     "\(config.operator_namespace).k8sHashes"
 	gitops_state_key_sidecar: "\(config.operator_namespace).sidecarHashes"
 
+	// This secret pertains to the mesh connections feature in greymatter.
+	// edge and catalog read certificates off disk from a secret.
+	// This is for inbound/outbound traffic to this mesh from other
+	// greymatter meshes.
+	mesh_connections_secret: "greymatter-mesh-connections-certs"
+
 	ports: {
 		default_ingress: 10808
 		edge_ingress:    defaults.ports.default_ingress

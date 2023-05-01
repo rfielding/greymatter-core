@@ -64,6 +64,10 @@ catalog: [
 									name:      "catalog-seed"
 									mountPath: "/app/seed"
 								},
+								{
+									name: defaults.mesh_connections_secret
+									mountPath: "/etc/proxy/tls/sidecar/connections"
+								}
 							]
 							securityContext: {
 								allowPrivilegeEscalation: false
@@ -76,10 +80,18 @@ catalog: [
 						seccompProfile: {type: "RuntimeDefault"}
 					}
 					volumes: #sidecar_volumes + [
-							{
+						{
 							name: "catalog-seed"
 							configMap: {name: "catalog-seed", defaultMode: 420}
 						},
+						{
+							name: defaults.mesh_connections_secret
+							secret: {
+								defaultMode: 420
+								secretName: "grematter-mesh-connections"
+								optional: true
+							}
+						}
 					]
 					imagePullSecrets: [{name: defaults.image_pull_secret_name}]
 				}

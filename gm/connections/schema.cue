@@ -7,19 +7,59 @@ import (
 let external_mesh_connections_egress = "catalog_egress_for_connections"
 let external_mesh_connections_ingress = "edge_ingress_for_connections"
 
-#Mesh: {
+// Top level schema validator that both accept and connect
+// must adhere too.
+#Connections: {
+    #Accept | #Connect
+
+    connections: [name=string]:  #Connection
+}
+
+// All registered meshes must adhere to a #Connection
+// schema. Operator uses all data to generate
+// mesh configurations as well as kubernetes manifests.
+#Connection: {
     url: string
     name: string
     display_name: string
-    ssl_config?: api.#ClusterSSLConfig
-    route: #ConnectionsAcceptRoute | #ConnectionsConnectRoute
+    ssl_config?: #ConnectSSLConfig
+    route: #AcceptRoute | #ConnectRoute
     cluster: {
         zone_key: string | *"default-zone"
         ...
     }
 }
 
-#ConnectionsAcceptRoute: #route & {
+// Ingress traffic ssl configuration.
+// This gets applied to the downstream listener on the edge.
+#AcceptSSLConfig: api.#ListenerSSLConfig & {
+    protocols: [ "TLS_AUTO"]
+    require_client_certs: bool | *true
+    allow_expired_certificate: bool | *false
+    cert_key_pairs: [
+        api.#CertKeyPathPair & {
+            certificate_path: string | *"/etc/proxy/tls/edge/connections/server.crt"
+            key_path:         string | *"/etc/proxy/tls/edge/connections/server.key"
+        },
+    ]
+    trust_file:       string | *"/etc/proxy/tls/edge/connections/ca.crt"
+}
+
+// Egress traffic ssl configuration. 
+// This gets applied to a cluster upstream on the catalog
+// sidecar.
+#ConnectSSLConfig: api.#ClusterSSLConfig & {
+    protocols: [ "TLS_AUTO"]
+    cert_key_pairs: [
+        api.#CertKeyPathPair & {
+            certificate_path: string | *"/etc/proxy/tls/sidecar/connections/server.crt"
+            key_path:         string | *"/etc/proxy/tls/sidecar/connections/server.key"
+        },
+    ]
+    trust_file:       string | *"/etc/proxy/tls/sidecar/connections/ca.crt"
+}
+
+#AcceptRoute: #route & {
     _name: string
     _upstream_cluster_key: "catalog"
     domain_key: external_mesh_connections_ingress
@@ -37,7 +77,7 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
     prefix_rewrite: ""
 }
 
-#ConnectionsConnectRoute: #route & {
+#ConnectRoute: #route & {
     _name: string
     _upstream_cluster_key: "\(_name)-cluster"
     domain_key: external_mesh_connections_egress
@@ -55,7 +95,7 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
     ]
 }
 
-#ConnectionsAccept: {
+#Accept: {
     domain: #domain & {
         domain_key: external_mesh_connections_ingress
         port: 10710
@@ -72,7 +112,7 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
     }
 }
 
-#ConnectionsConnect: {
+#Connect: {
     domain: #domain & {
         domain_key: external_mesh_connections_egress
         port: 10610

@@ -105,12 +105,7 @@ controlensemble: [
 						runAsNonRoot: true
 						seccompProfile: {type: "RuntimeDefault"}
 					}
-					volumes: #sidecar_volumes + [
-							{
-							name: "catalog-seed"
-							configMap: {name: "catalog-seed", defaultMode: 420}
-						},
-					]
+					volumes: #sidecar_volumes + []
 					imagePullSecrets: [{name: defaults.image_pull_secret_name}]
 					serviceAccountName: Name
 				}
