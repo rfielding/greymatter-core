@@ -27,9 +27,9 @@ catalog: [
 						"greymatter.io/cluster":  Name
 						"greymatter.io/workload": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 						for i in defaults.additional_labels.all_pods {
-							"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])",
+							"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])"
 						}
-						if len(defaults.additional_labels.external_spire_label) > 0{
+						if len(defaults.additional_labels.external_spire_label) > 0 {
 							"\(defaults.additional_labels.external_spire_label)": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 						}
 					}
@@ -57,7 +57,7 @@ catalog: [
 								{name: "REDIS_PORT", value: "6379"},
 								{name: "REDIS_DB", value:   "0"},
 							]
-							resources: catalog_resources
+							resources:       catalog_resources
 							imagePullPolicy: defaults.image_pull_policy
 							volumeMounts: [
 								{
@@ -65,9 +65,14 @@ catalog: [
 									mountPath: "/app/seed"
 								},
 								{
-									name: defaults.mesh_connections_secret
+									name:      defaults.mesh_connections_secret
 									mountPath: "/etc/proxy/tls/sidecar/connections"
-								}
+								},
+								{
+									name:      "greymatter-catalog-config"
+									mountPath: "/app/settings.toml"
+									subPath:   "settings.toml"
+								},
 							]
 							securityContext: {
 								allowPrivilegeEscalation: false
@@ -80,7 +85,7 @@ catalog: [
 						seccompProfile: {type: "RuntimeDefault"}
 					}
 					volumes: #sidecar_volumes + [
-						{
+							{
 							name: "catalog-seed"
 							configMap: {name: "catalog-seed", defaultMode: 420}
 						},
@@ -88,14 +93,34 @@ catalog: [
 							name: defaults.mesh_connections_secret
 							secret: {
 								defaultMode: 420
-								secretName: "grematter-mesh-connections"
+								secretName:  "grematter-mesh-connections"
+								optional:    true
+							}
+						},
+						{
+							name: "greymatter-catalog-config"
+							configMap: {
+								name:     "greymatter-catalog-config"
 								optional: true
 							}
-						}
+						},
 					]
 					imagePullSecrets: [{name: defaults.image_pull_secret_name}]
 				}
 			}
+		}
+	},
+
+	corev1.#ConfigMap & {
+		apiVersion: "v1"
+		kind:       "ConfigMap"
+		metadata: {
+			name:      "greymatter-catalog-config"
+			namespace: mesh.spec.install_namespace
+		}
+		data: {
+			"settings.toml": """
+				"""
 		}
 	},
 
