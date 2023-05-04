@@ -176,9 +176,9 @@ prometheus: [
               namespaces:
                 names: [\(strings.Join([mesh.spec.install_namespace]+mesh.spec.watch_namespaces, ","))]
           relabel_configs:
-          # Drop all named ports that are not "metrics"
+          # Drop all named ports that are not the metrics named port
           - source_labels: ['__meta_kubernetes_pod_container_port_name']
-            regex: 'metrics'
+            regex: '\(defaults.metrics_port_name)'
             action: 'keep'
           # Relabel Jobs to the service name and version of the zk path
           - source_labels: ['__meta_kubernetes_pod_label_greymatter_io_cluster']
@@ -206,7 +206,7 @@ prometheus: [
           - source_labels: ['__address__']
             regex: '(.*):(.*)'
             target_label:  '__address__'
-            replacement:   '${1}:8001'
+            replacement:   '${1}:\(defaults.ports.envoy_admin)'
       """
 
 			"recording_rules.yaml": #"""

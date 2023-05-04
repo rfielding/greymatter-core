@@ -51,7 +51,7 @@ redis: [
 						#sidecar_container_block & {
 							_Name: Name
 							ports: [{// redis listens on a non-default sidecar port
-								name:          "proxy"
+								name:          "ingress"
 								containerPort: defaults.ports.redis_ingress
 							}]
 						},

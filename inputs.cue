@@ -41,7 +41,7 @@ mesh: meshv1.#Mesh & {
 		install_namespace: string | *"greymatter"
 		watch_namespaces: [...string] | *["default", "examples"]
 		images: {
-			proxy:       string | *"greymatter.jfrog.io/oci/greymatter-proxy:1.9.0"
+			proxy:       string | *"greymatter.jfrog.io/dev-oci/greymatter-proxy:main"
 			catalog:     string | *"greymatter.jfrog.io/oci/greymatter-catalog:3.1.0"
 			dashboard:   string | *"greymatter.jfrog.io/oci/greymatter-dashboard:6.0.10"
 			control:     string | *"greymatter.jfrog.io/oci/greymatter-control:1.9.0"
@@ -58,7 +58,8 @@ defaults: {
 	image_pull_policy:      corev1.#enumPullPolicy | *corev1.#PullAlways
 	xds_host:               "controlensemble.\(mesh.spec.install_namespace).svc.cluster.local"
 	sidecar_list:           [...string] | *["dashboard", "catalog", "controlensemble", "edge", "redis", "prometheus", "jwtsecurity", "audits"]
-	proxy_port_name:        "proxy" // the name of the ingress port for sidecars - used by service discovery
+	proxy_port_name:        "ingress" // the name of the ingress port for sidecars - used by service discovery
+	metrics_port_name:      "stats" // the name of the metrics port for sidecars - used by Prometheus scrape
 	redis_cluster_name:     "greymatter-datastore"
 	redis_host:             "\(redis_cluster_name).\(mesh.spec.install_namespace).svc.cluster.local"
 	redis_port:             6379
@@ -85,15 +86,16 @@ defaults: {
 	mesh_connections_secret: "greymatter-mesh-connections-certs"
 
 	ports: {
-		default_ingress: 10808
+		default_ingress: 10908
 		edge_ingress:    defaults.ports.default_ingress
 		redis_ingress:   10910
-		metrics:         8081
+		metrics:         8082
+		envoy_admin:     8002
 	}
 
 	images: {
 		cli:               string | *"greymatter.jfrog.io/oci/greymatter-cli:4.8.0"
-		operator:          string | *"greymatter.jfrog.io/oci/greymatter-operator:0.17.0" @tag(operator_image)
+		operator:          string | *"greymatter.jfrog.io/dev-oci/greymatter-operator:main" @tag(operator_image)
 		vector:            string | *"timberio/vector:0.22.0-debian"
 		audits:            string | *"greymatter.jfrog.io/oci/greymatter-audits:1.1.7"
 		keycloak:          string | *"quay.io/keycloak/keycloak:19.0.3"

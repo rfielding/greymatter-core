@@ -34,7 +34,7 @@ keycloak: [
 							_Name: Name
 							ports: [{
 								// keycloak listens on a non-default sidecar port
-								name:          "proxy"
+								name:          "ingress"
 								containerPort: defaults.edge.oidc.upstream_port
 							}]
 						},

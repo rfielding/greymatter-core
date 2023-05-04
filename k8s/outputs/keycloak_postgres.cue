@@ -38,7 +38,7 @@ keycloak_postgres: [
 						#sidecar_container_block & {
 							_Name: Name
 							ports: [{
-								name: "proxy"
+								name: "ingress"
 								// postgres listens on a non-default sidecar port
 								containerPort: defaults.keycloak.database_ingress_port
 							}]

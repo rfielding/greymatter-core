@@ -14,16 +14,17 @@ import (
 	image: mesh.spec.images.proxy
 	ports: [...corev1.#ContainerPort] | *[
 		{
-			name:          "proxy"
+			name:          defaults.proxy_port_name
 			containerPort: defaults.ports.default_ingress
 		},
 		{
-			name:          "metrics"
+			name:          defaults.metrics_port_name
 			containerPort: defaults.ports.metrics
 		},
 	]
 	env: [
 		{name: "XDS_CLUSTER", value:          _Name},
+		{name: "ENVOY_ADMIN_PORT", value: "\(defaults.ports.envoy_admin)"},
 		{name: "ENVOY_ADMIN_LOG_PATH", value: "/dev/stdout"},
 		{name: "PROXY_DYNAMIC", value:        "true"},
 		{name: "XDS_ZONE", value:             mesh.spec.zone},
