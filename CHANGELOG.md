@@ -17,6 +17,8 @@
   - 8001 -> 8002
   - “proxy” -> “ingress”
   - “metrics” -> “stats”
+- Changed secrets greymatter-sync-secret, oidc-client-secret, gm-edge-ingress-certs to greymatter-core-repo
+  greymatter-oidc-provider, and greymatter-edge-ingress, respectively.
 
 ## v0.17.0 (March 29, 2023)
 
