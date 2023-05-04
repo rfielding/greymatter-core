@@ -126,11 +126,19 @@ vector: [
 								}
 							}
 						}, {
+							name: "ELASTICSEARCH_USER"
+							valueFrom: {
+								secretKeyRef: {
+									name: defaults.audits.elasticsearch_secret
+									key:  "elasticsearch_username"
+								}
+							}
+						}, {
 							name: "ELASTICSEARCH_PASSWORD"
 							valueFrom: {
 								secretKeyRef: {
-									name: defaults.audits.elasticsearch_password_secret
-									key:  "password"
+									name: defaults.audits.elasticsearch_secret
+									key:  "elasticsearch_password"
 								}
 							}
 						}]
@@ -250,7 +258,7 @@ vector: [
 			bulk.index = "\(defaults.audits.storage_index)"
 			compression = \"none\"
 			auth.strategy = \"basic\"
-			auth.user = "\(defaults.audits.elasticsearch_username)"
+			auth.user = \"${ELASTICSEARCH_USER})\"
 			auth.password = \"${ELASTICSEARCH_PASSWORD}\"
 			suppress_type_name = true
 			tls.verify_certificate = \(defaults.audits.elasticsearch_tls_verify_certificate)

@@ -58,13 +58,18 @@ audits: [
 								value: "gm"
 							}, {
 								name:  "ES_USER"
-								value: defaults.audits.elasticsearch_username
+								valueFrom: {
+									secretKeyRef: {
+										name: defaults.audits.elasticsearch_secret
+										key:  "elasticsearch_username"
+									}
+								}
 							}, {
 								name: "ES_PASSWORD"
 								valueFrom: {
 									secretKeyRef: {
-										name: defaults.audits.elasticsearch_password_secret
-										key:  "password"
+										name: defaults.audits.elasticsearch_secret
+										key:  "elasticsearch_password"
 									}
 								}
 							}, {

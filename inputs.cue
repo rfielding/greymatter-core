@@ -139,11 +139,9 @@ defaults: {
 		// of your Elasticsearch instance. This is used by to sync audit data
 		// with Elasticsearch.
 		elasticsearch_endpoint: "https://\(elasticsearch_host):\(elasticsearch_port)"
-		// elasticsearch_username is the default Elasticsearch basic authentication user name.
-		elasticsearch_username: "elastic"
-		// elasticsearch_password_secret is the Kubernetes secret name containing
-		// default Elasticsearch basic authentication password.
-		elasticsearch_password_secret: "elasticsearch-password"
+		// elasticsearch_secret is the name of the secret containing the elasticsearch username 
+		// and password
+		elasticsearch_secret: "greymatter-audits"
 		// elasticsearch_tls_verify_certificate determines if the audit agent verifies
 		// Elasticsearch's TLS certificate during the TLS handshake. If your Elasticsearch is
 		// using a self-signed certificate, set this to false.
@@ -168,7 +166,7 @@ defaults: {
 		// keycloak_postgres_cluster_name is the upstream cluster name for sidecar
 		// egress from Keycloak to Postgres.
 		keycloak_postgres_cluster_name: "keycloak-postgres"
-		// keycloak_admin_secretis the default Keycloak admin password secret name.
+		// keycloak_admin_secret is the default Keycloak admin password secret name.
 		keycloak_admin_secret: "keycloak-admin-password"
 		// keycloak_postgres_secretis the default Keycloak Postgres password secret name.
 		keycloak_postgres_secret: "keycloak-postgres-password"

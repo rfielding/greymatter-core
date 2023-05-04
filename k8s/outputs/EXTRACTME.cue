@@ -63,7 +63,6 @@ k8s_manifests: list.Concat([
 		[ for x in openshift_spire if config.openshift && config.spire {x}],
 		[ for x in audits if config.enable_audits {x}],
 		[ for x in vector if config.enable_audits {x}],
-		[ for x in elasticsearch_password if config.enable_audits {x}],
 		[ for x in jwt_security_manifests if _enable_jwtsecurity {x}],
 		[ for x in keycloak if config.enable_keycloak {x}],
 		[ for x in keycloak_postgres if config.enable_keycloak {x}],
