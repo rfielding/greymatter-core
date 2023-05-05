@@ -46,7 +46,7 @@ mesh: meshv1.#Mesh & {
 			dashboard:   string | *"greymatter.jfrog.io/oci/greymatter-dashboard:6.0.10"
 			control:     string | *"greymatter.jfrog.io/oci/greymatter-control:1.9.0"
 			control_api: string | *"greymatter.jfrog.io/oci/greymatter-control-api:1.9.0"
-			redis:       string | *"index.docker.io/library/redis:7.0.8"
+			redis:       string | *"greymatter.jfrog.io/ci-staging-oci/redis-stack-server:6.2.6-v7-20230504"
 			prometheus:  string | *"index.docker.io/prom/prometheus:v2.40.1"
 		}
 		display_name: string | *"greymatter Mesh"
