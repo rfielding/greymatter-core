@@ -70,7 +70,6 @@ then
   sleep 30
   
   echo ----- PROJECT Operator apply -----
-  kubectl apply -f ./generated-manifests/operator-spire.yaml
-
-  #mustWaitForEdge
+  kubectl apply -f ./generated-manifests/operator.yaml
+  mustWaitForEdge
 fi
