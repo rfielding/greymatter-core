@@ -13,7 +13,7 @@ generate_manifest(){
     cue eval -c ./k8s/outputs -e operator_manifests_yaml --out=text \
         -t openshift=${openshift_tag} \
         -t spire=${spire_tag} \
-        -t git_remote="git@github.com:<your-org>/greymatter-core.git" > ${re_order_dir}/manifest.yaml
+        -t git_remote="git@github.com:rfielding/greymatter-core.git" > ${re_order_dir}/manifest.yaml
 
     # re order the manifests so they install cleanly
     ./scripts/reorder-manifest.py
