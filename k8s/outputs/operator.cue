@@ -129,7 +129,7 @@ operator_sts: [
 								subPath:   "overrides.cue"
 							},
 							{
-								name:      "greymatter-sync-secret"
+								name:      "greymatter-core-repo"
 								readOnly:  true
 								mountPath: "/app/.ssh"
 							},
@@ -166,10 +166,10 @@ operator_sts: [
 							configMap: {name: "overrides-cue"}
 						},
 						{
-							name: "greymatter-sync-secret"
+							name: "greymatter-core-repo"
 							secret: {
 								defaultMode: 288
-								secretName:  "greymatter-sync-secret"
+								secretName:  "greymatter-core-repo"
 							}
 						},
 					]
@@ -206,7 +206,7 @@ operator_k8s: [
 	corev1.#ServiceAccount & {
 		apiVersion: "v1"
 		imagePullSecrets: [{
-			name: "gm-docker-secret"
+			name: "greymatter-image-pull"
 		}]
 		kind: "ServiceAccount"
 		metadata: {

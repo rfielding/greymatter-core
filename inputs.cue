@@ -39,7 +39,7 @@ mesh: meshv1.#Mesh & {
 	}
 	spec: {
 		install_namespace: string | *"greymatter"
-		watch_namespaces: [...string] | *["default", "examples"]
+		watch_namespaces:  [...string] | *["default", "examples"]
 		images: {
 			proxy:       string | *"greymatter.jfrog.io/dev-oci/greymatter-proxy:main"
 			catalog:     string | *"greymatter.jfrog.io/oci/greymatter-catalog:3.1.0"
@@ -54,7 +54,7 @@ mesh: meshv1.#Mesh & {
 }
 
 defaults: {
-	image_pull_secret_name: string | *"gm-docker-secret"
+	image_pull_secret_name: string | *"greymatter-image-pull"
 	image_pull_policy:      corev1.#enumPullPolicy | *corev1.#PullAlways
 	xds_host:               "controlensemble.\(mesh.spec.install_namespace).svc.cluster.local"
 	sidecar_list:           [...string] | *["dashboard", "catalog", "controlensemble", "edge", "redis", "prometheus", "jwtsecurity", "audits"]
@@ -186,8 +186,8 @@ defaults: {
 		// mTLS across sidecars. That behavior can be changed by setting the
 		// defaults.internal.core_internal_tls_certs.require_client_certs to true.
 		require_client_certs: bool | *false @tag(edge_require_client_certs, type=bool)
-		secret_name:          "gm-edge-ingress-certs"
-		annotations:{
+		secret_name:          "greymatter-edge-ingress"
+		annotations: {
 			// Additional annotations for the core edge service. ex: ["annotation_key_1:value1", "annotation_key_2:value2"]
 			service: [...string] | *[]
 		}
@@ -216,7 +216,7 @@ defaults: {
 
 			// 	kubernetes_secret: {
 			// 		namespace: mesh.spec.install_namespace
-			// 		name:      "oidc-client-secret"
+			// 		name:      "greymatter-oidc-provider"
 			// 		key:       "client-secret"
 			// 	}
 			// }

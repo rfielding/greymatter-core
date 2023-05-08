@@ -24,11 +24,11 @@ role_bindings: [
 		kind:       "Role"
 		metadata: {
 			namespace: mesh.spec.install_namespace
-			name: "secret-name-gm-control-role"
+			name:      "secret-name-gm-control-role"
 		}
 		rules: [{
 			apiGroups: [""]
-			resourceNames: ["oidc-client-secret"]
+			resourceNames: ["greymatter-oidc-provider"]
 			resources: ["secrets"]
 			verbs: ["get"]
 		}]

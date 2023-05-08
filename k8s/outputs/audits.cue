@@ -27,9 +27,9 @@ audits: [
 						"greymatter.io/cluster":  Name
 						"greymatter.io/workload": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 						for i in defaults.additional_labels.all_pods {
-							"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])",
+							"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])"
 						}
-						if len(defaults.additional_labels.external_spire_label) > 0{
+						if len(defaults.additional_labels.external_spire_label) > 0 {
 							"\(defaults.additional_labels.external_spire_label)": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 						}
 					}
@@ -83,7 +83,7 @@ audits: [
 					]
 					volumes: #sidecar_volumes
 					imagePullSecrets: [{
-						name: "gm-docker-secret"
+						name: "greymatter-image-pull"
 					}]
 				}
 			}
