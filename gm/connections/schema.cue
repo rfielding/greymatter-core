@@ -2,38 +2,80 @@ package greymatter
 
 import (
 	api "greymatter.io/api"
+	"regexp"
+	"crypto/md5"
+	"encoding/hex"
+	"strings"
+	"strconv"
 )
 
 let external_mesh_connections_egress = "catalog_egress_for_connections"
 let external_mesh_connections_ingress = "edge_ingress_for_connections"
 
-// Top level schema validator that both accept and connect
-// must adhere too.
+// Root schema. Must be present in the connections.cue file
 #Connections: {
-	#Accept | #Connect
-
-	connections: [name=string]: #Connection
+	outbound_socket: #Outbound
+	inbound_socket:  #Inbound
+	connections: [Name=string]: #Connection & {name: Name}
+        accept_connections: *false | bool
 }
 
-// All registered meshes must adhere to a #Connection
-// schema. Operator uses all data to generate
-// mesh configurations as well as kubernetes manifests.
+#AcceptConnections: accept_connections: true
+
+// A route-cluster combo. Holds the config for the destination catalog
 #Connection: {
-	url?:           string
-	dashboard_url?: string
-	name:           string
-	display_name:   *name | string
-	ssl_config?:    #ConnectSSLConfig
-	route:          #AcceptRoute | #ConnectRoute
-	cluster: {
-		zone_key: string | *"default-zone"
-		...
+	url:           string
+	dashboard_url: string
+	N=name:        string
+	S=ssl_config?: #OutboundSSLConfig
+	// name could potentially be unsafe for a url. A simple fix in CUE is to hash and truncate since the url is not human-facing
+	url_safe_name: strings.SliceRunes(hex.Encode(md5.Sum(name)), 0, 8)
+	route:         #route & {
+		_upstream_cluster_key: "\(name)-cluster"
+		domain_key:            external_mesh_connections_egress
+		route_key:             "\(name)-route"
+		prefix_rewrite:        "/"
+		route_match: {
+			path: "/\(url_safe_name)/"
+		}
+		redirects: [
+			{
+				from:          "^/\(url_safe_name)$"
+				to:            route_match.path
+				redirect_type: "permanent"
+			},
+		]
 	}
+	cluster: #cluster & {
+		zone_key:    string | *"default-zone"
+		name:        N
+		cluster_key: "\(name)-cluster"
+		if S != _|_ {
+			ssl_config: S
+		}
+
+		instances: [{
+			host: _host
+			port: _port
+		}]
+	}
+
+	// Processing the url into parts we can use
+	_scheme:       *regexp.FindSubmatch(#"(\w+)://"#, url)[1] | "http"
+	_port_default: int
+	if _scheme == "https" {
+		_port_default: 443
+	}
+	if _scheme == "http" {
+		_port_default: 80
+	}
+	_host: regexp.FindSubmatch(#"//([\w\d-.]+)"#, url)[1]
+	_port: *strconv.Atoi(regexp.FindSubmatch(#":(\d+$)"#, url)[1]) | _port_default
 }
 
-// Ingress traffic ssl configuration.
+// Ingress traffic tls configuration.
 // This gets applied to the downstream listener on the edge.
-#AcceptSSLConfig: api.#ListenerSSLConfig & {
+#InboundSSLConfig: api.#ListenerSSLConfig & {
 	protocols: [ "TLS_AUTO"]
 	require_client_certs:      bool | *true
 	allow_expired_certificate: bool | *false
@@ -49,7 +91,7 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 // Egress traffic ssl configuration. 
 // This gets applied to a cluster upstream on the catalog
 // sidecar.
-#ConnectSSLConfig: api.#ClusterSSLConfig & {
+#OutboundSSLConfig: api.#ClusterSSLConfig & {
 	protocols: [ "TLS_AUTO"]
 	cert_key_pairs: [
 		api.#CertKeyPathPair & {
@@ -60,49 +102,15 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 	trust_file: string | *"/etc/proxy/tls/sidecar/connections/ca.crt"
 }
 
-#AcceptRoute: #route & {
-	_name:                 string
-	_upstream_cluster_key: "catalog"
-	domain_key:            external_mesh_connections_ingress
-	route_key:             "\(_name)-route"
-	route_match: {
-		path: "/\(_name)"
-	}
-	redirects: [
-		{
-			from:          "^/\(_name)$"
-			to:            route_match.path
-			redirect_type: "permanent"
-		},
-	]
-	prefix_rewrite: ""
-}
-
-#ConnectRoute: #route & {
-	_name:                 string
-	_upstream_cluster_key: "\(_name)-cluster"
-	domain_key:            external_mesh_connections_egress
-	route_key:             "\(_name)-route"
-	prefix_rewrite:        ""
-	route_match: {
-		path: "/\(_name)"
-	}
-	redirects: [
-		{
-			from:          "^/\(_name)$"
-			to:            route_match.path
-			redirect_type: "permanent"
-		},
-	]
-}
-
-#Accept: {
+// listener, route rule on the edge to the catalog sidecar
+// We connect into the existing edge-catalog cluster 
+#Inbound: {
 	domain: #domain & {
 		domain_key:        external_mesh_connections_ingress
 		port:              10710
-		_trust_file:       "/etc/proxy/tls/edge/connections/ca.crt"
-		_certificate_path: "/etc/proxy/tls/edge/connections/server.crt"
-		_key_path:         "/etc/proxy/tls/edge/connections/server.key"
+		_trust_file:       *"/etc/proxy/tls/edge/connections/ca.crt" | string
+		_certificate_path: *"/etc/proxy/tls/edge/connections/server.crt" | string
+		_key_path:         *"/etc/proxy/tls/edge/connections/server.key" | string
 	}
 	listener: #listener & {
 		listener_key:          external_mesh_connections_ingress
@@ -111,9 +119,26 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 		port:                  10710
 		_is_ingress:           true
 	}
+	route: #route & {
+		_upstream_cluster_key: "catalog"
+		domain_key:            external_mesh_connections_ingress
+		route_key:             "mesh-connections-edge-ingress"
+		route_match: {
+			path: "/services/catalog/"
+		}
+		redirects: [
+			{
+				from:          "^/services/catalog$"
+				to:            route_match.path
+				redirect_type: "permanent"
+			},
+		]
+		prefix_rewrite: "/"
+	}
 }
 
-#Connect: {
+// egress listener for the catalog sidecar
+#Outbound: {
 	domain: #domain & {
 		domain_key: external_mesh_connections_egress
 		port:       10610
