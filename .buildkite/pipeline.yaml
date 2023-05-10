@@ -75,8 +75,6 @@ steps:
       JF_DEST_REGISTRY: dev-generic
     commands:
       - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
-      - buildkite-agent artifact download generated_inputs.cue . --step update-inputs-cue
-      - mv generated_inputs.cue inputs.cue
       - sleep 10
       - rm -rf /tmp/greymatter-core && mkdir /tmp/greymatter-core
       - tar --exclude-vcs --exclude=".buildkite" --exclude="CHANGELOG.md" --exclude="scripts/cibuild" --exclude="scripts/bootstrap" --exclude="scripts/update" --exclude="scripts/promotion" --exclude="greymatter-download-template.sh" -czf /tmp/greymatter-core/greymatter-core.tar.gz .
