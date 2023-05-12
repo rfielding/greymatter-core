@@ -58,10 +58,17 @@ redis: [
 						{
 							name:  "redis"
 							image: mesh.spec.images.redis
-							command: ["redis-server"]
+							command: ["/app/redis-stack-server/bin/redis-server"]
 							args: [
 								"--appendonly", "yes",
 								"--dir", "/data",
+								"--protected-mode", "no",
+								"--daemonize", "no",
+								"--loadmodule", "/app/redis-stack-server/lib/redisearch.so", "MAXSEARCHRESULTS", "10000", "MAXAGGREGATERESULTS", "10000",
+								"--loadmodule", "/app/redis-stack-server/lib/redisgraph.so", "MAX_QUEUED_QUERIES", "25", "TIMEOUT", "1000", "RESULTSET_SIZE", "10000",
+								"--loadmodule", "/app/redis-stack-server/lib/redistimeseries.so",
+								"--loadmodule", "/app/redis-stack-server/lib/rejson.so",
+								"--loadmodule", "/app/redis-stack-server/lib/redisbloom.so",
 								"--logLevel", "verbose",
 							]
 							resources: redis_resources
