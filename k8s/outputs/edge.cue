@@ -63,7 +63,7 @@ edge: [
 							name: "greymatter-mesh-connections"
 							secret: {
 								defaultMode: 420
-								secretName: "grematter-mesh-connections"
+								secretName: "greymatter-mesh-connections"
 								optional: true
 							}
 						}
