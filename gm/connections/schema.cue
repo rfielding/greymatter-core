@@ -17,7 +17,20 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 	outbound_socket: #Outbound
 	inbound_socket:  #Inbound
 	connections: [Name=string]: #Connection & {name: Name}
-        accept_connections: *false | bool
+	accept_connections: *false | bool
+
+	// If any connection is TLS, add a custom header informing envoy to upgrade the connection.
+	for c in connections {
+		if c.ssl_config != _|_ {
+			outbound_socket: domain: custom_headers: [
+				{
+					key:   "x-forwarded-proto"
+					value: "https"
+				},
+			]
+		}
+	}
+
 }
 
 #AcceptConnections: accept_connections: true
@@ -51,7 +64,7 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 		name:        N
 		cluster_key: "\(name)-cluster"
 		if S != _|_ {
-			ssl_config: S
+			S
 		}
 
 		instances: [{
@@ -75,34 +88,40 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 
 // Ingress traffic tls configuration.
 // This gets applied to the downstream listener on the edge.
-#InboundSSLConfig: api.#ListenerSSLConfig & {
-	protocols: [ "TLS_AUTO"]
-	require_client_certs:      bool | *true
-	allow_expired_certificate: bool | *false
-	cert_key_pairs: [
-		api.#CertKeyPathPair & {
-			certificate_path: string | *"/etc/proxy/tls/edge/connections/server.crt"
-			key_path:         string | *"/etc/proxy/tls/edge/connections/server.key"
-		},
-	]
-	trust_file: string | *"/etc/proxy/tls/edge/connections/ca.crt"
+#InboundSSLConfig: {
+	force_https: true
+	ssl_config:  api.#ListenerSSLConfig & {
+		protocols: [ "TLS_AUTO"]
+		require_client_certs:      bool | *true
+		allow_expired_certificate: bool | *false
+		cert_key_pairs: [
+			api.#CertKeyPathPair & {
+				certificate_path: string | *"/etc/proxy/tls/edge/connections/server.crt"
+				key_path:         string | *"/etc/proxy/tls/edge/connections/server.key"
+			},
+		]
+		trust_file: string | *"/etc/proxy/tls/edge/connections/ca.crt"
+	}
 }
 
-// Egress traffic ssl configuration. 
+// Egress traffic TLS configuration. 
 // This gets applied to a cluster upstream on the catalog
 // sidecar.
-#OutboundSSLConfig: api.#ClusterSSLConfig & {
-	protocols: [ "TLS_AUTO"]
-	cert_key_pairs: [
-		api.#CertKeyPathPair & {
-			certificate_path: string | *"/etc/proxy/tls/sidecar/connections/server.crt"
-			key_path:         string | *"/etc/proxy/tls/sidecar/connections/server.key"
-		},
-	]
-	trust_file: string | *"/etc/proxy/tls/sidecar/connections/ca.crt"
+#OutboundSSLConfig: {
+	require_tls: true
+	ssl_config:  api.#ClusterSSLConfig & {
+		protocols: [ "TLS_AUTO"]
+		cert_key_pairs: [
+			api.#CertKeyPathPair & {
+				certificate_path: string | *"/etc/proxy/tls/sidecar/connections/server.crt"
+				key_path:         string | *"/etc/proxy/tls/sidecar/connections/server.key"
+			},
+		]
+		trust_file: string | *"/etc/proxy/tls/sidecar/connections/ca.crt"
+	}
 }
 
-// listener, route rule on the edge to the catalog sidecar
+// Listener, domain, & route rule on the edge to the catalog sidecar
 // We connect into the existing edge-catalog cluster 
 #Inbound: {
 	domain: #domain & {
@@ -137,7 +156,7 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 	}
 }
 
-// egress listener for the catalog sidecar
+// Egress listener for the catalog sidecar
 #Outbound: {
 	domain: #domain & {
 		domain_key: external_mesh_connections_egress
@@ -149,8 +168,7 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 	listener: #listener & {
 		listener_key:          external_mesh_connections_egress
 		_gm_observables_topic: external_mesh_connections_egress
-		// egress listeners are local only
-		ip:   "127.0.0.1"
-		port: 10610
+		ip:                    "127.0.0.1"
+		port:                  10610
 	}
 }
