@@ -37,7 +37,10 @@ catalog: [
 				spec: #spire_permission_requests & {
 					containers: [
 
-						#sidecar_container_block & {_Name: Name},
+						#sidecar_container_block & {_Name: Name, _volume_mounts: [ {
+							name:      defaults.mesh_connections_secret
+							mountPath: "/etc/proxy/tls/sidecar/connections"
+						}]},
 
 						{
 							name:  "catalog"
@@ -65,10 +68,6 @@ catalog: [
 									mountPath: "/app/seed"
 								},
 								{
-									name:      defaults.mesh_connections_secret
-									mountPath: "/etc/proxy/tls/sidecar/connections"
-								},
-								{
 									name:      "greymatter-catalog-config"
 									mountPath: "/app/settings.toml"
 									subPath:   "settings.toml"
@@ -93,7 +92,7 @@ catalog: [
 							name: defaults.mesh_connections_secret
 							secret: {
 								defaultMode: 420
-								secretName:  "grematter-mesh-connections"
+								secretName:  "greymatter-mesh-connections"
 								optional:    true
 							}
 						},
