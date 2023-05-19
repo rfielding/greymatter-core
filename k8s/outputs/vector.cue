@@ -10,7 +10,7 @@ import (
 
 let Name = "greymatter-audit-agent"
 let logs_namespaces = [mesh.spec.install_namespace] + mesh.spec.watch_namespaces
-let logs = strings.Join([ for namespace in logs_namespaces {"'/var/log/pods/\(namespace)*/sidecar/*.log'"}], ",")
+let logs = strings.Join([ for namespace in logs_namespaces {"'/var/log/pods/\(namespace)*/sidecar*/*.log'"}], ",")
 
 vector_permissions: [
 	corev1.#Namespace & {
