@@ -10,7 +10,7 @@ import (
 	_Name: string
 	_volume_mounts: [...]
 
-	name:  "sidecar"
+	name:  "sidecar18"
 	image: mesh.spec.images.proxy
 	ports: [...corev1.#ContainerPort] | *[
 		{

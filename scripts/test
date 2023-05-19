@@ -85,20 +85,20 @@ cmd_eval_k8s_spire_enabled_and_edge_tls_enabled(){
       _check_volume "is_present" "${cue_eval}" ${n} "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check edge for tls-certs sidecar volume mount 
-      _check_volume_mount "is_present" "${cue_eval}" ${n} "sidecar" "tls-certs"
+      _check_volume_mount "is_present" "${cue_eval}" ${n} "sidecar18" "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check edge for spire-socket volume
       _check_volume "is_present" "${cue_eval}" ${n} "spire-socket"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check edge for spire-socket sidecar volume mount
-      _check_volume_mount "is_present" "${cue_eval}" ${n} "sidecar" "spire-socket"
+      _check_volume_mount "is_present" "${cue_eval}" ${n} "sidecar18" "spire-socket"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
     else
       ################################
       #  Non edge deploy/sts checks
       ################################
       # check that there are NO tls volume mounts on it
-      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar" "tls-certs"
+      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar18" "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check that there are NO tls volume mount on it
       _check_volume "is_not_present" "${cue_eval}" ${n} "tls-certs"
@@ -107,7 +107,7 @@ cmd_eval_k8s_spire_enabled_and_edge_tls_enabled(){
       _check_volume "is_not_present" "${cue_eval}" ${n} "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check there is a spire_path environment variable
-      _check_environment_variable "is_present" "${cue_eval}" ${n} "sidecar" "SPIRE_PATH"
+      _check_environment_variable "is_present" "${cue_eval}" ${n} "sidecar18" "SPIRE_PATH"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check there is a spire volume
       _check_volume "is_present" "${cue_eval}" "edge" "spire-socket"
@@ -148,20 +148,20 @@ cmd_eval_k8s_spire_enabled_and_edge_tls_disabled(){
       _check_volume "is_not_present" "${cue_eval}" ${n} "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check edge for tls-certs sidecar volume mount 
-      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar" "tls-certs"
+      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar18" "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check edge for spire-socket volume
       _check_volume "is_present" "${cue_eval}" ${n} "spire-socket"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check edge for spire-socket sidecar volume mount
-      _check_volume_mount "is_present" "${cue_eval}" ${n} "sidecar" "spire-socket"
+      _check_volume_mount "is_present" "${cue_eval}" ${n} "sidecar18" "spire-socket"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
     else
       ################################
       #  Non edge deploy/sts checks
       ################################
       # check that there are NO tls volume mounts on it
-      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar" "tls-certs"
+      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar18" "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check that there are NO tls volume mount on it
       _check_volume "is_not_present" "${cue_eval}" ${n} "tls-certs"
@@ -170,7 +170,7 @@ cmd_eval_k8s_spire_enabled_and_edge_tls_disabled(){
       _check_volume "is_not_present" "${cue_eval}" ${n} "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check there is a spire_path environment variable
-      _check_environment_variable "is_present" "${cue_eval}" ${n} "sidecar" "SPIRE_PATH"
+      _check_environment_variable "is_present" "${cue_eval}" ${n} "sidecar18" "SPIRE_PATH"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check there is a spire volume
       _check_volume "is_present" "${cue_eval}" "edge" "spire-socket"
@@ -211,20 +211,20 @@ cmd_eval_k8s_spire_disabled_and_edge_tls_disabled(){
       _check_volume "is_not_present" "${cue_eval}" ${n} "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check edge for tls-certs sidecar volume mount 
-      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar" "tls-certs"
+      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar18" "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check edge for spire-socket volume
       _check_volume "is_not_present" "${cue_eval}" ${n} "spire-socket"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check edge for spire-socket sidecar volume mount
-      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar" "spire-socket"
+      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar18" "spire-socket"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
     else
       ################################
       #  Non edge deploy/sts checks
       ################################
       # check that there are NO tls volume mounts on it
-      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar" "tls-certs"
+      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar18" "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check that there are NO tls volume mount on it
       _check_volume "is_not_present" "${cue_eval}" ${n} "tls-certs"
@@ -233,7 +233,7 @@ cmd_eval_k8s_spire_disabled_and_edge_tls_disabled(){
       _check_volume "is_not_present" "${cue_eval}" ${n} "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check there is a spire_path environment variable
-      _check_environment_variable "is_not_present" "${cue_eval}" ${n} "sidecar" "SPIRE_PATH"
+      _check_environment_variable "is_not_present" "${cue_eval}" ${n} "sidecar18" "SPIRE_PATH"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check there is a spire volume
       _check_volume "is_not_present" "${cue_eval}" "edge" "spire-socket"
@@ -274,20 +274,20 @@ cmd_eval_k8s_spire_disabled_and_edge_tls_enabled(){
       _check_volume "is_present" "${cue_eval}" ${n} "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check edge for tls-certs sidecar volume mount 
-      _check_volume_mount "is_present" "${cue_eval}" ${n} "sidecar" "tls-certs"
+      _check_volume_mount "is_present" "${cue_eval}" ${n} "sidecar18" "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check edge for spire-socket volume
       _check_volume "is_not_present" "${cue_eval}" ${n} "spire-socket"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check edge for spire-socket sidecar volume mount
-      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar" "spire-socket"
+      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar18" "spire-socket"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
     else
       ################################
       #  Non edge deploy/sts checks
       ################################
       # check that there are NO tls volume mounts on it
-      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar" "tls-certs"
+      _check_volume_mount "is_not_present" "${cue_eval}" ${n} "sidecar18" "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check that there are NO tls volume mount on it
       _check_volume "is_not_present" "${cue_eval}" ${n} "tls-certs"
@@ -296,7 +296,7 @@ cmd_eval_k8s_spire_disabled_and_edge_tls_enabled(){
       _check_volume "is_not_present" "${cue_eval}" ${n} "tls-certs"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check there is a spire_path environment variable
-      _check_environment_variable "is_not_present" "${cue_eval}" ${n} "sidecar" "SPIRE_PATH"
+      _check_environment_variable "is_not_present" "${cue_eval}" ${n} "sidecar18" "SPIRE_PATH"
       if [[ $? -ne 0 ]]; then p=$((p + 1)); fi
       # check there is a spire volume
       _check_volume "is_not_present" "${cue_eval}" "edge" "spire-socket"
