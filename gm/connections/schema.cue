@@ -40,7 +40,7 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 	url:           string
 	dashboard_url: string
 	N=name:        string
-	S=ssl_config?: #OutboundSSLConfig
+	T=tls?:        #OutboundTLSConfig
 	// name could potentially be unsafe for a url. A simple fix in CUE is to hash and truncate since the url is not human-facing
 	url_safe_name: strings.SliceRunes(hex.Encode(md5.Sum(name)), 0, 8)
 	route:         #route & {
@@ -63,8 +63,8 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 		zone_key:    string | *"default-zone"
 		name:        N
 		cluster_key: "\(name)-cluster"
-		if S != _|_ {
-			S
+		if T != _|_ {
+			T
 		}
 
 		instances: [{
@@ -88,8 +88,8 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 
 // Ingress traffic tls configuration.
 // This gets applied to the downstream listener on the edge.
-#InboundSSLConfig: {
-	force_https: true
+#InboundTLSConfig: {
+	force_https: *true | bool
 	ssl_config:  api.#ListenerSSLConfig & {
 		protocols: [ "TLS_AUTO"]
 		require_client_certs:      bool | *true
@@ -107,8 +107,8 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 // Egress traffic TLS configuration. 
 // This gets applied to a cluster upstream on the catalog
 // sidecar.
-#OutboundSSLConfig: {
-	require_tls: true
+#OutboundTLSConfig: {
+	require_tls: *true | bool
 	ssl_config:  api.#ClusterSSLConfig & {
 		protocols: [ "TLS_AUTO"]
 		cert_key_pairs: [
@@ -124,7 +124,12 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 // Listener, domain, & route rule on the edge to the catalog sidecar
 // We connect into the existing edge-catalog cluster 
 #Inbound: {
+	tls?:   #InboundTLSConfig
 	domain: #domain & {
+		if tls != _|_ {
+			tls
+		}
+
 		domain_key:        external_mesh_connections_ingress
 		port:              10710
 		_trust_file:       *"/etc/proxy/tls/edge/connections/ca.crt" | string
