@@ -10,7 +10,6 @@ import (
 )
 
 let external_mesh_connections_egress = "catalog_egress_for_connections"
-let external_mesh_connections_ingress = "edge_ingress_for_connections"
 
 // Root schema. Must be present in the connections.cue file
 #Connections: {
@@ -130,22 +129,19 @@ let external_mesh_connections_ingress = "edge_ingress_for_connections"
 			tls
 		}
 
-		domain_key:        external_mesh_connections_ingress
-		port:              10710
-		_trust_file:       *"/etc/proxy/tls/edge/connections/ca.crt" | string
-		_certificate_path: *"/etc/proxy/tls/edge/connections/server.crt" | string
-		_key_path:         *"/etc/proxy/tls/edge/connections/server.key" | string
+		domain_key: defaults.external_mesh_connections_ingress
+		port:       10710
 	}
 	listener: #listener & {
-		listener_key:          external_mesh_connections_ingress
-		_gm_observables_topic: external_mesh_connections_ingress
+		listener_key:          defaults.external_mesh_connections_ingress
+		_gm_observables_topic: defaults.external_mesh_connections_ingress
 		ip:                    "0.0.0.0"
 		port:                  10710
 		_is_ingress:           true
 	}
 	route: #route & {
 		_upstream_cluster_key: "catalog"
-		domain_key:            external_mesh_connections_ingress
+		domain_key:            defaults.external_mesh_connections_ingress
 		route_key:             "mesh-connections-edge-ingress"
 		route_match: {
 			path: "/services/catalog/"

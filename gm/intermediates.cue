@@ -49,10 +49,11 @@ import (
 	_is_egress:    bool | *false
 
 	_enable_ssl_block: [
-				if (domain_key != defaults.edge.key && (_security_spec.internal.type == "manual-tls" || _security_spec.internal.type == "manual-mtls")) {true},
+				if (domain_key != defaults.edge.key && domain_key != defaults.external_mesh_connections_ingress && (_security_spec.internal.type == "manual-tls" || _security_spec.internal.type == "manual-mtls")) {true},
 				if (domain_key == defaults.edge.key && (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls" )) {true},
 				if _security_spec.internal.type == "plaintext" {false},
 				if _security_spec.internal.type == "spire" {false},
+				false,
 	][0]
 
 	if _enable_ssl_block && (!_force_no_ssl) && (!_is_egress) {
@@ -60,12 +61,14 @@ import (
 			_require_client_certs: [
 						if _security_spec.internal.type == "manual-tls" {false},
 						if _security_spec.internal.type == "manual-mtls" {true},
+						false,
 			][0]
 		}
 		if domain_key == defaults.edge.key {
 			_require_client_certs: [
 						if _security_spec.edge.type == "tls" {false},
 						if _security_spec.edge.type == "mtls" {true},
+						false,
 			][0]
 		}
 
@@ -596,6 +599,7 @@ import (
 				if (_security_spec.internal.type == "manual-tls") {true},
 				if ( _security_spec.internal.type == "plaintext" ) {false},
 				if ( _security_spec.internal.type == "spire") {false},
+				false,
 	][0]
 
 	// if len(instances) == 0 then it is using service discovery (so a cluster from a sidecar going to another sidecar)
