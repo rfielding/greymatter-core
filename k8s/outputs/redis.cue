@@ -72,7 +72,7 @@ redis: [
 								"--logLevel", "verbose",
 							]
 							resources: redis_resources
-							ports: [{// HACK this port is exposed so the Service (below) can get to it for easy bootstrap
+							ports: [{// this port is exposed so the Service (below) can get to it for easy bootstrap
 								name:          "redis"
 								containerPort: 6379
 							}]
@@ -116,8 +116,8 @@ redis: [
 		}
 	},
 
-	// HACK to avoid static configuration during bootstrap, give things direct access to redis
-	// Later, use Redis' sidecar
+	// to avoid static configuration during bootstrap, grant direct access to redis
+	// later, use Redis' sidecar
 	corev1.#Service & {
 		apiVersion: "v1"
 		kind:       "Service"

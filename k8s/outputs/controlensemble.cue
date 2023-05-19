@@ -86,7 +86,7 @@ controlensemble: [
 								{name: "GM_CONTROL_API_PERSISTER_TYPE", value:        "redis"},
 								{name: "GM_CONTROL_API_REDIS_MAX_RETRIES", value:     "50"},
 								{name: "GM_CONTROL_API_REDIS_RETRY_DELAY", value:     "5s"},
-								// HACK - later use redis sidecar or external redis, but this keeps bootstrap simple for now
+								// later use redis sidecar or external redis, but this keeps bootstrap simple for now
 								{name: "GM_CONTROL_API_REDIS_HOST", value: defaults.redis_host},
 								{name: "GM_CONTROL_API_REDIS_PORT", value: "6379"}, // local redis in this pod
 								{name: "GM_CONTROL_API_REDIS_DB", value:   "0"},
@@ -172,7 +172,7 @@ controlensemble: [
 					port:       50000
 					targetPort: 50000
 				},
-				{// HACK the operator needs direct access gmapi.go#66
+				{// the operator needs direct access gmapi.go#66
 					name:       "controlapi"
 					port:       5555
 					targetPort: 5555

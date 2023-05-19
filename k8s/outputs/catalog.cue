@@ -55,7 +55,7 @@ catalog: [
 								{name: "CONFIG_SOURCE", value:     "redis"},
 								{name: "REDIS_MAX_RETRIES", value: "10"},
 								{name: "REDIS_RETRY_DELAY", value: "5s"},
-								// HACK - later use redis sidecar or external redis, but this keeps bootstrap simple for now
+								// later use redis sidecar or external redis, but this keeps bootstrap simple for now
 								{name: "REDIS_HOST", value: defaults.redis_host},
 								{name: "REDIS_PORT", value: "6379"},
 								{name: "REDIS_DB", value:   "0"},
@@ -151,7 +151,7 @@ catalog: [
 		}
 	},
 
-	// HACK the operator needs direct access
+	// the operator needs direct access
 	corev1.#Service & {
 		apiVersion: "v1"
 		kind:       "Service"
