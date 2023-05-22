@@ -54,20 +54,19 @@ mesh: meshv1.#Mesh & {
 }
 
 defaults: {
-	external_mesh_connections_ingress: "edge_ingress_for_connections"
-	image_pull_secret_name:            string | *"greymatter-image-pull"
-	image_pull_policy:                 corev1.#enumPullPolicy | *corev1.#PullAlways
-	xds_host:                          "controlensemble.\(mesh.spec.install_namespace).svc.cluster.local"
-	sidecar_list:                      [...string] | *["dashboard", "catalog", "controlensemble", "edge", "redis", "prometheus", "jwtsecurity", "audits"]
-	proxy_port_name:                   "ingress" // the name of the ingress port for sidecars - used by service discovery
-	metrics_port_name:                 "stats"   // the name of the metrics port for sidecars - used by Prometheus scrape
-	redis_cluster_name:                "greymatter-datastore"
-	redis_host:                        "\(redis_cluster_name).\(mesh.spec.install_namespace).svc.cluster.local"
-	redis_port:                        6379
-	redis_db:                          0
-	redis_username:                    ""
-	redis_password:                    ""
-	metrics_receiver:                  #MetricsRedisSecret & {
+	image_pull_secret_name: string | *"greymatter-image-pull"
+	image_pull_policy:      corev1.#enumPullPolicy | *corev1.#PullAlways
+	xds_host:               "controlensemble.\(mesh.spec.install_namespace).svc.cluster.local"
+	sidecar_list:           [...string] | *["dashboard", "catalog", "controlensemble", "edge", "redis", "prometheus", "jwtsecurity", "audits"]
+	proxy_port_name:        "ingress" // the name of the ingress port for sidecars - used by service discovery
+	metrics_port_name:      "stats"   // the name of the metrics port for sidecars - used by Prometheus scrape
+	redis_cluster_name:     "greymatter-datastore"
+	redis_host:             "\(redis_cluster_name).\(mesh.spec.install_namespace).svc.cluster.local"
+	redis_port:             6379
+	redis_db:               0
+	redis_username:         ""
+	redis_password:         ""
+	metrics_receiver:       #MetricsRedisSecret & {
 		greymatter.#PlaintextSecret
 
 		plaintext_secret: {
@@ -80,8 +79,8 @@ defaults: {
 	gitops_state_key_k8s:     "\(config.operator_namespace).k8sHashes"
 	gitops_state_key_sidecar: "\(config.operator_namespace).sidecarHashes"
 
-	// This secret pertains to the mesh connections feature in greymatter.
-	// edge and catalog read certificates off disk from a secret.
+	// mesh_connections_secret pertains to the mesh connections feature in greymatter.
+	// Edge and catalog read certificates off-disk from a secret.
 	// This is for inbound/outbound traffic to this mesh from other
 	// greymatter meshes.
 	mesh_connections_secret: "greymatter-mesh-connections-certs"

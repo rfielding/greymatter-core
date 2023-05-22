@@ -20,6 +20,10 @@ import (
 // can be overriden.
 /////////////////////////////////////////////////////////////
 
+// external_mesh_connections_ingress is the key used for greymatter mesh objects
+// for inbound connections from external meshes.
+external_mesh_connections_ingress: "edge_ingress_for_connections"
+
 // #domain represents a greymatter domain object, which deals with incoming 
 // requests to the service.
 // See https://docs.greymatter.io/service-mesh/domain for more details.
@@ -49,7 +53,7 @@ import (
 	_is_egress:    bool | *false
 
 	_enable_ssl_block: [
-				if (domain_key != defaults.edge.key && domain_key != defaults.external_mesh_connections_ingress && (_security_spec.internal.type == "manual-tls" || _security_spec.internal.type == "manual-mtls")) {true},
+				if (domain_key != defaults.edge.key && domain_key != external_mesh_connections_ingress && (_security_spec.internal.type == "manual-tls" || _security_spec.internal.type == "manual-mtls")) {true},
 				if (domain_key == defaults.edge.key && (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls" )) {true},
 				if _security_spec.internal.type == "plaintext" {false},
 				if _security_spec.internal.type == "spire" {false},

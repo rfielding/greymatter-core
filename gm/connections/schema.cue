@@ -129,19 +129,19 @@ let external_mesh_connections_egress = "catalog_egress_for_connections"
 			tls
 		}
 
-		domain_key: defaults.external_mesh_connections_ingress
+		domain_key: external_mesh_connections_ingress
 		port:       10710
 	}
 	listener: #listener & {
-		listener_key:          defaults.external_mesh_connections_ingress
-		_gm_observables_topic: defaults.external_mesh_connections_ingress
+		listener_key:          external_mesh_connections_ingress
+		_gm_observables_topic: external_mesh_connections_ingress
 		ip:                    "0.0.0.0"
 		port:                  10710
 		_is_ingress:           true
 	}
 	route: #route & {
 		_upstream_cluster_key: "catalog"
-		domain_key:            defaults.external_mesh_connections_ingress
+		domain_key:            external_mesh_connections_ingress
 		route_key:             "mesh-connections-edge-ingress"
 		route_match: {
 			path: "/services/catalog/"
