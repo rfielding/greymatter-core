@@ -63,7 +63,7 @@ keycloak_postgres: [
 								{name: "POSTGRES_DB", value: defaults.keycloak.database_name},
 								{name: "PGDATA", value:      "/var/lib/postgresql/data/pgdata"},
 							]
-							resources: keycloak_postgres_resources
+							resources:       keycloak_postgres_resources
 							imagePullPolicy: defaults.image_pull_policy
 							volumeMounts: [
 								{

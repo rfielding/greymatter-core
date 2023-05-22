@@ -9,7 +9,7 @@ openshift_vector_scc_bindings: [
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "RoleBinding"
 		metadata: {
-			name: "\(config.operator_namespace)-vector-scc"
+			name:      "\(config.operator_namespace)-vector-scc"
 			namespace: mesh.spec.install_namespace
 		}
 		roleRef: {

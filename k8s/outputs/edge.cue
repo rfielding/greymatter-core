@@ -21,12 +21,12 @@ edge: [
 			template: {
 				metadata: {
 					labels: {
-						"greymatter.io/cluster": defaults.edge.key
+						"greymatter.io/cluster":  defaults.edge.key
 						"greymatter.io/workload": "\(config.operator_namespace).\(mesh.metadata.name).\(defaults.edge.key)"
 						for i in defaults.additional_labels.all_pods {
-							"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])",
+							"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])"
 						}
-						if len(defaults.additional_labels.external_spire_label) > 0{
+						if len(defaults.additional_labels.external_spire_label) > 0 {
 							"\(defaults.additional_labels.external_spire_label)": "\(config.operator_namespace).\(mesh.metadata.name).\(defaults.edge.key)"
 						}
 					}
@@ -43,19 +43,19 @@ edge: [
 									}
 								},
 								{
-									name: "greymatter-mesh-connections"
+									name:      "greymatter-mesh-connections"
 									mountPath: "/etc/proxy/tls/edge/connections"
-								}
+								},
 							]
 						},
 					]
 					volumes: #sidecar_volumes + [
-						if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") {
+							if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") {
 							{
 								name: "tls-certs"
 								secret: {
 									defaultMode: 420
-									secretName: _security_spec.edge.secret_name
+									secretName:  _security_spec.edge.secret_name
 								}
 							}
 						},
@@ -63,10 +63,10 @@ edge: [
 							name: "greymatter-mesh-connections"
 							secret: {
 								defaultMode: 420
-								secretName: "greymatter-mesh-connections"
-								optional: true
+								secretName:  "greymatter-mesh-connections"
+								optional:    true
 							}
-						}
+						},
 					]
 					imagePullSecrets: [{name: defaults.image_pull_secret_name}]
 				}
@@ -81,16 +81,16 @@ edge: [
 			name:      defaults.edge.key
 			namespace: mesh.spec.install_namespace
 			if len(defaults.additional_labels.edge_service) > 0 {
-				labels:{
+				labels: {
 					for i in defaults.additional_labels.edge_service {
-						"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])",
+						"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])"
 					}
 				}
 			}
 			if len(defaults.edge.annotations.service) > 0 {
-				annotations:{
+				annotations: {
 					for i in defaults.edge.annotations.service {
-						"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])",
+						"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])"
 					}
 				}
 			}

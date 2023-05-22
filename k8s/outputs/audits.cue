@@ -57,7 +57,7 @@ audits: [
 								name:  "TARGET_PRODUCT"
 								value: "gm"
 							}, {
-								name:  "ES_USER"
+								name: "ES_USER"
 								valueFrom: {
 									secretKeyRef: {
 										name: defaults.audits.elasticsearch_secret

@@ -26,12 +26,12 @@ controlensemble: [
 			template: {
 				metadata: {
 					labels: {
-						"greymatter.io/cluster":  Name,
+						"greymatter.io/cluster":  Name
 						"greymatter.io/workload": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 						for i in defaults.additional_labels.all_pods {
-							"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])",
+							"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])"
 						}
-						if len(defaults.additional_labels.external_spire_label) > 0{
+						if len(defaults.additional_labels.external_spire_label) > 0 {
 							"\(defaults.additional_labels.external_spire_label)": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 						}
 					}
@@ -47,22 +47,22 @@ controlensemble: [
 								containerPort: 50000
 							}]
 							env: [
-								{name: "GM_CONTROL_CMD", value:                      "kubernetes"},
-								{name: "KUBERNETES_NAMESPACES", value:    strings.Join([mesh.spec.install_namespace]+mesh.spec.watch_namespaces, ",")},
-								{name: "KUBERNETES_CLUSTER_LABEL", value: "greymatter.io/cluster"},
-								{name: "KUBERNETES_PORT_NAMES", value:     defaults.proxy_port_name},
-								{name: "GM_CONTROL_REDIS_ADDRESS", value: "\(defaults.redis_host):6379"},
-								{name: "GM_CONTROL_XDS_ADS_ENABLED", value:          "true"},
-								{name: "GM_CONTROL_XDS_RESOLVE_DNS", value:          "true"},
-								{name: "GM_CONTROL_API_HOST", value:                 "127.0.0.1:5555"},
-								{name: "GM_CONTROL_API_INSECURE", value:             "true"},
-								{name: "GM_CONTROL_API_SSL", value:                  "false"},
-								{name: "GM_CONTROL_API_KEY", value:                  "xxx"}, // no longer used, but must be set
-								{name: "GM_CONTROL_API_ZONE_NAME", value:            mesh.spec.zone},
-								{name: "GM_CONTROL_DIFF_IGNORE_CREATE", value:       "true"},
-								{name: "GM_CONTROL_CONSOLE_LEVEL", value: "info"},							
+								{name: "GM_CONTROL_CMD", value:                "kubernetes"},
+								{name: "KUBERNETES_NAMESPACES", value:         strings.Join([mesh.spec.install_namespace]+mesh.spec.watch_namespaces, ",")},
+								{name: "KUBERNETES_CLUSTER_LABEL", value:      "greymatter.io/cluster"},
+								{name: "KUBERNETES_PORT_NAMES", value:         defaults.proxy_port_name},
+								{name: "GM_CONTROL_REDIS_ADDRESS", value:      "\(defaults.redis_host):6379"},
+								{name: "GM_CONTROL_XDS_ADS_ENABLED", value:    "true"},
+								{name: "GM_CONTROL_XDS_RESOLVE_DNS", value:    "true"},
+								{name: "GM_CONTROL_API_HOST", value:           "127.0.0.1:5555"},
+								{name: "GM_CONTROL_API_INSECURE", value:       "true"},
+								{name: "GM_CONTROL_API_SSL", value:            "false"},
+								{name: "GM_CONTROL_API_KEY", value:            "xxx"}, // no longer used, but must be set
+								{name: "GM_CONTROL_API_ZONE_NAME", value:      mesh.spec.zone},
+								{name: "GM_CONTROL_DIFF_IGNORE_CREATE", value: "true"},
+								{name: "GM_CONTROL_CONSOLE_LEVEL", value:      "info"},
 							]
-							resources: control_resources
+							resources:       control_resources
 							imagePullPolicy: defaults.image_pull_policy
 							securityContext: {
 								allowPrivilegeEscalation: false
@@ -90,9 +90,9 @@ controlensemble: [
 								{name: "GM_CONTROL_API_REDIS_HOST", value: defaults.redis_host},
 								{name: "GM_CONTROL_API_REDIS_PORT", value: "6379"}, // local redis in this pod
 								{name: "GM_CONTROL_API_REDIS_DB", value:   "0"},
-								{name: "GM_CONTROL_API_LOG_LEVEL", value: "error" },
+								{name: "GM_CONTROL_API_LOG_LEVEL", value:  "error"},
 							]
-							resources: control_api_resources
+							resources:       control_api_resources
 							imagePullPolicy: defaults.image_pull_policy
 							securityContext: {
 								allowPrivilegeEscalation: false
@@ -172,10 +172,10 @@ controlensemble: [
 					port:       50000
 					targetPort: 50000
 				},
-				{// the operator needs direct access gmapi.go#66
+				{
 					name:       "controlapi"
 					port:       5555
-					targetPort: 5555
+					targetPort: 5555 // the operator needs direct access gmapi.go#66
 				},
 			]
 		}

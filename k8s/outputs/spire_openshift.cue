@@ -90,9 +90,9 @@ openshift_spire_scc: [
 		allowHostPorts:           false
 		allowPrivilegeEscalation: false
 		allowPrivilegedContainer: false
-		allowedCapabilities:      [ "NET_BIND_SERVICE" ]
-		apiVersion:               "security.openshift.io/v1"
-		defaultAddCapabilities:   null
+		allowedCapabilities: [ "NET_BIND_SERVICE"]
+		apiVersion:             "security.openshift.io/v1"
+		defaultAddCapabilities: null
 		fsGroup: type: "MustRunAs"
 		groups: []
 		kind: "SecurityContextConstraints"
@@ -104,10 +104,10 @@ openshift_spire_scc: [
 		}
 		priority:               null
 		readOnlyRootFilesystem: false
-		requiredDropCapabilities: [ "ALL" ]
-		runAsUser: type:          "MustRunAsRange"
-		seLinuxContext: type:     "MustRunAs"
-		seccompProfiles: [ "runtime/default" ]
+		requiredDropCapabilities: [ "ALL"]
+		runAsUser: type:      "MustRunAsRange"
+		seLinuxContext: type: "MustRunAs"
+		seccompProfiles: [ "runtime/default"]
 		supplementalGroups: type: "RunAsAny"
 		users: []
 		volumes: [
@@ -134,7 +134,6 @@ openshift_spire_scc: [
 		}]
 	},
 ]
-
 
 openshift_spire: [
 	// RoleBindings for greymatter services so they can access their agent.sock

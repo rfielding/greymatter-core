@@ -24,7 +24,7 @@ import (
 	]
 	env: [
 		{name: "XDS_CLUSTER", value:          _Name},
-		{name: "ENVOY_ADMIN_PORT", value: "\(defaults.ports.envoy_admin)"},
+		{name: "ENVOY_ADMIN_PORT", value:     "\(defaults.ports.envoy_admin)"},
 		{name: "ENVOY_ADMIN_LOG_PATH", value: "/dev/stdout"},
 		{name: "PROXY_DYNAMIC", value:        "true"},
 		{name: "XDS_ZONE", value:             mesh.spec.zone},
@@ -34,7 +34,7 @@ import (
 			{name: "SPIRE_PATH", value: "\(defaults.spire.socket_mount_path)/agent.sock"}
 		},
 	]
-	resources: edge_and_sidecar_resources
+	resources:       edge_and_sidecar_resources
 	volumeMounts:    #sidecar_volume_mounts + _volume_mounts
 	imagePullPolicy: defaults.image_pull_policy
 	securityContext: {
@@ -52,7 +52,7 @@ import (
 	}
 	if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") && !(_security_spec.internal.type == "spire") {
 		[{
-			name: "internal-tls-certs"
+			name:      "internal-tls-certs"
 			mountPath: "/etc/proxy/tls/sidecar/"
 		}]
 	}
@@ -64,7 +64,7 @@ import (
 		[{
 			name: "spire-socket"
 			hostPath: {
-				path: defaults.spire.socket_mount_path,
+				path: defaults.spire.socket_mount_path
 				type: "DirectoryOrCreate"
 			}
 		}]
@@ -73,10 +73,10 @@ import (
 		[{
 			name: "internal-tls-certs"
 			secret: {
-				defaultMode: 420,
-				secretName: [
-					if _security_spec.edge.secret_name != _security_spec.internal.manual.secret_name {_security_spec.internal.manual.secret_name}
-					if _security_spec.edge.secret_name == _security_spec.internal.manual.secret_name {_security_spec.edge.secret_name}
+				defaultMode: 420
+				secretName:  [
+						if _security_spec.edge.secret_name != _security_spec.internal.manual.secret_name {_security_spec.internal.manual.secret_name},
+						if _security_spec.edge.secret_name == _security_spec.internal.manual.secret_name {_security_spec.edge.secret_name},
 				][0]
 			}
 		}]
