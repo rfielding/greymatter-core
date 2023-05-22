@@ -56,9 +56,10 @@ catalog: [
 								{name: "REDIS_MAX_RETRIES", value: "10"},
 								{name: "REDIS_RETRY_DELAY", value: "5s"},
 								// later use redis sidecar or external redis, but this keeps bootstrap simple for now
-								{name: "REDIS_HOST", value: defaults.redis_host},
-								{name: "REDIS_PORT", value: "6379"},
-								{name: "REDIS_DB", value:   "0"},
+								{name: "REDIS_HOST", value:       defaults.redis_host},
+								{name: "REDIS_PORT", value:       "6379"},
+								{name: "REDIS_DB", value:         "0"},
+								{name: "MESH_CONNECTIONS", value: "true"},
 							]
 							resources:       catalog_resources
 							imagePullPolicy: defaults.image_pull_policy
