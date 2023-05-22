@@ -6,13 +6,6 @@ import (
 	"strings"
 )
 
-_authRealms: string | *"/realms/"
-if defaults.edge.oidc.keycloak_pre_17 != _|_ {
-	if defaults.edge.oidc.keycloak_pre_17 {
-		_authRealms: "/auth/realms/"
-	}
-}
-
 let Name = "dashboard"
 dashboard: [
 	appsv1.#Deployment & {
@@ -58,21 +51,6 @@ dashboard: [
 								{name: "USE_PROMETHEUS", value:               "\(config.enable_historical_metrics)"},
 								{name: "DISABLE_PROMETHEUS_ROUTES_UI", value: "true"},
 								{name: "ENABLE_INLINE_DOCS", value:           "true"},
-								{name: "REDIS_HOST", value:                   "\(defaults.redis_host)"},
-								{name: "REDIS_PORT", value:                   "6379"},
-								{name: "KEYCLOAK_CLIENT_ID", value:           "\(defaults.edge.oidc.client_id)"},
-								if defaults.edge.oidc.client_secret.plaintext_secret != _|_ {
-									{name: "KEYCLOAK_CLIENT_SECRET", value:   "\(defaults.edge.oidc.client_secret.plaintext_secret.secret)"},
-								}
-								if defaults.edge.oidc.client_secret.kubernetes_secret != _|_ {
-									{
-										name: "KEYCLOAK_CLIENT_SECRET", 
-										valueFrom: secretKeyRef: {
-											name: defaults.edge.oidc.client_secret.kubernetes_secret.name, key: defaults.edge.oidc.client_secret.kubernetes_secret.key
-										}
-									},
-								}
-								{name: "KEYCLOAK_AUTH_URL", value:            "\(defaults.edge.oidc.endpoint)\(_authRealms)\(defaults.edge.oidc.realm)/protocol/openid-connect/token"},
 							]
 							resources: dashboard_resources
 							volumeMounts: [
