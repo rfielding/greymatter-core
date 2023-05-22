@@ -39,7 +39,7 @@ mesh: meshv1.#Mesh & {
 	}
 	spec: {
 		install_namespace: string | *"greymatter"
-		watch_namespaces: [...string] | *["default", "examples"]
+		watch_namespaces: ["greymatter-gmd", "default"]  //[...string] | *["default", "examples"]
 		images: {
 			proxy:       string | *"greymatter.jfrog.io/oci/greymatter-proxy:1.9.0"
 			catalog:     string | *"greymatter.jfrog.io/oci/greymatter-catalog:3.1.0"
@@ -174,7 +174,7 @@ defaults: {
 		// enable_tls enables TLS on the edge proxy. This config also enables
 		// internal TLS across sidecars. That behavior can be changed by
 		// setting defaults.internal.core_internal_tls_certs.enable to false.
-		enable_tls: bool | *false @tag(edge_enable_tls,type=bool)
+		enable_tls: true // bool | *false @tag(edge_enable_tls,type=bool)
 		// require_client_certs enables mTLS on the edge proxy. This requires
 		// that edge.enable_tls is also true. This config also enables internal
 		// mTLS across sidecars. That behavior can be changed by setting the

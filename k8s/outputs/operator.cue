@@ -8,7 +8,7 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 )
 
-_git_remote: string | *"git@github.com:greymatter-io/greymatter-core.git" @tag(git_remote,type=string)
+_git_remote: string | *"git@github.com:rfielding/greymatter-core.git" @tag(git_remote,type=string)
 
 operator_namespace: [
 	corev1.#Namespace & {
