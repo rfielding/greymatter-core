@@ -7,7 +7,6 @@ import (
 )
 
 let egress_to_redis = "\(defaults.edge.key)_egress_to_redis"
-let external_mesh_connections_ingress = "edge_ingress_for_connections"
 
 let upstream_clusters = list.Concat([
 	[defaults.edge.key, egress_to_redis, external_mesh_connections_ingress],
@@ -31,14 +30,14 @@ edge_config: [
 		_enable_fault_injection:     false
 		_enable_ext_authz:           false
 		_oidc_endpoint:              defaults.edge.oidc.endpoint
-		_edge_protocol:[
-			if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") {"https"}
-			if _security_spec.edge.type == "plaintext" {"http"}
+		_edge_protocol:              [
+						if (_security_spec.edge.type == "tls" || _security_spec.edge.type == "mtls") {"https"},
+						if _security_spec.edge.type == "plaintext" {"http"},
 		][0]
 		_oidc_service_url:   "\(_edge_protocol)://\(defaults.edge.oidc.edge_domain):\(defaults.ports.edge_ingress)"
 		_oidc_client_id:     defaults.edge.oidc.client_id
 		_oidc_cookie_domain: defaults.edge.oidc.edge_domain
-		_oidc_realm: defaults.edge.oidc.realm
+		_oidc_realm:         defaults.edge.oidc.realm
 	},
 	// This cluster must exist (though it never receives traffic)
 	// so that Catalog will be able to look-up edge instances
