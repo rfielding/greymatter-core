@@ -1,0 +1,147 @@
+steps:
+  - label: ":blue_book: Run Cue Tests"
+    key: tests
+    agents:
+      queue: k8s-agent
+    commands:
+    - ./scripts/cibuild test
+    plugins:
+    - greymatter-io/k8s:
+        secret-name: build-secrets
+        agent-token-ssh-secret-key: buildkite-agent-token
+        git-ssh-secret-key: ssh-key
+        image-pull-secret: agent-pull-secret
+
+        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
+        always-pull: true
+        mount-secret: build-secrets:/secrets
+
+  - label: ":spiral_note_pad: Parse and Upload Changelog"
+    key: parse-and-open-changelog
+    agents:
+      queue: k8s-agent
+    commands:
+    - ./scripts/cibuild changelog
+    plugins:
+    - greymatter-io/k8s:
+        secret-name: build-secrets
+        agent-token-ssh-secret-key: buildkite-agent-token
+        git-ssh-secret-key: ssh-key
+        image-pull-secret: agent-pull-secret
+
+        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
+        always-pull: true
+        mount-secret: build-secrets:/secrets
+
+
+  # ##############################################
+  # # Generate manifests
+  # ##############################################
+
+  - label: ":blue_book: Generate Manifests"
+    key: generate-manifests
+    agents:
+      queue: k8s-agent
+    depends_on: tests
+    commands:
+    - set -e
+    - ./scripts/generate-manifests
+    - buildkite-agent artifact upload "generated-manifests/*"
+    plugins:
+    - greymatter-io/k8s:
+        secret-name: build-secrets
+        agent-token-ssh-secret-key: buildkite-agent-token
+        git-ssh-secret-key: ssh-key
+        image-pull-secret: agent-pull-secret
+
+        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
+        always-pull: true
+        mount-secret: build-secrets:/secrets
+
+
+  # ##############################################
+  # # Generate inputs.cue that points to staging assets
+  # ##############################################
+  - label: ":blue_book: Update inputs.cue"
+    key: update-inputs-cue
+    agents:
+      queue: k8s-agent
+    commands:
+    - set -e
+    - ./scripts/promotion.py generate inputs
+    - buildkite-agent artifact upload "generated_inputs.cue"
+    env:  
+      GENERIC_SRC: "dev-generic"
+      GENERIC_DEST: "ci-staging-generic"
+      OCI_SRC: "dev-oci"
+      OCI_DEST: "ci-staging-oci"
+    plugins:
+    - greymatter-io/k8s:
+        secret-name: build-secrets
+        agent-token-ssh-secret-key: buildkite-agent-token
+        git-ssh-secret-key: ssh-key
+        image-pull-secret: agent-pull-secret
+
+        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
+        always-pull: true
+        mount-secret: build-secrets:/secrets
+
+  # ##############################################
+  # # Package and push core tarball to staging
+  # ##############################################
+  - label: ":package: Package Tarball"
+    key: package-tarball
+    agents:
+      queue: k8s-agent
+    depends_on:
+    - tests
+    - generate-manifests
+    - update-inputs-cue
+    if: build.source != "schedule"
+    env:  
+      JF_DEST_REGISTRY: dev-generic
+    commands:
+      - set -e
+      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
+      - jf config add --access-token=$(cat /secrets/jfrog-token) --url https://greymatter.jfrog.io --interactive=false
+      - sleep 10
+      - rm -rf /tmp/greymatter-core && mkdir /tmp/greymatter-core
+      - tar --exclude-vcs --exclude=".buildkite" --exclude="CHANGELOG.md" --exclude="scripts/cibuild" --exclude="scripts/bootstrap" --exclude="scripts/update" --exclude="scripts/promotion" --exclude="greymatter-download-template.sh" -czf /tmp/greymatter-core/greymatter-core.tar.gz .
+      - cp /tmp/greymatter-core/greymatter-core.tar.gz . && rm -r /tmp/greymatter-core
+      - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_COMMIT}_none_none.tar.gz
+      - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_${BUILDKITE_BRANCH}_none_none.tar.gz
+      - buildkite-agent artifact upload greymatter-core.tar.gz
+    plugins:
+    - greymatter-io/k8s:
+        secret-name: build-secrets
+        agent-token-ssh-secret-key: buildkite-agent-token
+        git-ssh-secret-key: ssh-key
+        image-pull-secret: agent-pull-secret
+
+        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
+        always-pull: true
+        mount-secret: build-secrets:/secrets
+
+  - label: ":jfrog: Promote tarball to Artifactory (latest)"
+    key: promote-generic-latest
+    agents:
+      queue: k8s-agent
+    depends_on:
+    - package-tarball
+    if: build.branch == 'main' && build.source != "schedule"
+    env:  
+      JF_DEST_REGISTRY: dev-generic
+    commands:
+      - jf config add --access-token=$(cat /secrets/jfrog-token) --url https://greymatter.jfrog.io --interactive=false
+      - buildkite-agent artifact download greymatter-core.tar.gz . --step package-tarball
+      - jf rt upload ./greymatter-core.tar.gz $$JF_DEST_REGISTRY/greymatter-core/greymatter-core_latest_none_none.tar.gz
+    plugins:
+    - greymatter-io/k8s:
+        secret-name: build-secrets
+        agent-token-ssh-secret-key: buildkite-agent-token
+        git-ssh-secret-key: ssh-key
+        image-pull-secret: agent-pull-secret
+
+        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
+        always-pull: true
+        mount-secret: build-secrets:/secrets
