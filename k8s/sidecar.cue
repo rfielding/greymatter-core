@@ -34,6 +34,9 @@ import (
 			{name: "SPIRE_PATH", value: "\(defaults.spire.socket_mount_path)/agent.sock"}
 		},
 	]
+	if defaults.allow_multi_sidecar == true {
+		args: ["./gm-proxy", "-c", "config.yaml", "--drain-time-s", "20", "--use-dynamic-base-id"]
+	}
 	resources: edge_and_sidecar_resources
 	volumeMounts:    #sidecar_volume_mounts + _volume_mounts
 	imagePullPolicy: defaults.image_pull_policy

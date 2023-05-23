@@ -7,6 +7,8 @@
 - Add CUE definitions defining connection and accept configurations for external mesh connections.
 - Add explicit securityContext for catalog, control, and redis for pod security admission.
 - Introduced a configmap to configure catalog
+- Added new `allow_multi_sidecar` config in defaults that configures envoy 
+  to use a shared memory space. This allows multiple sidecars deployed in one pod. 
 
 ### Changed
 
