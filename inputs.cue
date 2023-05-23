@@ -58,6 +58,7 @@ defaults: {
 	image_pull_policy:      corev1.#enumPullPolicy | *corev1.#PullAlways
 	xds_host:               "controlensemble.\(mesh.spec.install_namespace).svc.cluster.local"
 	sidecar_list:           [...string] | *["dashboard", "catalog", "controlensemble", "edge", "redis", "prometheus", "jwtsecurity", "audits"]
+	allow_multi_sidecar:    bool | *false // Allows multiple sidecars to run in a single host pod. By default, only one sidecar is allowed per pod. 
 	proxy_port_name:        "ingress" // the name of the ingress port for sidecars - used by service discovery
 	metrics_port_name:      "stats"   // the name of the metrics port for sidecars - used by Prometheus scrape
 	redis_cluster_name:     "greymatter-datastore"
