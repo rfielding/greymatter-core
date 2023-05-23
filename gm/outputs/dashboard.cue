@@ -18,11 +18,11 @@ dashboard_config: [
 		_is_ingress:           true
 	},
 	#cluster & {
-		cluster_key: LocalName
+		cluster_key:    LocalName
 		_upstream_port: 1337
 	},
 	#route & {
-		route_key:     LocalName
+		route_key: LocalName
 	},
 
 	// egress -> redis

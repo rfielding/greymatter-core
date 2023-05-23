@@ -25,11 +25,11 @@ keycloak_config: [
 		port:                  defaults.edge.oidc.upstream_port
 	},
 	#cluster & {
-		cluster_key: KeycloakIngressName
+		cluster_key:    KeycloakIngressName
 		_upstream_port: 8080
 	},
 	#route & {
-		route_key:     KeycloakIngressName
+		route_key: KeycloakIngressName
 	},
 
 	// egress -> redis

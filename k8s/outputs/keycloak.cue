@@ -70,7 +70,7 @@ keycloak: [
 										}
 									}
 								}]
-							resources: keycloak_resources
+							resources:       keycloak_resources
 							imagePullPolicy: defaults.image_pull_policy
 							volumeMounts: [
 								{

@@ -24,11 +24,11 @@ keycloak_postgres_config: [
 		_tcp_upstream: KeycloakPostgresIngressName
 	},
 	#cluster & {
-		cluster_key: KeycloakPostgresIngressName
+		cluster_key:    KeycloakPostgresIngressName
 		_upstream_port: 5432
 	},
 	#route & {
-		route_key:     KeycloakPostgresIngressName
+		route_key: KeycloakPostgresIngressName
 	},
 
 	// egress -> redis

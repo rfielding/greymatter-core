@@ -9,7 +9,7 @@ let EgressToRedisName = "\(Name)_egress_to_redis"
 prometheus_config: [
 	// sidecar -> prometheus
 	#domain & {
-		domain_key: LocalName,
+		domain_key: LocalName
 	},
 	#listener & {
 		listener_key:          LocalName
@@ -48,7 +48,7 @@ prometheus_config: [
 	// egress -> redis
 	#domain & {
 		domain_key: EgressToRedisName
-		port: defaults.ports.redis_ingress
+		port:       defaults.ports.redis_ingress
 		// Set to true to force no ssl_config
 		// on the plaintext egress listener
 		_is_egress: true

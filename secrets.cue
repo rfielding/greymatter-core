@@ -14,35 +14,35 @@ import (
 // `defaults.metrics_receiver` plaintext secret.
 
 // Keycloak/OIDC client secret used in the OIDC filter pipeline.
-#OIDCSecret: greymatter.#FilterSecret & {	
+#OIDCSecret: greymatter.#FilterSecret & {
 	filter: "gm_oidc-authentication"
-	path: "clientSecret"
+	path:   "clientSecret"
 }
 
 // Metrics filter external connections supporting the
 // health checking system
 #MetricsNatsSecret: greymatter.#FilterSecret & {
 	filter: "gm_metrics"
-	path: "metrics_receiver.nats_connection_string"
+	path:   "metrics_receiver.nats_connection_string"
 }
 
 #MetricsRedisSecret: greymatter.#FilterSecret & {
 	filter: "gm_metrics"
-	path: "metrics_receiver.redis_connection_string"
+	path:   "metrics_receiver.redis_connection_string"
 }
 
 // MetricsFilter AWS Cloudwatch secrets
 #MetricsAWSSecretAccessKeySecret: greymatter.#FilterSecret & {
 	filter: "gm_metrics"
-	path: "aws_secret_access_key"
+	path:   "aws_secret_access_key"
 }
 
 #MetricsAWSAccessKeyIDSecret: greymatter.#FilterSecret & {
 	filter: "gm_metrics"
-	path: "aws_access_key_id"
+	path:   "aws_access_key_id"
 }
 
 #MetricsAWSSessionTokenSecret: greymatter.#FilterSecret & {
 	filter: "gm_metrics"
-	path: "aws_session_token"
+	path:   "aws_session_token"
 }

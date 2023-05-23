@@ -7,7 +7,7 @@ import (
 )
 
 openshift_redis_scc_bindings: [
-	
+
 ]
 
 openshift_redis_scc: [
@@ -37,9 +37,9 @@ openshift_redis_scc: [
 		priority:               null
 		readOnlyRootFilesystem: false
 		requiredDropCapabilities: [ "KILL", "MKNOD", "SETUID", "SETGID"]
-		runAsUser: type:          "RunAsAny"
-		seLinuxContext: type:     "MustRunAs"
-		seccompProfiles: [ "runtime/default" ]
+		runAsUser: type:      "RunAsAny"
+		seLinuxContext: type: "MustRunAs"
+		seccompProfiles: [ "runtime/default"]
 		supplementalGroups: type: "RunAsAny"
 		users: []
 		volumes: [
@@ -73,7 +73,7 @@ openshift_redis_scc: [
 		apiVersion: "rbac.authorization.k8s.io/v1"
 		kind:       "RoleBinding"
 		metadata: {
-			name: "\(config.operator_namespace)-redis-scc"
+			name:      "\(config.operator_namespace)-redis-scc"
 			namespace: mesh.spec.install_namespace
 		}
 		roleRef: {

@@ -21,17 +21,17 @@ package greymatter
 			_is_ingress:           true
 		},
 		#cluster & {
-			cluster_key: LocalName
+			cluster_key:    LocalName
 			_upstream_port: Port
 		},
 		#route & {
-			route_key:     LocalName
+			route_key: LocalName
 		},
 
 		// egress -> redis
 		#domain & {
 			domain_key: EgressToRedisName
-			port: defaults.ports.redis_ingress
+			port:       defaults.ports.redis_ingress
 			// Set to true to force no ssl_config
 			// on the plaintext egress listener
 			_is_egress: true

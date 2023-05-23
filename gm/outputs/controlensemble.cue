@@ -19,17 +19,17 @@ controlensemble_config: [
 		_is_ingress:           true
 	},
 	#cluster & {
-		cluster_key: ControlAPIIngressName
+		cluster_key:    ControlAPIIngressName
 		_upstream_port: 5555
 	},
 	#route & {
-		route_key:     ControlAPIIngressName
+		route_key: ControlAPIIngressName
 	},
 
 	// egress->redis
 	#domain & {
 		domain_key: EgressToRedisName
-		port: defaults.ports.redis_ingress
+		port:       defaults.ports.redis_ingress
 		// Set to true to force no ssl_config
 		// on the plaintext egress listener
 		_is_egress: true

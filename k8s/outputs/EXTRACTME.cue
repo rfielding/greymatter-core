@@ -102,13 +102,12 @@ sidecar_container: {
 	volumes:   #sidecar_volumes
 }
 
-
-redis_configs: redis
-vector: vector
-redis_openshift: openshift_redis_scc
-control_configs: controlensemble
+redis_configs:     redis
+vector:            vector
+redis_openshift:   openshift_redis_scc
+control_configs:   controlensemble
 dashboard_configs: dashboard
-edge_configs: edge
-catalog_configs: catalog
-jwt_configs: jwt_security
-audits_configs: audits
+edge_configs:      edge
+catalog_configs:   catalog
+jwt_configs:       jwt_security
+audits_configs:    audits

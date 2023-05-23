@@ -12,9 +12,9 @@ let Name = defaults.redis_cluster_name
 redis: [
 	corev1.#ServiceAccount & {
 		apiVersion: "v1"
-		kind: "ServiceAccount"
+		kind:       "ServiceAccount"
 		metadata: {
-			name: Name
+			name:      Name
 			namespace: mesh.spec.install_namespace
 		}
 	},
@@ -34,12 +34,12 @@ redis: [
 			template: {
 				metadata: {
 					labels: {
-						"greymatter.io/cluster": Name
+						"greymatter.io/cluster":  Name
 						"greymatter.io/workload": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 						for i in defaults.additional_labels.all_pods {
-							"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])",
+							"\(strings.Split(i, ":")[0])": "\(strings.Split(i, ":")[1])"
 						}
-						if len(defaults.additional_labels.external_spire_label) > 0{
+						if len(defaults.additional_labels.external_spire_label) > 0 {
 							"\(defaults.additional_labels.external_spire_label)": "\(config.operator_namespace).\(mesh.metadata.name).\(Name)"
 						}
 					}
@@ -50,9 +50,9 @@ redis: [
 
 						#sidecar_container_block & {
 							_Name: Name
-							ports: [{// redis listens on a non-default sidecar port
+							ports: [{
 								name:          "ingress"
-								containerPort: defaults.ports.redis_ingress
+								containerPort: defaults.ports.redis_ingress // redis listens on a non-default sidecar port
 							}]
 						},
 						{
@@ -72,9 +72,9 @@ redis: [
 								"--logLevel", "verbose",
 							]
 							resources: redis_resources
-							ports: [{// this port is exposed so the Service (below) can get to it for easy bootstrap
+							ports: [{
 								name:          "redis"
-								containerPort: 6379
+								containerPort: 6379 // this port is exposed so the Service (below) can get to it for easy bootstrap
 							}]
 							imagePullPolicy: defaults.image_pull_policy
 							volumeMounts: [
@@ -90,10 +90,10 @@ redis: [
 						}, // redis
 					] // containers
 					securityContext: {
-						runAsUser: 1001
-						fsGroup: 1001
+						runAsUser:           1001
+						fsGroup:             1001
 						fsGroupChangePolicy: "OnRootMismatch"
-						runAsNonRoot: true
+						runAsNonRoot:        true
 						seccompProfile: {type: "RuntimeDefault"}
 					}
 					volumes: #sidecar_volumes

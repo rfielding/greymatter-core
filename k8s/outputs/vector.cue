@@ -154,9 +154,9 @@ vector: [
 							name:      "var-log"
 							readOnly:  true
 						}, {
-							name: "data-dir"
+							name:      "data-dir"
 							mountPath: "/tmp/"
-							readOnly: false
+							readOnly:  false
 						}]
 						resources: vector_resources
 					}]

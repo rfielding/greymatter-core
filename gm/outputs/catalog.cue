@@ -20,17 +20,17 @@ catalog_config: [
 		_is_ingress:           true
 	},
 	#cluster & {
-		cluster_key: CatalogIngressName
+		cluster_key:    CatalogIngressName
 		_upstream_port: 8080
 	},
 	#route & {
-		route_key:     CatalogIngressName
+		route_key: CatalogIngressName
 	},
 
 	// egress -> redis
 	#domain & {
 		domain_key: EgressToRedisName
-		port: defaults.ports.redis_ingress
+		port:       defaults.ports.redis_ingress
 		// Set to true to force no ssl_config
 		// on the plaintext egress listener
 		_is_egress: true
