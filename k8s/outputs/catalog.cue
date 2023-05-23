@@ -93,7 +93,7 @@ catalog: [
 							name: defaults.mesh_connections_secret
 							secret: {
 								defaultMode: 420
-								secretName:  "greymatter-mesh-connections"
+								secretName:  defaults.mesh_connections_secret
 								optional:    true
 							}
 						},

@@ -20,7 +20,7 @@ let external_mesh_connections_egress = "catalog_egress_for_connections"
 
 	// If any connection is TLS, add a custom header informing envoy to upgrade the connection.
 	for c in connections {
-		if c.ssl_config != _|_ {
+		if c.tls != _|_ {
 			outbound_socket: domain: custom_headers: [
 				{
 					key:   "x-forwarded-proto"
