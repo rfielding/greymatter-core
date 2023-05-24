@@ -39,7 +39,7 @@ mesh: meshv1.#Mesh & {
 	}
 	spec: {
 		install_namespace: string | *"greymatter"
-		watch_namespaces: ["greymatter-gmd", "default"]  //[...string] | *["default", "examples"]
+		watch_namespaces: ["default"]  //[...string] | *["default", "examples"]
 		images: {
 			proxy:       string | *"greymatter.jfrog.io/oci/greymatter-proxy:1.9.0"
 			catalog:     string | *"greymatter.jfrog.io/oci/greymatter-catalog:3.1.0"
