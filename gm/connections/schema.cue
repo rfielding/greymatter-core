@@ -36,10 +36,10 @@ let external_mesh_connections_egress = "catalog_egress_for_connections"
 
 // A route-cluster combo. Holds the config for the destination catalog
 #Connection: {
-	url:           string
-	dashboard_url: string
-	N=name:        string
-	T=tls?:        #OutboundTLSConfig
+	url:        string
+	public_url: string
+	N=name:     string
+	T=tls?:     #OutboundTLSConfig
 	// name could potentially be unsafe for a url. A simple fix in CUE is to hash and truncate since the url is not human-facing
 	url_safe_name: strings.SliceRunes(hex.Encode(md5.Sum(name)), 0, 8)
 	route:         #route & {
