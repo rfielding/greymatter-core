@@ -188,58 +188,62 @@ external_mesh_connections_ingress: "edge_ingress_for_connections"
 		...
 	}
 
-	// _http_filter_weight establishes a baseline for greymatter
-	// filter priority. The ordering here does not matter as 
-	// the sorting algorithm will sort given the order in the 
-	// inputted array and in accordance with the assigned weights.
+	// To override default weights insert this CUE expression into the #listener block of the service:
+	// _http_filter_weight: "<name of the filter>": <new value>
+	// Example: _http_filter_weight: "envoy.lua": 9000
+
+	// To add a weight other than the default weight of 5 for a filter not found in this map:
+	// _http_filter_weight: "<name of the filter>": <value>
+
+	// _http_filter_weight holds default weights for filter sorting positions
 	_http_filter_weight: {
 		// Authentication always comes first so we can 
 		// block/deny/allow as necessary.
-		"envoy.lua":              1
-		"envoy.fault":            1
-		"gm.inheaders":           1
-		"gm.impersonation":       1
-		"gm.oidc-authentication": 1
-		"gm.ensure-variables":    1
-		"gm.oidc-validation":     1
+		"envoy.lua":              *1 | int
+		"envoy.fault":            *1 | int
+		"gm.inheaders":           *1 | int
+		"gm.impersonation":       *1 | int
+		"gm.oidc-authentication": *1 | int
+		"gm.ensure-variables":    *1 | int
+		"gm.oidc-validation":     *1 | int
 
 		// the greymatter observability pipeline
 		// comes in the middle of the filter stack
 		// so we can collect stats.
-		"gm.observables": 2
+		"gm.observables": *2 | int
 
 		// This kind of auth needs to be tracked by the 
 		// observability pipeline.
-		"envoy.jwt_authn": 3
-		"envoy.ext_authz": 3
-		"envoy.rbac":      3
+		"envoy.jwt_authn": *3 | int
+		"envoy.ext_authz": *3 | int
+		"envoy.rbac":      *3 | int
 
 		// Metrics is last due to a known 
 		// cardinality issue that may overload the system.
-		"gm.metrics": 10
+		"gm.metrics": *10 | int
+		...
 	}
 
-	// _network_filter_weight establishes a baseline for greymatter
-	// filter priority. The ordering here does not matter as 
-	// the sorting algorithm will sort given the order in the 
-	// inputted array and in accordance with the assigned weights.
+	// _network_filter_weight holds default weights for filter sorting positions
+	// see above comments on how to override these values
 	_network_filter_weight: {
 		// Authentication always comes first so we can 
 		// block/deny/allow as necessary.
-		"envoy.ext_authz": 1
+		"envoy.ext_authz": *1 | int
 
 		// Rate limiting also receives a high priority
 		// since it can prevent DOS attacks.
-		"envoy.rate_limit": 2
+		"envoy.rate_limit": *2 | int
 
 		// TCP proxy and protocol filters should 
 		// always be last as they signal the proxy 
 		// what kind of connection its handling.
-		"envoy.tcp_proxy": 10
+		"envoy.tcp_proxy": *10 | int
 
 		// The greymatter proxy requires redis to be 
 		// last in the network filter chain.
-		"envoy.redis_proxy": 11
+		"envoy.redis_proxy": *11 | int
+		...
 	}
 
 	// For TCP listeners.
@@ -268,25 +272,17 @@ external_mesh_connections_ingress: "edge_ingress_for_connections"
 			...string,
 		]
 
-		// We apply a middle weight to user inputted filters so they are in between
-		// our boundaries and prioritized greymatter filters. This can be changed if necessary
-		// or if another toggle is added please adjust the networkFilterWeight mapping with a new 
-		// entry. The order of the user inputted list is also preserved in the stable sort.
-		for k, v in _active_network_filters {
-			_network_filter_weight: {
-				"\(v)": 5
-			}
-		}
-
 		// This active_network_filters list contains the filters which will be active on the listener.
 		// NB: Even if configuration exists in network_filters for a filter,
 		// only filters which are listed as active will be applied and used.
+		// The sort order is determined by the weights found in _network_filter_weights
+		// list.Sort is stable. 
 		active_network_filters: list.Sort(
 					// the inputted array is the combined user defined filters and our
 					// known list of toggleable filters.
 					_active_network_filter_toggles+_active_network_filters,
-					// the sort algorithm used is stable.
-					{x: string, y: string, less: _network_filter_weight[x] < _network_filter_weight[y]},
+					// Filters without a weight receive a default weight of 5
+					{x: string, y: string, less: (*_network_filter_weight[x] | 5) < (*_network_filter_weight[y] | 5)},
 					)
 
 		network_filters: {
@@ -369,29 +365,17 @@ external_mesh_connections_ingress: "edge_ingress_for_connections"
 			...string,
 		]
 
-		// We apply a middle weight to user inputted filters so they are in between
-		// our boundaries and prioritized greymatter filters. This can be changed if necessary
-		// or if another toggle is added please adjust the httpFilterWeight mapping with a new 
-		// entry. The order of the user inputted list is also preserved in the stable sort.
-		for k, v in _active_http_filters {
-			_http_filter_weight: {
-				"\(v)": 5
-			}
-		}
-
 		// The active_http_filters list contains the filters which will be active on the listener.
 		// NB: Even if configuration exists in http_filters for a filter,
 		// only filters which are listed as active will be applied and used.
-		// To add custom filters, introduce a new toggle above and match the
-		// pattern below to place it correctly in the chain. 
-		// We use a special sort weight to correctly prioritize what filter order 
-		// these get applied in.
+		// The sort order is determined by the weights found in _http_filter_weights
+		// list.Sort is stable. 
 		active_http_filters: list.Sort(
 					// the inputted array is the combined user defined filters and our
 					// known list of toggleable filters.
 					_active_http_filter_toggles+_active_http_filters,
-					// the sort algorithm used is stable.
-					{x: string, y: string, less: _http_filter_weight[x] < _http_filter_weight[y]},
+					// Filters without a weight receive a default weight of 5
+					{x: string, y: string, less: (*_http_filter_weight[x] | 5 ) < (*_http_filter_weight[y] | 5)},
 					)
 
 		// Set a default external_secret for DEV mode redis connections.
