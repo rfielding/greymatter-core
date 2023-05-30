@@ -1,6 +1,6 @@
 # Changelog
 
-## vNext
+## 0.18.0-alpha
 
 ### Added
 
@@ -20,6 +20,7 @@
   - “metrics” -> “stats”
 - Changed secrets greymatter-sync-secret, oidc-client-secret, gm-edge-ingress-certs to greymatter-core-repo
   greymatter-oidc-provider, and greymatter-edge-ingress, respectively.
+- bumped component versions to alpha releases
 
 ## v0.17.0 (March 29, 2023)
 
