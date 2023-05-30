@@ -145,3 +145,10 @@ steps:
         image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
         always-pull: true
         mount-secret: build-secrets:/secrets
+  
+  - wait
+
+  - label: ":pipeline: tag realease"
+    command: buildkite-agent pipeline upload .buildkite/workload-pipelines/tag.yaml
+    if: build.tag != null && build.source != "schedule"
+    soft_fail: true

@@ -16,6 +16,5 @@ steps:
                 label: "Upload build-image pipeline"
   - wait
 
-
   - label: ":pipeline: default build pipeline config"
     command: buildkite-agent pipeline upload .buildkite/workload-pipelines/pipeline.yaml
