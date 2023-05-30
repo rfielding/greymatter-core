@@ -41,12 +41,12 @@ mesh: meshv1.#Mesh & {
 		install_namespace: string | *"greymatter"
 		watch_namespaces:  [...string] | *["default", "examples"]
 		images: {
-			proxy:       string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-proxy:1.9.1-alpha"
-			catalog:     string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-catalog:3.2.0-alpha"
-			dashboard:   string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-dashboard:6.1.0-alpha"
-			control:     string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-control:1.9.1-alpha"
-			control_api: string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-control-api:1.9.1-alpha"
-			redis:       string | *"greymatter.jfrog.io/ci-staging-oci/redis-stack-server:6.2.6-v7-20230504"
+			proxy:       string | *"greymatter.jfrog.io/dev-oci/greymatter-proxy:1.9.1-alpha"
+			catalog:     string | *"greymatter.jfrog.io/dev-oci/greymatter-catalog:3.2.0-alpha"
+			dashboard:   string | *"greymatter.jfrog.io/dev-oci/greymatter-dashboard:6.1.0-alpha"
+			control:     string | *"greymatter.jfrog.io/dev-oci/greymatter-control:1.9.1-alpha"
+			control_api: string | *"greymatter.jfrog.io/dev-oci/greymatter-control-api:1.9.1-alpha"
+			redis:       string | *"greymatter.jfrog.io/dev-oci/redis-stack-server:6.2.6-v7-20230504"
 			prometheus:  string | *"index.docker.io/prom/prometheus:v2.40.1"
 		}
 		display_name: string | *"greymatter Mesh"
@@ -95,10 +95,10 @@ defaults: {
 	}
 
 	images: {
-		cli:               string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-cli:4.8.1-alpha"
-		operator:          string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-operator:0.18.0-alpha" @tag(operator_image)
+		cli:               string | *"greymatter.jfrog.io/dev-oci/greymatter-cli:4.8.1-alpha"
+		operator:          string | *"greymatter.jfrog.io/dev-oci/greymatter-operator:0.18.0-alpha" @tag(operator_image)
 		vector:            string | *"timberio/vector:0.22.0-debian"
-		audits:            string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-audits:1.1.7"
+		audits:            string | *"greymatter.jfrog.io/dev-oci/greymatter-audits:1.1.7"
 		keycloak:          string | *"quay.io/keycloak/keycloak:19.0.3"
 		keycloak_postgres: string | *"postgres:15.0"
 	}
