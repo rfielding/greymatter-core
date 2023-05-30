@@ -117,6 +117,8 @@ steps:
     env:
       JF_DEST_REGISTRY: generic
     commands:
+      - set -e
+      - jf config add --access-token=$(cat /secrets/jfrog-token) --url https://greymatter.jfrog.io --interactive=false
       - buildkite-agent artifact download generated_inputs.cue . --step update-inputs-cue-tag
       - mv generated_inputs.cue inputs.cue
       - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step update-generated-manifests
