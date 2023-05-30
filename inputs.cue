@@ -43,7 +43,7 @@ mesh: meshv1.#Mesh & {
 		images: {
 			proxy:       string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-proxy:1.9.1-alpha"
 			catalog:     string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-catalog:3.2.0-alpha"
-			dashboard:   string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-dashboard:v6.1.0-alpha"
+			dashboard:   string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-dashboard:6.1.0-alpha"
 			control:     string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-control:1.9.1-alpha"
 			control_api: string | *"greymatter.jfrog.io/ci-staging-oci/greymatter-control-api:1.9.1-alpha"
 			redis:       string | *"greymatter.jfrog.io/ci-staging-oci/redis-stack-server:6.2.6-v7-20230504"
