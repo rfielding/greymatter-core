@@ -122,7 +122,7 @@ steps:
         always-pull: true
         mount-secret: build-secrets:/secrets
 
-  - label: ":jfrog: Promote tarball to Artifactory (latest)"
+  - label: ":jfrog: Promote Tarball To Artifactory (Latest)"
     key: promote-generic-latest
     agents:
       queue: k8s-agent
@@ -148,7 +148,7 @@ steps:
   
   - wait
 
-  - label: ":pipeline: tag realease"
+  - label: ":pipeline: Tag Realease"
     command: buildkite-agent pipeline upload .buildkite/workload-pipelines/tag.yaml
     if: build.tag != null && build.source != "schedule"
     soft_fail: true

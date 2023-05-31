@@ -1,120 +1,128 @@
 
 steps:
   # this is in place of automated smoke test
-  - block: "I have run a smoke test using the inputs-output.cue artifact from merge to main build (under promote artifacts to staging)"
-
+  - block: "I Have Run A Smoke Test Using The Inputs-Output.Cue Artifact From Merge To Main Build (Under Promote Artifacts To Staging)"
+    key: tag-block
   ##############################################
   # Create and validate release inputs.cue 
   ##############################################
   
-  - label: "Update inputs.cue on tag"
-    key: "update-inputs-cue-tag"
-    env:
-      GENERIC_DEST: "generic"
-      OCI_SRC: "dev-oci"
-      OCI_DEST: "oci"
-    command: 
-    - set -e
-    - ./scripts/promotion.py generate inputs
-    - buildkite-agent artifact upload generated_inputs.cue
-    agents:
-      queue: k8s-agent
-    plugins:
-    - greymatter-io/k8s:
-        secret-name: build-secrets
-        agent-token-ssh-secret-key: buildkite-agent-token
-        git-ssh-secret-key: ssh-key
-        image-pull-secret: agent-pull-secret
-
-        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
-        always-pull: true
-        mount-secret: build-secrets:/secrets
-
-  - label: validate generated inputs-cue
-    key: validate-generated-inputs-cue
+  - group: ":scroll: Update And Validate Inputs.Cue For Release"
+    key: update-and-validate-inputs-cue-tag
     depends_on:
-      - update-inputs-cue-tag
-    env:
-      - DEST_OCI_CI: "oci"
-    commands:
-      - set -e
-      - buildkite-agent artifact download generated_inputs.cue . --step update-inputs-cue-tag
-      - mv generated_inputs.cue inputs.cue
-      - ./scripts/validate-generated-inputs-cue
-    agents:
-      queue: k8s-agent
-    plugins:
-    - greymatter-io/k8s:
-        secret-name: build-secrets
-        agent-token-ssh-secret-key: buildkite-agent-token
-        git-ssh-secret-key: ssh-key
-        image-pull-secret: agent-pull-secret
+      - tag-block
+    steps:
+      - label: ":scroll: Update Inputs.Cue On Tag"
+        key: update-inputs-cue-tag
+        env:
+          GENERIC_DEST: "generic"
+          OCI_SRC: "dev-oci"
+          OCI_DEST: "oci"
+        command: 
+        - set -e
+        - ./scripts/promotion.py generate inputs
+        - buildkite-agent artifact upload generated_inputs.cue
+        agents:
+          queue: k8s-agent
+        plugins:
+        - greymatter-io/k8s:
+            secret-name: build-secrets
+            agent-token-ssh-secret-key: buildkite-agent-token
+            git-ssh-secret-key: ssh-key
+            image-pull-secret: agent-pull-secret
 
-        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
-        always-pull: true
-        mount-secret: build-secrets:/secrets
+            image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
+            always-pull: true
+            mount-secret: build-secrets:/secrets
+
+      - label: ":heavy_check_mark: Validate Generated Inputs.cue"
+        key: validate-generated-inputs-cue
+        depends_on:
+          - update-inputs-cue-tag
+        env:
+          - DEST_OCI_CI: "oci"
+        commands:
+          - set -e
+          - buildkite-agent artifact download generated_inputs.cue . --step update-inputs-cue-tag
+          - mv generated_inputs.cue inputs.cue
+          - ./scripts/validate-generated-inputs-cue
+        agents:
+          queue: k8s-agent
+        plugins:
+        - greymatter-io/k8s:
+            secret-name: build-secrets
+            agent-token-ssh-secret-key: buildkite-agent-token
+            git-ssh-secret-key: ssh-key
+            image-pull-secret: agent-pull-secret
+
+            image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
+            always-pull: true
+            mount-secret: build-secrets:/secrets
 
 
   ##############################################
   # Validate generated manifests
   ##############################################
-
-  - label: "Update generated manifests"
-    key: update-generated-manifests
+  - group: ":scroll: Update and validate generated manifests for release"
+    key: update-and-validate-generated-manifests-tag
     depends_on:
-      - generate-manifests
-    commands: 
-      - set -e
-      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
-      - find ./generated-manifests -type f -name 'operator*.yaml' -exec sed -i 's|greymatter.jfrog.io/dev-oci/|greymatter.jfrog.io/oci/|g' {} \;
-      - buildkite-agent artifact upload "generated-manifests/*"
-    agents:
-      queue: k8s-agent
-    plugins:
-    - greymatter-io/k8s:
-        secret-name: build-secrets
-        agent-token-ssh-secret-key: buildkite-agent-token
-        git-ssh-secret-key: ssh-key
-        image-pull-secret: agent-pull-secret
+      - tag-block
+    steps:
+      - label: ":scroll: Update Generated Manifests"
+        key: update-generated-manifests
+        depends_on:
+          - generate-manifests
+        commands: 
+          - set -e
+          - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
+          - find ./generated-manifests -type f -name 'operator*.yaml' -exec sed -i 's|greymatter.jfrog.io/dev-oci/|greymatter.jfrog.io/oci/|g' {} \;
+          - buildkite-agent artifact upload "generated-manifests/*"
+        agents:
+          queue: k8s-agent
+        plugins:
+        - greymatter-io/k8s:
+            secret-name: build-secrets
+            agent-token-ssh-secret-key: buildkite-agent-token
+            git-ssh-secret-key: ssh-key
+            image-pull-secret: agent-pull-secret
 
-        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
-        always-pull: true
-        mount-secret: build-secrets:/secrets
+            image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
+            always-pull: true
+            mount-secret: build-secrets:/secrets
 
-  - label: validate generated manifests use correct operator image
-    key:
-    depends_on:
-      - update-generated-manifests
-    env:
-      - DEST_OCI_CI: "oci"
-    commands:
-      - set -e
-      - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step update-generated-manifests
-      - ./scripts/validate-generated-manifests
-    soft_fail: true
-    agents:
-      queue: k8s-agent
-    plugins:
-    - greymatter-io/k8s:
-        secret-name: build-secrets
-        agent-token-ssh-secret-key: buildkite-agent-token
-        git-ssh-secret-key: ssh-key
-        image-pull-secret: agent-pull-secret
+      - label: ":heavy_check_mark: Validate Generated Manifests Use Correct Operator Image"
+        key:
+        depends_on:
+          - update-generated-manifests
+        env:
+          - DEST_OCI_CI: "oci"
+        commands:
+          - set -e
+          - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step update-generated-manifests
+          - ./scripts/validate-generated-manifests
+        soft_fail: true
+        agents:
+          queue: k8s-agent
+        plugins:
+        - greymatter-io/k8s:
+            secret-name: build-secrets
+            agent-token-ssh-secret-key: buildkite-agent-token
+            git-ssh-secret-key: ssh-key
+            image-pull-secret: agent-pull-secret
 
-        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
-        always-pull: true
-        mount-secret: build-secrets:/secrets
+            image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
+            always-pull: true
+            mount-secret: build-secrets:/secrets
 
   ##############################################
   # Package and push core tarball to release
   ##############################################
-  - label: "Package Tarball tag"
-    key: "package-tarball-tag"
+  - label: ":package: :jfrog: Package And Publish Tarball Tag"
+    key: package-tarball-tag
     depends_on:
       - tests
-      - validate-generated-inputs-cue
-      - update-generated-manifests
-      - update-inputs-cue-tag
+      - update-and-validate-inputs-cue-tag
+      - update-and-validate-generated-manifests-tag
     env:
       JF_DEST_REGISTRY: generic
     commands:
