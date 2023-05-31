@@ -6,8 +6,8 @@ steps:
     command:
     - set -e
     - buildah login -u ci --password-stdin < /secrets/jfrog-reference-token greymatter.jfrog.io
-    - buildah bud --layers -f .buildkite/dockerfiles/Dockerfile -t greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest .
-    - buildah push greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
+    - buildah bud --layers -f .buildkite/dockerfiles/Dockerfile -t greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1 .
+    - buildah push greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
     plugins:
     - greymatter-io/k8s:
         secret-name: build-secrets
