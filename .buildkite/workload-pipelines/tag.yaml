@@ -25,7 +25,7 @@ steps:
         git-ssh-secret-key: ssh-key
         image-pull-secret: agent-pull-secret
 
-        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
+        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
         always-pull: true
         mount-secret: build-secrets:/secrets
 
@@ -49,7 +49,7 @@ steps:
         git-ssh-secret-key: ssh-key
         image-pull-secret: agent-pull-secret
 
-        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
+        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
         always-pull: true
         mount-secret: build-secrets:/secrets
 
@@ -76,7 +76,7 @@ steps:
         git-ssh-secret-key: ssh-key
         image-pull-secret: agent-pull-secret
 
-        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
+        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
         always-pull: true
         mount-secret: build-secrets:/secrets
 
@@ -100,7 +100,7 @@ steps:
         git-ssh-secret-key: ssh-key
         image-pull-secret: agent-pull-secret
 
-        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
+        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
         always-pull: true
         mount-secret: build-secrets:/secrets
 
@@ -137,6 +137,6 @@ steps:
         git-ssh-secret-key: ssh-key
         image-pull-secret: agent-pull-secret
 
-        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:latest
+        image: greymatter.jfrog.io/pipeline-oci/greymatter-core-ci:v1
         always-pull: true
         mount-secret: build-secrets:/secrets
