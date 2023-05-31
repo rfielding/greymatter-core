@@ -11,6 +11,7 @@ steps:
     key: "update-inputs-cue-tag"
     env:
       GENERIC_DEST: "generic"
+      OCI_SRC: "dev-oci"
       OCI_DEST: "oci"
     command: 
     - set -e

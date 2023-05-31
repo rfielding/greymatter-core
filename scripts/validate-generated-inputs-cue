@@ -17,7 +17,7 @@ desired_host="greymatter.jfrog.io"
 desired_path=${DEST_OCI_CI:-"oci"}
 
 # evaluate the cue
-cue eval inputs.cue ./global_intermediates.cue --out json > ${test_workspace}/myjson.json
+cue eval $(find . -maxdepth 1 -name "*.cue" | xargs) --out json > ${test_workspace}/myjson.json
 
 touch ${test_workspace}/test-results
 
