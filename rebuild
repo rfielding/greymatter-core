@@ -65,10 +65,6 @@ then
   # tenant namespaces are mentioned in watch_namespace, 
   # so this config is pushed into core
   kubectl create namespace greymatter-gmd
-  kubectl create secret generic greymatter-sync-secret \
-        --from-file=ssh-private-key=$PRIVAT_KEY \
-        --from-file=known_hosts=known_hosts \
-        -n greymatter-gmd
 
   echo ----- PROJECT JFROG SECRET -----
   kubectl create secret docker-registry gm-docker-secret \
@@ -88,4 +84,10 @@ then
   echo ----- PROJECT Operator apply -----
   kubectl apply -f ./generated-manifests/operator.yaml
   mustWaitForEdge
+
+  # setup the sync secret on the namespace
+  kubectl create secret generic greymatter-sync-secret \
+        --from-file=ssh-private-key=$PRIVATE_KEY \
+        --from-file=known_hosts=known_hosts \
+        -n greymatter-gmd
 fi
