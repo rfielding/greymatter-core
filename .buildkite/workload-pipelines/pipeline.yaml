@@ -73,7 +73,7 @@ steps:
     env:  
       GENERIC_SRC: "dev-generic"
       GENERIC_DEST: "ci-staging-generic"
-      OCI_SRC: "dev-oci"
+      OCI_SRC: "internal-oci"
       OCI_DEST: "ci-staging-oci"
     plugins:
     - greymatter-io/k8s:
