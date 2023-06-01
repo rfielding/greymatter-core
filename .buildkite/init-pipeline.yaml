@@ -3,7 +3,7 @@ agents:
 
 steps:
   # Build the build image will will do that if there is an update to the dockerfile or pipeline
-  - label: ":docker: Check for changes to the build image"
+  - label: ":pipeline: Check For Changes To The Build Image"
     plugins:
       - monebag/monorepo-diff#v2.5.8:
           interpolation: false
@@ -13,8 +13,8 @@ steps:
                 - ".buildkite/workload_pipelines/build-image.yaml"
               config:
                 command: buildkite-agent pipeline upload .buildkite/workload-pipelines/build-image.yaml
-                label: "Upload build-image pipeline"
+                label: ":pipeline:"
   - wait
 
-  - label: ":pipeline: default build pipeline config"
+  - label: ":pipeline: Default Build"
     command: buildkite-agent pipeline upload .buildkite/workload-pipelines/pipeline.yaml
