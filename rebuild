@@ -53,26 +53,30 @@ then
 
   kubectl create namespace gm-operator
   kubectl create namespace greymatter-gmd
-  ssh-keyscan github.com > known_hosts
+  ssh-keyscan github.com >known_hosts
+
+  # Allow a custom private key file if necessary
+  PRIVATE_KEY=${PRIVATE_KEY:-$(echo ~/).ssh/id_rsa}
+
   kubectl create secret generic greymatter-sync-secret \
-        --from-file=ssh-private-key=$(echo ~/).ssh/id_rsa \
-        --from-file=known_hosts=known_hosts \
-        -n gm-operator
+    --from-file=ssh-private-key=$PRIVATE_KEY \
+    --from-file=known_hosts=known_hosts \
+    -n gm-operator
 
   echo ----- PROJECT JFROG SECRET -----
   kubectl create secret docker-registry gm-docker-secret \
-	--docker-server=$GREYMATTER_REGISTRY \
-	--docker-username=$GREYMATTER_REGISTRY_USERNAME \
-	--docker-password=$GREYMATTER_REGISTRY_PASSWORD \
-	--docker-email=$GREYMATTER_REGISTRY_USERNAME \
-	-n gm-operator
+    --docker-server=$GREYMATTER_REGISTRY \
+    --docker-username=$GREYMATTER_REGISTRY_USERNAME \
+    --docker-password=$GREYMATTER_REGISTRY_PASSWORD \
+    --docker-email=$GREYMATTER_REGISTRY_USERNAME \
+    -n gm-operator
   sleep 30
 
   # trying to make error with certs go away
   kubectl create secret generic -n gm-operator gm-edge-ingress-certs \
-	  --from-file=ca.crt=./certs/intermediate.crt \
-	  --from-file=server.crt=./certs/localhost.crt \
-	  --from-file=server.key=./certs/localhost.key
+    --from-file=ca.crt=./certs/intermediate.crt \
+    --from-file=server.crt=./certs/localhost.crt \
+    --from-file=server.key=./certs/localhost.key
 
   echo ----- PROJECT Operator apply -----
   kubectl apply -f ./generated-manifests/operator.yaml
