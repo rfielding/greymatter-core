@@ -85,7 +85,7 @@ then
   kubectl apply -f ./generated-manifests/operator.yaml
 
   # setup the sync secret on the namespace
-  kubectl create secret generic greymatter-core-repo \
+  kubectl create secret generic greymatter-admin-sync \
         --from-file=ssh-private-key=$PRIVATE_KEY \
         --from-file=known_hosts=known_hosts \
         -n greymatter-gmd
