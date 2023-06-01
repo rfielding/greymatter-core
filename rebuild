@@ -44,7 +44,7 @@ then
   echo ----- CLUSTER CREATE -----
   export MY_CLUSTER=gmdata
   k3d cluster delete $MY_CLUSTER
-  k3d cluster create $MY_CLUSTER --api-port 6999 --port 443:443@loadbalancer --port 10808:10808@loadbalancer 
+  k3d cluster create $MY_CLUSTER --api-port 6999 --port 443:443@loadbalancer --port 10908:10908@loadbalancer 
   echo ----- CLUSTER kubeconfig START -----
   sleep 5 # is there something we can wait on?
   export KUBECONFIG="$(k3d kubeconfig write $MY_CLUSTER)"
@@ -57,7 +57,7 @@ then
 
   # operator namespace setup
   kubectl create namespace gm-operator
-  kubectl create secret generic greymatter-sync-secret \
+  kubectl create secret generic greymatter-core-repo \
         --from-file=ssh-private-key=$PRIVATE_KEY \
         --from-file=known_hosts=known_hosts \
         -n gm-operator
@@ -67,7 +67,7 @@ then
   kubectl create namespace greymatter-gmd
 
   echo ----- PROJECT JFROG SECRET -----
-  kubectl create secret docker-registry gm-docker-secret \
+  kubectl create secret docker-registry greymatter-image-pull \
     --docker-server=$GREYMATTER_REGISTRY \
     --docker-username=$GREYMATTER_REGISTRY_USERNAME \
     --docker-password=$GREYMATTER_REGISTRY_PASSWORD \
@@ -76,7 +76,7 @@ then
   sleep 30
 
   # trying to make error with certs go away
-  kubectl create secret generic -n gm-operator gm-edge-ingress-certs \
+  kubectl create secret generic -n gm-operator greymatter-edge-ingress \
     --from-file=ca.crt=./certs/intermediate.crt \
     --from-file=server.crt=./certs/localhost.crt \
     --from-file=server.key=./certs/localhost.key
@@ -86,7 +86,7 @@ then
   mustWaitForEdge
 
   # setup the sync secret on the namespace
-  kubectl create secret generic greymatter-sync-secret \
+  kubectl create secret generic greymatter-core-repo \
         --from-file=ssh-private-key=$PRIVATE_KEY \
         --from-file=known_hosts=known_hosts \
         -n greymatter-gmd
