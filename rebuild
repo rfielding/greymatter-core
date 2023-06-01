@@ -51,17 +51,24 @@ then
   echo ----- CLUSTER kubeconfig STOP -----
   kubectl config use-context k3d-$MY_CLUSTER
 
-  kubectl create namespace gm-operator
-  kubectl create namespace greymatter-gmd
-  ssh-keyscan github.com >known_hosts
-
-  # Allow a custom private key file if necessary
+  # operator namespace setup
+  ssh-keyscan github.com > known_hosts
   PRIVATE_KEY=${PRIVATE_KEY:-$(echo ~/).ssh/id_rsa}
 
+  # operator namespace setup
+  kubectl create namespace gm-operator
   kubectl create secret generic greymatter-sync-secret \
-    --from-file=ssh-private-key=$PRIVATE_KEY \
-    --from-file=known_hosts=known_hosts \
-    -n gm-operator
+        --from-file=ssh-private-key=$(echo ~/).ssh/id_rsa \
+        --from-file=known_hosts=known_hosts \
+        -n gm-operator
+
+  # tenant namespaces are mentioned in watch_namespace, 
+  # so this config is pushed into core
+  kubectl create namespace greymatter-gmd
+  kubectl create secret generic greymatter-sync-secret \
+        --from-file=ssh-private-key=$PRIVAT_KEY \
+        --from-file=known_hosts=known_hosts \
+        -n greymatter-gmd
 
   echo ----- PROJECT JFROG SECRET -----
   kubectl create secret docker-registry gm-docker-secret \
