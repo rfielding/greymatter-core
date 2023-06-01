@@ -44,7 +44,7 @@ then
   echo ----- CLUSTER CREATE -----
   export MY_CLUSTER=gmdata
   k3d cluster delete $MY_CLUSTER
-  k3d cluster create $MY_CLUSTER --api-port 6999 --port 443:443@loadbalancer 
+  k3d cluster create $MY_CLUSTER --api-port 6999 --port 443:443@loadbalancer --port 10808:10808@loadbalancer 
   echo ----- CLUSTER kubeconfig START -----
   sleep 5 # is there something we can wait on?
   export KUBECONFIG="$(k3d kubeconfig write $MY_CLUSTER)"
