@@ -318,7 +318,7 @@ spec:
         - -sshPrivateKeyPath
         - /app/.ssh/ssh-private-key
         - -branch
-        - main
+        - rob
         command:
         - /app/operator
         env:
