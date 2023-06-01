@@ -52,6 +52,7 @@ then
   kubectl config use-context k3d-$MY_CLUSTER
 
   kubectl create namespace gm-operator
+  kubectl create namespace greymatter-gmd
   ssh-keyscan github.com > known_hosts
   kubectl create secret generic greymatter-sync-secret \
         --from-file=ssh-private-key=$(echo ~/).ssh/id_rsa \
