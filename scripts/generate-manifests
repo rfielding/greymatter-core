@@ -59,6 +59,6 @@ YOURORG=$(cat .git/config | grep -A1 'remote "origin"' | awk 'NR%3==2' | cut -d'
 echo overwrite operator org with $YOURORG
 grep -rl '<your-org>' ./generated-manifests | xargs sed -i "s@<your-org>@${YOURORG}@g"
 WATCHED="$1"
-echo watch namespaces ${WATCHED}
-sed -i "s@watched\_namespaces [. @watched\_namespaces ${WATCHED} // @" inputs.cue
+echo watch namespace ${WATCHED}
+sed -i "s@YOURNAMESPACE@${WATCHED}@" inputs.cue
 
