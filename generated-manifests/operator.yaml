@@ -324,7 +324,7 @@ spec:
         env:
         - name: SSH_KNOWN_HOSTS
           value: /app/.ssh/known_hosts
-        image: greymatter.jfrog.io/dev-oci/greymatter-operator:0.18.0-alpha
+        image: greymatter.jfrog.io/internal-oci/greymatter-operator:0.18.0-alpha
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
