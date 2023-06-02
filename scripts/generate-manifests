@@ -60,5 +60,5 @@ echo overwrite operator org with $YOURORG
 grep -rl '<your-org>' ./generated-manifests | xargs sed -i "s@<your-org>@${YOURORG}@g"
 WATCHED="$1"
 echo watch namespaces ${WATCHED}
-sed -i "s@watched\_namespaces @watched\_namespaces ${WATCHED}@" inputs.cue
+sed -i "s@watched\_namespaces [. @watched\_namespaces ${WATCHED} // @" inputs.cue
 
