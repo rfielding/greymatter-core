@@ -59,6 +59,8 @@ YOURORG=$(cat .git/config | grep -A1 'remote "origin"' | awk 'NR%3==2' | cut -d'
 echo overwrite operator org with $YOURORG
 grep -rl '<your-org>' ./generated-manifests | xargs sed -i "s@<your-org>@${YOURORG}@g"
 WATCHED="$1"
-echo watch namespace ${WATCHED}
-sed -i "s@YOURNAMESPACE@${WATCHED}@" inputs.cue
+
+# eh... just commit the watch into inputs.cue, because our copy is meant to watch this namespace
+#echo watch namespace ${WATCHED}
+##sed -i "s@YOURNAMESPACE@${WATCHED}@" inputs.cue
 
