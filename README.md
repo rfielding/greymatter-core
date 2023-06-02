@@ -2,6 +2,36 @@
 
 Enterprise-level CUE files for core greymatter.io mesh configurations.
 
+## quickstart
+
+Do this after checkout to generate things that would need hand-edits, because they
+cannot be committed into the repo:
+
+```
+./scripts/bootstrap && ./scripts/generate-manifest
+```
+
+Then, bring it up.
+
+```
+./rebuild
+```
+
+This way, if there is a bug, then it can simply be committed, rather than
+a fix only described by somebody that thinks it should work.
+
+Edits to inputs.cue should be committed. Once the dashboard basically works,
+getting the certs setup should be enabled by default. Especially for gm-data,
+gm-data cannot be used without the client coming in with an mTLS cert, because
+USER\_DN is required to do anything useful at all. I am currently cheating,
+by injecting a USER\_DN, only because mTLS is far too hard to get setup.
+
+We can override the certs later, but eventually, this setup must be using
+mTLS on startup, by default.
+
+
+
+
 ## Prerequisites
 
 - [CUE CLI](https://cuelang.org/docs/install/) v0.5.0
