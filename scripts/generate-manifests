@@ -48,4 +48,13 @@ generate_manifest true true ${workspace}/operator-openshift-spire.yaml
 # cleanup
 rm -rf ${re_order_dir}
 
-grep -rl '/dev-oci/' . | xargs sed -i 's@/dev-oci/@/internal-oci/@g'
+# If editing is not done by hand, then re-generate manifests when switching branches
+# and do not commit them.
+echo overwrite dev-oci with internal-oci
+grep -rl '/internal-oci/' . | xargs sed -i 's@/internal-oci/@/internal-oci/@g'
+YOURBRANCH=$(cat .git/HEAD | cut -d'/' -f 3)
+echo overwrite operator branches with $YOURBRANCH
+grep -rl '\- main' ./generated-manifests/* | xargs sed -i "s/ main/ ${YOURBRANCH}/g"
+YOURORG=$(cat .git/config | grep -A1 'remote "origin"' | awk 'NR%3==2' | cut -d' ' -f 3 | cut -d'/' -f 1 | cut -d':' -f 2)
+echo overwrite operator org with $YOURORG
+grep -rl '<your-org>' ./generated-manifests | xargs sed -i "s@<your-org>@${YOURORG}@g"

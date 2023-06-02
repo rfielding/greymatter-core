@@ -69,7 +69,7 @@ def test_filter_artifact_list_generic():
 
 def test_filter_artifact_list_oci():
     LIST_ARTIFACTS_RESPONSE = {
-        "uri": "https://greymatter.jfrog.io/artifactory/api/storage/dev-oci/greymatter-cli",
+        "uri": "https://greymatter.jfrog.io/artifactory/api/storage/internal-oci/greymatter-cli",
         "created": "2019-06-06T13:19:14.514Z",
         "files": [
             {

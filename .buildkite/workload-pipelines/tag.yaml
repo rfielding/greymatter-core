@@ -75,7 +75,7 @@ steps:
         commands: 
           - set -e
           - buildkite-agent artifact download generated-manifests/* . --build ${BUILDKITE_BUILD_ID} --step generate-manifests
-          - find ./generated-manifests -type f -name 'operator*.yaml' -exec sed -i 's|greymatter.jfrog.io/dev-oci/|greymatter.jfrog.io/oci/|g' {} \;
+          - find ./generated-manifests -type f -name 'operator*.yaml' -exec sed -i 's|greymatter.jfrog.io/internal-oci/|greymatter.jfrog.io/oci/|g' {} \;
           - buildkite-agent artifact upload "generated-manifests/*"
         agents:
           queue: k8s-agent
