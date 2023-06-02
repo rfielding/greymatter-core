@@ -47,3 +47,5 @@ generate_manifest true true ${workspace}/operator-openshift-spire.yaml
 
 # cleanup
 rm -rf ${re_order_dir}
+
+grep -rl '/dev-oci/' . | xargs sed -i 's@/dev-oci/@/internal-oci/@g'
