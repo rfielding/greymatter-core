@@ -89,6 +89,11 @@ then
         --from-file=ssh-private-key=$PRIVATE_KEY \
         --from-file=known_hosts=known_hosts \
         -n greymatter-gmd
+  # setup the sync secret on the namespace
+  kubectl create secret generic greymatter-admin-sync \
+        --from-file=ssh-private-key=$PRIVATE_KEY \
+        --from-file=known_hosts=known_hosts \
+        -n default
 
   mustWaitForEdge
 fi
