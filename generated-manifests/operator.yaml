@@ -314,11 +314,11 @@ spec:
       containers:
       - args:
         - -repo
-        - git@github.com:<your-org>/greymatter-core.git
+        - git@github.com:rfielding/greymatter-core.git
         - -sshPrivateKeyPath
         - /app/.ssh/ssh-private-key
         - -branch
-        - main
+        - umain2
         command:
         - /app/operator
         env:
